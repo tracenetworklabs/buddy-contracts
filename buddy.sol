@@ -754,7 +754,6 @@ interface IERC20 {
     );
 }
 
-
 interface ERC721 {
     function balanceOf(address _owner) external view returns (uint256);
 
@@ -868,6 +867,7 @@ contract Buddy is ERC721, ERCMetadata {
         require(msg.sender == admin, "Buddy: You are not allowed to access");
         _;
     }
+
     function _beforeTokenTransfer(
         address from,
         address to,
@@ -1149,18 +1149,16 @@ contract Buddy is ERC721, ERCMetadata {
         // Use ID 1 for the first NFT tokenId
         nextTokenId = 1;
     }
-    
-    /**
-    * @notice Withdraws the amount to the admin address
-    */
 
-    function withdraw(address payable tokenAddress) 
-    public onlyAdmin {
-        if(tokenAddress!=address(0)) {
+    /**
+     * @notice Withdraws the amount to the admin address
+     */
+
+    function withdraw(address tokenAddress) public onlyAdmin {
+        if (tokenAddress != address(0)) {
             uint256 amount = IERC20(tokenAddress).balanceOf(address(this));
             IERC20(tokenAddress).transfer(msg.sender, amount);
-        }
-        else {
+        } else {
             msg.sender.transfer(address(this).balance);
         }
     }
@@ -1168,19 +1166,24 @@ contract Buddy is ERC721, ERCMetadata {
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(string memory tokenIPFSPath, address tokenAddress, uint256 _fees)
-        public payable
-        returns (uint256 tokenId)
-    {
-        require(tokens[tokenAddress],"Buddy: Token not supported");
-        if(tokenAddress!= address(0)) {
-            require(_fees>= feesAmount[tokenAddress],"Buddy: Fees Amount is low");
-            IERC20(tokenAddress).transferFrom(msg.sender, address(this),_fees);
-            
-        }
-        else {
-         require(msg.value >= feesAmount[tokenAddress],"Buddy: Fees Amount is low");
-        _fees = msg.value;
+    function mint(
+        string memory tokenIPFSPath,
+        address tokenAddress,
+        uint256 _fees
+    ) public payable returns (uint256 tokenId) {
+        require(tokens[tokenAddress], "Buddy: Token not supported");
+        if (tokenAddress != address(0)) {
+            require(
+                _fees >= feesAmount[tokenAddress],
+                "Buddy: Fees Amount is low"
+            );
+            IERC20(tokenAddress).transferFrom(msg.sender, address(this), _fees);
+        } else {
+            require(
+                msg.value >= feesAmount[tokenAddress],
+                "Buddy: Fees Amount is low"
+            );
+            _fees = msg.value;
         }
         tokenId = nextTokenId++;
         _mint(msg.sender, tokenId);
@@ -1203,10 +1206,11 @@ contract Buddy is ERC721, ERCMetadata {
     /**
      * @notice Allows Admin to add token address and set fees.
      */
-    function adminUpdateToken(address tokenAddress, uint256 feeAmount, bool status)
-        public
-        onlyAdmin
-    {
+    function adminUpdateToken(
+        address tokenAddress,
+        uint256 feeAmount,
+        bool status
+    ) public onlyAdmin {
         tokens[tokenAddress] = status;
         feesAmount[tokenAddress] = feeAmount;
         if (tokenAddress == address(0)) {
