@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.6.12;
+pragma solidity 0.7.6;
 
 /**
  * @dev String operations.
@@ -662,6 +662,99 @@ library SafeMath {
     }
 }
 
+/**
+ * @dev Interface of the ERC20 standard as defined in the EIP.
+ */
+interface IERC20 {
+    /**
+     * @dev Returns the name of token.
+     */
+    function name() external view returns (string memory);
+
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
+
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `recipient`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address recipient, uint256 amount)
+        external
+        returns (bool);
+
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
+
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Moves `amount` tokens from `sender` to `recipient` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
+}
+
+
 interface ERC721 {
     function balanceOf(address _owner) external view returns (uint256);
 
@@ -716,6 +809,7 @@ contract Buddy is ERC721, ERCMetadata {
     string _name;
     string _symbol;
     string private _baseURI;
+    address private admin;
     // Mapping from token ID to approved address
     mapping(uint256 => address) private _tokenApprovals;
     // Mapping from owner to operator approvals
@@ -726,6 +820,12 @@ contract Buddy is ERC721, ERCMetadata {
     mapping(address => mapping(string => bool))
         private creatorToIPFSHashToMinted;
     mapping(uint256 => string) internal _tokenURIs;
+    //mapping address to fees paid
+    mapping (address => uint256) public fees;
+    mapping(address => bool) public tokens;
+    //mapping tokens to feesAmount
+    mapping(address => uint256) public feesAmount;
+
     event Updated(
         address indexed creator,
         uint256 indexed tokenId,
@@ -735,14 +835,15 @@ contract Buddy is ERC721, ERCMetadata {
     event BaseURIUpdated(string baseURI);
 
     constructor(
-        string memory name,
-        string memory symbol,
-        string memory baseURI
-    ) public {
-        _name = name;
-        _symbol = symbol;
+        string memory NftName,
+        string memory NftSymbol,
+        string memory baseURI_
+    ) {
+        _name = NftName;
+        _symbol = NftSymbol;
+        admin = msg.sender;
         _initializeNFT721Mint();
-        _updateBaseURI(baseURI);
+        _updateBaseURI(baseURI_);
     }
 
     event TokenCreatorUpdated(
@@ -756,10 +857,18 @@ contract Buddy is ERC721, ERCMetadata {
         string indexed indexedTokenIPFSPath,
         string tokenIPFSPath
     );
-
+    event TokenUpdated(
+        address indexed tokenAddress,
+        bool indexed status,
+        string name
+    );
     uint256 private nextTokenId;
     EnumerableMapUpgradeable.UintToAddressMap private _tokenOwners;
 
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Buddy: You are not allowed to access");
+        _;
+    }
     function _beforeTokenTransfer(
         address from,
         address to,
@@ -1042,13 +1151,30 @@ contract Buddy is ERC721, ERCMetadata {
         nextTokenId = 1;
     }
 
+    function updateFees(uint256 _fees) 
+    internal
+    {
+            fees[msg.sender] = fees[msg.sender].add(_fees);
+    }
+
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(string memory tokenIPFSPath)
-        public
+    function mint(string memory tokenIPFSPath, address tokenAddress, uint256 _fees)
+        public payable
         returns (uint256 tokenId)
     {
+        require(tokens[tokenAddress],"Buddy: Token not supported");
+        if(tokenAddress!= address(0)) {
+            require(_fees>= feesAmount[tokenAddress],"Fees Amount is low");
+            IERC20(tokenAddress).transferFrom(msg.sender, address(this),_fees);
+            
+        }
+        else {
+         require(msg.value >= feesAmount[tokenAddress],"Fees Amount is low");
+        _fees = msg.value;
+        }
+        updateFees(_fees);
         tokenId = nextTokenId++;
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
@@ -1065,5 +1191,25 @@ contract Buddy is ERC721, ERCMetadata {
      */
     function _burn(uint256 tokenId) internal virtual {
         delete tokenIdToCreator[tokenId];
+    }
+
+    /**
+     * @notice Allows Admin to add token address and set fees.
+     */
+    function adminUpdateToken(address tokenAddress, uint256 feeAmount, bool status)
+        public
+        onlyAdmin
+    {
+        tokens[tokenAddress] = status;
+        feesAmount[tokenAddress] = feeAmount;
+        if (tokenAddress == address(0)) {
+            emit TokenUpdated(tokenAddress, status, "Matic");
+        } else {
+            emit TokenUpdated(
+                tokenAddress,
+                status,
+                IERC20(tokenAddress).name()
+            );
+        }
     }
 }
