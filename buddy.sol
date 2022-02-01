@@ -820,8 +820,6 @@ contract Buddy is ERC721, ERCMetadata {
     mapping(address => mapping(string => bool))
         private creatorToIPFSHashToMinted;
     mapping(uint256 => string) internal _tokenURIs;
-    //mapping address to fees paid
-    mapping (address => uint256) public fees;
     mapping(address => bool) public tokens;
     //mapping tokens to feesAmount
     mapping(address => uint256) public feesAmount;
@@ -860,7 +858,8 @@ contract Buddy is ERC721, ERCMetadata {
     event TokenUpdated(
         address indexed tokenAddress,
         bool indexed status,
-        string name
+        string name,
+        uint256 Fees
     );
     uint256 private nextTokenId;
     EnumerableMapUpgradeable.UintToAddressMap private _tokenOwners;
@@ -1150,11 +1149,20 @@ contract Buddy is ERC721, ERCMetadata {
         // Use ID 1 for the first NFT tokenId
         nextTokenId = 1;
     }
+    
+    /**
+    * @notice Withdraws the amount to the admin address
+    */
 
-    function updateFees(uint256 _fees) 
-    internal
-    {
-            fees[msg.sender] = fees[msg.sender].add(_fees);
+    function withdraw(address payable tokenAddress) 
+    public onlyAdmin {
+        if(tokenAddress!=address(0)) {
+            uint256 amount = IERC20(tokenAddress).balanceOf(address(this));
+            IERC20(tokenAddress).transfer(msg.sender, amount);
+        }
+        else {
+            msg.sender.transfer(address(this).balance);
+        }
     }
 
     /**
@@ -1166,15 +1174,14 @@ contract Buddy is ERC721, ERCMetadata {
     {
         require(tokens[tokenAddress],"Buddy: Token not supported");
         if(tokenAddress!= address(0)) {
-            require(_fees>= feesAmount[tokenAddress],"Fees Amount is low");
+            require(_fees>= feesAmount[tokenAddress],"Buddy: Fees Amount is low");
             IERC20(tokenAddress).transferFrom(msg.sender, address(this),_fees);
             
         }
         else {
-         require(msg.value >= feesAmount[tokenAddress],"Fees Amount is low");
+         require(msg.value >= feesAmount[tokenAddress],"Buddy: Fees Amount is low");
         _fees = msg.value;
         }
-        updateFees(_fees);
         tokenId = nextTokenId++;
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
@@ -1203,12 +1210,13 @@ contract Buddy is ERC721, ERCMetadata {
         tokens[tokenAddress] = status;
         feesAmount[tokenAddress] = feeAmount;
         if (tokenAddress == address(0)) {
-            emit TokenUpdated(tokenAddress, status, "Matic");
+            emit TokenUpdated(tokenAddress, status, "Matic", feeAmount);
         } else {
             emit TokenUpdated(
                 tokenAddress,
                 status,
-                IERC20(tokenAddress).name()
+                IERC20(tokenAddress).name(),
+                feeAmount
             );
         }
     }
