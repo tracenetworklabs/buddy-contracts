@@ -1343,6 +1343,7 @@ contract Buddy is
     string _symbol;
     string private _baseURI;
     address private admin;
+    address public tokenAddress;
     // Mapping from token ID to approved address
     mapping(uint256 => address) private _tokenApprovals;
     // Mapping from owner to operator approvals
@@ -1353,11 +1354,7 @@ contract Buddy is
     mapping(address => mapping(string => bool))
         private creatorToIPFSHashToMinted;
     mapping(uint256 => string) internal _tokenURIs;
-
-    mapping(uint256 => address) public supportedToken;
-    mapping(address => bool) public tokens;
-
-    
+   
     //mapping tokens to feesAmount
     mapping(address => uint256) public feesAmount;
 
@@ -1396,7 +1393,6 @@ contract Buddy is
     );
     event TokenUpdated(
         address indexed tokenAddress,
-        string name,
         uint256 Fees
     );
     uint256 private nextTokenId;
@@ -1690,32 +1686,19 @@ contract Buddy is
     }
 
     /**
-     * @notice Withdraws the amount to the admin address
-     */
-
-    function withdraw(address tokenAddress) public onlyAdmin {
-        if (tokenAddress != address(0)) {
-            uint256 amount = IERC20(tokenAddress).balanceOf(address(this));
-            IERC20(tokenAddress).transfer(getFoundationTreasury(), amount);
-        } else {
-            getFoundationTreasury().transfer(address(this).balance);
-        }
-    }
-
-    /**
      * @notice Allows a creator to mint an NFT.
      */
     function mint(
         string memory tokenIPFSPath
     ) public payable returns (uint256 tokenId) {
-        address tokenAddress = supportedToken[0];
         if (tokenAddress != address(0)) {
-            IERC20(tokenAddress).transferFrom(msg.sender, address(this), feesAmount[tokenAddress]);
+            IERC20(tokenAddress).transferFrom(msg.sender, getFoundationTreasury(), feesAmount[tokenAddress]);
         } else {
             require(
                 msg.value >= feesAmount[tokenAddress],
                 "Buddy: Fees Amount is low"
             );
+            getFoundationTreasury().transfer(address(this).balance);
         }
         tokenId = nextTokenId++;
         _mint(msg.sender, tokenId);
@@ -1739,19 +1722,11 @@ contract Buddy is
      * @notice Allows Admin to add token address and set fees.
      */
     function adminUpdateToken(
-        address tokenAddress,
+        address _tokenAddress,
         uint256 feeAmount
     ) public onlyAdmin {
-        supportedToken[0]=tokenAddress;
+        tokenAddress = _tokenAddress;
         feesAmount[tokenAddress] = feeAmount;
-        if (tokenAddress == address(0)) {
-            emit TokenUpdated(tokenAddress, "Matic", feeAmount);
-        } else {
-            emit TokenUpdated(
-                tokenAddress,
-                IERC20(tokenAddress).name(),
-                feeAmount
-            );
-        }
+            emit TokenUpdated(tokenAddress, feeAmount);
     }
 }
