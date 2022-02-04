@@ -1192,7 +1192,6 @@ abstract contract FoundationAdminRole is FoundationTreasuryNode {
 
 // File contracts/mixins/HasSecondarySaleFees.sol
 
-
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
  */
@@ -1330,10 +1329,7 @@ interface ERCMetadata {
     function symbol() external view returns (string memory _symbol);
 }
 
-contract Buddy is 
-    ERC721, 
-    ERCMetadata,
-    FoundationTreasuryNode {
+contract Buddy is ERC721, ERCMetadata, FoundationTreasuryNode {
     using SafeMath for uint256;
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.UintSet;
     using EnumerableMapUpgradeable for EnumerableMapUpgradeable.UintToAddressMap;
@@ -1354,7 +1350,7 @@ contract Buddy is
     mapping(address => mapping(string => bool))
         private creatorToIPFSHashToMinted;
     mapping(uint256 => string) internal _tokenURIs;
-   
+
     //mapping tokens to feesAmount
     mapping(address => uint256) public feesAmount;
 
@@ -1367,13 +1363,13 @@ contract Buddy is
     event BaseURIUpdated(string baseURI);
 
     constructor(
-        string memory NftName,
-        string memory NftSymbol,
+        string memory nftName,
+        string memory nftSymbol,
         string memory baseURI_,
         address payable treasury
     ) {
-        _name = NftName;
-        _symbol = NftSymbol;
+        _name = nftName;
+        _symbol = nftSymbol;
         admin = msg.sender;
         _initializeNFT721Mint();
         _updateBaseURI(baseURI_);
@@ -1391,10 +1387,7 @@ contract Buddy is
         string indexed indexedTokenIPFSPath,
         string tokenIPFSPath
     );
-    event TokenUpdated(
-        address indexed tokenAddress,
-        uint256 Fees
-    );
+    event TokenUpdated(address indexed tokenAddress, uint256 Fees);
     uint256 private nextTokenId;
     EnumerableMapUpgradeable.UintToAddressMap private _tokenOwners;
 
@@ -1688,11 +1681,17 @@ contract Buddy is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(
-        string memory tokenIPFSPath
-    ) public payable returns (uint256 tokenId) {
+    function mint(string memory tokenIPFSPath)
+        public
+        payable
+        returns (uint256 tokenId)
+    {
         if (tokenAddress != address(0)) {
-            IERC20(tokenAddress).transferFrom(msg.sender, getFoundationTreasury(), feesAmount[tokenAddress]);
+            IERC20(tokenAddress).transferFrom(
+                msg.sender,
+                getFoundationTreasury(),
+                feesAmount[tokenAddress]
+            );
         } else {
             require(
                 msg.value >= feesAmount[tokenAddress],
@@ -1721,12 +1720,12 @@ contract Buddy is
     /**
      * @notice Allows Admin to add token address and set fees.
      */
-    function adminUpdateToken(
-        address _tokenAddress,
-        uint256 feeAmount
-    ) public onlyAdmin {
+    function adminUpdateToken(address _tokenAddress, uint256 feeAmount)
+        public
+        onlyAdmin
+    {
         tokenAddress = _tokenAddress;
         feesAmount[tokenAddress] = feeAmount;
-            emit TokenUpdated(tokenAddress, feeAmount);
+        emit TokenUpdated(tokenAddress, feeAmount);
     }
 }

@@ -272,7 +272,6 @@ interface IERC20 {
     );
 }
 
-
 // File: contracts/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol
 
 pragma solidity >=0.4.24 <0.8.0;
@@ -956,16 +955,17 @@ abstract contract CollateralManagement is AdminRole {
      * @param amount       Amount to withdrawal or 0 to withdraw all available funds
      */
 
-    function withdrawTokens(address tokenAddress, address payable to, uint256 amount)
-        public
-        onlyAdmin
-    {
-        if(amount == 0) {
+    function withdrawTokens(
+        address tokenAddress,
+        address payable to,
+        uint256 amount
+    ) public onlyAdmin {
+        if (amount == 0) {
             amount = IERC20(tokenAddress).balanceOf(address(this));
         }
-        IERC20(tokenAddress).transfer(to,amount);
-        
+        IERC20(tokenAddress).transfer(to, amount);
     }
+
     uint256[1000] private __gap;
 }
 
