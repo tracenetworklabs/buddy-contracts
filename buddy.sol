@@ -2568,7 +2568,7 @@ abstract contract NFT721Mint is
 
      //mapping tokens to feesAmount
     mapping(address => uint256) public feesAmount;
-    address public tokenAddress;
+    mapping(address => bool) public tokenAddress;
 
     uint256 private nextTokenId;
 
@@ -2581,6 +2581,7 @@ abstract contract NFT721Mint is
 
     event TokenUpdated(
         address indexed tokenAddress,
+        bool status,
         uint256 Fees
     );
 
@@ -2603,13 +2604,14 @@ abstract contract NFT721Mint is
      * @notice Allows a creator to mint an NFT.
      */
      function mint(
-        string memory tokenIPFSPath
+        string memory tokenIPFSPath, address paymentMode
     ) public payable returns (uint256 tokenId) {
-        if (tokenAddress != address(0)) {
-            IERC20(tokenAddress).transferFrom(msg.sender, getBuddyTreasury(), feesAmount[tokenAddress]);
+        require(tokenAddress[paymentMode] == true, "Buddy: Payment mode is not accepted");
+        if (paymentMode != address(0)) {
+            IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), feesAmount[paymentMode]);
         } else {
             require(
-                msg.value >= feesAmount[tokenAddress],
+                msg.value >= feesAmount[paymentMode],
                 "Buddy: Fees Amount is low"
             );
             getBuddyTreasury().transfer(address(this).balance);
@@ -2641,7 +2643,7 @@ pragma solidity ^0.7.0;
  * @title Buddy NFTs implemented using the ERC-721 standard.
  * @dev This top level file holds no data directly to ease future upgrades.
  */
-contract FNDNFT721_Flat is
+contract Buddy is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Core,
@@ -2695,11 +2697,12 @@ contract FNDNFT721_Flat is
      */
         function adminUpdateToken(
         address _tokenAddress,
+        bool status,
         uint256 feeAmount
     ) public onlyBuddyAdmin {
-        tokenAddress = _tokenAddress;
-        feesAmount[tokenAddress] = feeAmount;
-            emit TokenUpdated(tokenAddress, feeAmount);
+        tokenAddress[_tokenAddress] = status;
+        feesAmount[_tokenAddress] = feeAmount;
+            emit TokenUpdated(_tokenAddress, status,feeAmount);
     }
 
 }
