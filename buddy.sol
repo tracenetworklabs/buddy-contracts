@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
 
 // File @openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol@v3.4.1-solc-0.7
 
-// SPDX-License-Identifier: UNLICENSED
+
 
 pragma solidity ^0.7.0;
 
@@ -668,6 +669,34 @@ interface IERC721ReceiverUpgradeable {
         uint256 tokenId,
         bytes calldata data
     ) external returns (bytes4);
+}
+
+pragma solidity ^0.7.0;
+
+/**
+ * @title ERC721 token receiver interface
+ * @dev Interface for any contract that wants to support safeTransfers
+ * from ERC721 asset contracts.
+ */
+interface collectionContract {
+    
+    function lock(uint256 tokenId) external;
+    function ownerOf(uint256 tokenId) external view returns (address);
+    
+}
+
+interface NFTContract {
+    
+    function lock(uint256 tokenId) external;
+
+    function getNextTokenId() external view returns (uint256);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external;
+    
 }
 
 // File @openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol@v3.4.1-solc-0.7
@@ -1701,6 +1730,12 @@ contract ERC721Upgradeable is
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
+    //Mapping from tokenId to Properties
+    mapping(uint256 => string[]) public tokenIdToProp;
+
+    ////Mapping from Properties to its value
+    mapping(uint256 => mapping(string => string[])) public propTovalue;
+
     // Token name
     string private _name;
 
@@ -2378,7 +2413,6 @@ abstract contract NFT721Creator is
     Initializable,
     ERC721Upgradeable
 {
-
     mapping(uint256 => address payable) private tokenIdToCreator;
 
     /**
@@ -2475,6 +2509,9 @@ pragma solidity ^0.7.0;
  * @notice A mixin to extend the OpenZeppelin metadata implementation.
  */
 abstract contract NFT721Metadata is NFT721Creator {
+    address DefaultNFT;
+    address defaultNFTAdmin;
+    uint256 transferTokenId=1;
     using StringsUpgradeable for uint256;
 
     /**
@@ -2554,7 +2591,7 @@ abstract contract NFT721Metadata is NFT721Creator {
 // File contracts/mixins/NFT721Mint.sol
 
 pragma solidity ^0.7.0;
-
+pragma experimental ABIEncoderV2;
 /**
  * @notice Allows creators to mint NFTs.
  */
@@ -2565,14 +2602,25 @@ abstract contract NFT721Mint is
     NFT721Metadata,
     BuddyAdminRole
 {
-
+    using SafeMathUpgradeable for uint256;
      //mapping tokens to feesAmount
     mapping(address => uint256) public feesAmount;
     mapping(address => bool) public tokenAddress;
+    mapping(uint256 => mapping(address => uint256[])) mapTokenIds;
+
 
     uint256 private nextTokenId;
 
     event Minted(
+        address indexed creator,
+        uint256 indexed tokenId,
+        string indexed indexedTokenIPFSPath,
+        string tokenIPFSPath,
+        string[] category,
+        string[] values
+    );
+
+    event Updated(
         address indexed creator,
         uint256 indexed tokenId,
         string indexed indexedTokenIPFSPath,
@@ -2604,23 +2652,72 @@ abstract contract NFT721Mint is
      * @notice Allows a creator to mint an NFT.
      */
      function mint(
-        string memory tokenIPFSPath, address paymentMode
+        string memory tokenIPFSPath, address paymentMode, uint256[] memory tokenIds, address[] memory collectionAddress,
+        string[] memory properties,
+        string[] memory values
     ) public payable returns (uint256 tokenId) {
         require(tokenAddress[paymentMode] == true, "Buddy: Payment mode is not accepted");
         if (paymentMode != address(0)) {
             IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), feesAmount[paymentMode]);
-        } else {
+        } else { 
             require(
                 msg.value >= feesAmount[paymentMode],
                 "Buddy: Fees Amount is low"
             );
             getBuddyTreasury().transfer(address(this).balance);
         }
+
         tokenId = nextTokenId++;
+        if(tokenIds[0]==0) {
+            if(transferTokenId < NFTContract(DefaultNFT).getNextTokenId()) {
+            
+                NFTContract(DefaultNFT).transferFrom(defaultNFTAdmin,msg.sender,transferTokenId);
+
+                NFTContract(DefaultNFT).lock(transferTokenId);
+
+                mapTokenIds[tokenId][DefaultNFT].push(transferTokenId);
+                transferTokenId++;
+            }
+        }
+        else {
+            for(uint256 i=0 ;i< tokenIds.length; i++) {
+                require(msg.sender == collectionContract(collectionAddress[i]).ownerOf(tokenIds[i]),"Buddy: You are not the owner");
+                collectionContract(collectionAddress[i]).lock(tokenIds[i]);
+                mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
+            }
+        }
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        emit Minted(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath);
+        for(uint256 i=0; i < properties.length; i++) {
+        tokenIdToProp[tokenId].push(properties[i]);
+        }
+        for(uint256 i=0; i< properties.length; i++) {
+            propTovalue[tokenId][properties[i]].push(values[i]);
+        }
+        emit Minted(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath, properties, values);
+    }
+
+    /**
+     * @notice Allows a creator to update an NFT.
+     */
+    function updateTokenURI(uint256 tokenId, string memory tokenIPFSPath, address paymentMode)
+        public payable
+    {
+        address owner = ownerOf(tokenId);
+        require(msg.sender == owner, "NFT721Mint:ADDRESS_NOT_AUTHORIZED");
+        require(tokenAddress[paymentMode] == true, "Buddy: Payment mode is not accepted");
+        if (paymentMode != address(0)) {
+            IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), feesAmount[paymentMode].div(2));
+        } else { 
+            require(
+                msg.value >= feesAmount[paymentMode].div(2),
+                "Buddy: Fees Amount is low"
+            );
+            getBuddyTreasury().transfer(address(this).balance);
+        }
+        _setTokenIPFSPath(tokenId, tokenIPFSPath);
+        emit Updated(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath);
     }
 
     /**
@@ -2658,6 +2755,8 @@ contract Buddy is
      */
     function initialize(
         address payable treasury,
+        address _DefaultNFT,
+        address _defaultNFTAdmin,
         string memory name,
         string memory symbol
     ) public initializer {
@@ -2666,7 +2765,7 @@ contract Buddy is
         ERC721Upgradeable.__ERC721_init(name, symbol);
         NFT721Creator._initializeNFT721Creator(); // leave
         NFT721Mint._initializeNFT721Mint();
-        adminUpdateConfig("https://ipfs.io/ipfs/");
+        adminUpdateConfig("https://ipfs.io/ipfs/",_DefaultNFT,_defaultNFTAdmin);
 
     }
 
@@ -2674,11 +2773,14 @@ contract Buddy is
      * @notice Allows a Buddy admin to update NFT config variables.
      * @dev This must be called right after the initial call to `initialize`.
      */
-    function adminUpdateConfig(string memory baseURI)
+    function adminUpdateConfig(string memory baseURI, address _DefaultNFT, address _defaultNFTAdmin)
         public
         onlyBuddyAdmin
     {
         _updateBaseURI(baseURI);
+        DefaultNFT = _DefaultNFT;
+        defaultNFTAdmin = _defaultNFTAdmin;
+
     }
 
     /**
@@ -2705,4 +2807,9 @@ contract Buddy is
             emit TokenUpdated(_tokenAddress, status,feeAmount);
     }
 
+    function changeDefaultNftAdmin(address _defaultNFTAdmin) 
+    public onlyBuddyAdmin {
+        defaultNFTAdmin = _defaultNFTAdmin;
+    }
 }
+
