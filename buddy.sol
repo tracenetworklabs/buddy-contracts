@@ -685,20 +685,6 @@ interface collectionContract {
     
 }
 
-interface NFTContract {
-    
-    function lock(uint256 tokenId) external;
-
-    function getNextTokenId() external view returns (uint256);
-
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) external;
-    
-}
-
 // File @openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -2509,8 +2495,8 @@ pragma solidity ^0.7.0;
  * @notice A mixin to extend the OpenZeppelin metadata implementation.
  */
 abstract contract NFT721Metadata is NFT721Creator {
-    address DefaultNFT;
-    address defaultNFTAdmin;
+    //address DefaultNFT;
+    //address defaultNFTAdmin;
     uint256 transferTokenId=1;
     using StringsUpgradeable for uint256;
 
@@ -2602,9 +2588,9 @@ abstract contract NFT721Mint is
     NFT721Metadata,
     BuddyAdminRole
 {
-    using SafeMathUpgradeable for uint256;
      //mapping tokens to feesAmount
     mapping(address => uint256) public feesAmount;
+    mapping(address => uint256) public updateFee;
     mapping(address => bool) public tokenAddress;
     mapping(uint256 => mapping(address => uint256[])) mapTokenIds;
 
@@ -2624,13 +2610,22 @@ abstract contract NFT721Mint is
         address indexed creator,
         uint256 indexed tokenId,
         string indexed indexedTokenIPFSPath,
-        string tokenIPFSPath
+        string tokenIPFSPath,
+        string[] category,
+        string[] values
     );
 
     event TokenUpdated(
         address indexed tokenAddress,
         bool status,
-        uint256 Fees
+        uint256 mintFee,
+        uint256 uriUpdateFee
+    );
+
+    event TokenFeesUpdated(
+        address indexed tokenAddress,
+        uint256 mintFee,
+        uint256 uriUpdateFee
     );
 
     /**
@@ -2668,29 +2663,16 @@ abstract contract NFT721Mint is
         }
 
         tokenId = nextTokenId++;
-        if(tokenIds[0]==0) {
-            if(transferTokenId < NFTContract(DefaultNFT).getNextTokenId()) {
-            
-                NFTContract(DefaultNFT).transferFrom(defaultNFTAdmin,msg.sender,transferTokenId);
-
-                NFTContract(DefaultNFT).lock(transferTokenId);
-
-                mapTokenIds[tokenId][DefaultNFT].push(transferTokenId);
-                transferTokenId++;
-            }
-        }
-        else {
-            for(uint256 i=0 ;i< tokenIds.length; i++) {
-                require(msg.sender == collectionContract(collectionAddress[i]).ownerOf(tokenIds[i]),"Buddy: You are not the owner");
-                collectionContract(collectionAddress[i]).lock(tokenIds[i]);
-                mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
-            }
+        for(uint256 i=0 ;i< tokenIds.length; i++) {
+            require(msg.sender == collectionContract(collectionAddress[i]).ownerOf(tokenIds[i]),"Buddy: You are not the owner");
+            collectionContract(collectionAddress[i]).lock(tokenIds[i]);
+            mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
         }
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         for(uint256 i=0; i < properties.length; i++) {
-        tokenIdToProp[tokenId].push(properties[i]);
+            tokenIdToProp[tokenId].push(properties[i]);
         }
         for(uint256 i=0; i< properties.length; i++) {
             propTovalue[tokenId][properties[i]].push(values[i]);
@@ -2701,23 +2683,37 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to update an NFT.
      */
-    function updateTokenURI(uint256 tokenId, string memory tokenIPFSPath, address paymentMode)
+    function updateTokenURI(uint256 tokenId, string memory tokenIPFSPath, address paymentMode,uint256[] memory tokenIds, address[] memory collectionAddress,
+        string[] memory properties,
+        string[] memory values)
         public payable
     {
         address owner = ownerOf(tokenId);
         require(msg.sender == owner, "NFT721Mint:ADDRESS_NOT_AUTHORIZED");
         require(tokenAddress[paymentMode] == true, "Buddy: Payment mode is not accepted");
         if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), feesAmount[paymentMode].div(2));
+            IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), updateFee[paymentMode]);
         } else { 
             require(
-                msg.value >= feesAmount[paymentMode].div(2),
+                msg.value >= updateFee[paymentMode],
                 "Buddy: Fees Amount is low"
             );
             getBuddyTreasury().transfer(address(this).balance);
         }
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        emit Updated(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath);
+        for(uint256 i=0 ;i< tokenIds.length; i++) {
+            require(msg.sender == collectionContract(collectionAddress[i]).ownerOf(tokenIds[i]),"Buddy: You are not the owner");
+            collectionContract(collectionAddress[i]).lock(tokenIds[i]);
+            mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
+        }
+
+        for(uint256 i=0; i < properties.length; i++) {
+            tokenIdToProp[tokenId].push(properties[i]);
+        }
+        for(uint256 i=0; i< properties.length; i++) {
+            propTovalue[tokenId][properties[i]].push(values[i]);
+        }
+        emit Updated(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath, properties, values);
     }
 
     /**
@@ -2755,17 +2751,14 @@ contract Buddy is
      */
     function initialize(
         address payable treasury,
-        address _DefaultNFT,
-        address _defaultNFTAdmin,
         string memory name,
         string memory symbol
     ) public initializer {
         TreasuryNode._initializeTreasuryNode(treasury);
-
         ERC721Upgradeable.__ERC721_init(name, symbol);
         NFT721Creator._initializeNFT721Creator(); // leave
         NFT721Mint._initializeNFT721Mint();
-        adminUpdateConfig("https://ipfs.io/ipfs/",_DefaultNFT,_defaultNFTAdmin);
+        adminUpdateConfig("https://ipfs.io/ipfs/");
 
     }
 
@@ -2773,13 +2766,11 @@ contract Buddy is
      * @notice Allows a Buddy admin to update NFT config variables.
      * @dev This must be called right after the initial call to `initialize`.
      */
-    function adminUpdateConfig(string memory baseURI, address _DefaultNFT, address _defaultNFTAdmin)
+    function adminUpdateConfig(string memory baseURI)
         public
         onlyBuddyAdmin
     {
         _updateBaseURI(baseURI);
-        DefaultNFT = _DefaultNFT;
-        defaultNFTAdmin = _defaultNFTAdmin;
 
     }
 
@@ -2800,16 +2791,23 @@ contract Buddy is
         function adminUpdateToken(
         address _tokenAddress,
         bool status,
-        uint256 feeAmount
+        uint256 _mintFee,
+        uint256 _updateFee
     ) public onlyBuddyAdmin {
         tokenAddress[_tokenAddress] = status;
-        feesAmount[_tokenAddress] = feeAmount;
-            emit TokenUpdated(_tokenAddress, status,feeAmount);
+        feesAmount[_tokenAddress] = _mintFee;
+        updateFee[_tokenAddress] = _updateFee;
+            emit TokenUpdated(_tokenAddress, status,_mintFee,_updateFee);
     }
 
-    function changeDefaultNftAdmin(address _defaultNFTAdmin) 
-    public onlyBuddyAdmin {
-        defaultNFTAdmin = _defaultNFTAdmin;
+    function adminUpdateFees(
+        address _tokenAddress,
+        uint256 _mintFee,
+        uint256 _updateFee
+    ) public onlyBuddyAdmin {
+        feesAmount[_tokenAddress] = _mintFee;
+        updateFee[_tokenAddress] = _updateFee;
+        emit TokenFeesUpdated(_tokenAddress,_mintFee,_updateFee);
     }
 }
 
