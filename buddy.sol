@@ -2663,10 +2663,12 @@ abstract contract NFT721Mint is
         }
 
         tokenId = nextTokenId++;
-        for(uint256 i=0 ;i< tokenIds.length; i++) {
-            require(msg.sender == collectionContract(collectionAddress[i]).ownerOf(tokenIds[i]),"Buddy: You are not the owner");
-            collectionContract(collectionAddress[i]).lock(tokenIds[i]);
-            mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
+        if(tokenIds[0]!=0) {
+            for(uint256 i=0 ;i< tokenIds.length; i++) {
+                require(msg.sender == collectionContract(collectionAddress[i]).ownerOf(tokenIds[i]),"Buddy: You are not the owner");
+                collectionContract(collectionAddress[i]).lock(tokenIds[i]);
+                mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
+            }
         }
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
@@ -2701,12 +2703,13 @@ abstract contract NFT721Mint is
             getBuddyTreasury().transfer(address(this).balance);
         }
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        for(uint256 i=0 ;i< tokenIds.length; i++) {
-            require(msg.sender == collectionContract(collectionAddress[i]).ownerOf(tokenIds[i]),"Buddy: You are not the owner");
-            collectionContract(collectionAddress[i]).lock(tokenIds[i]);
-            mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
+        if(tokenIds[0]!=0) {
+            for(uint256 i=0 ;i< tokenIds.length; i++) {
+                require(msg.sender == collectionContract(collectionAddress[i]).ownerOf(tokenIds[i]),"Buddy: You are not the owner");
+                collectionContract(collectionAddress[i]).lock(tokenIds[i]);
+                mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
+            }
         }
-
         for(uint256 i=0; i < properties.length; i++) {
             tokenIdToProp[tokenId].push(properties[i]);
         }
