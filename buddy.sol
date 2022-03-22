@@ -682,6 +682,11 @@ interface collectionContract {
     
     function lock(uint256 tokenId) external;
     function ownerOf(uint256 tokenId) external view returns (address);
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external;
     
 }
 
@@ -2647,19 +2652,25 @@ abstract contract NFT721Mint is
      * @notice Allows a creator to mint an NFT.
      */
      function mint(
-        string memory tokenIPFSPath, address paymentMode, uint256[] memory tokenIds, address[] memory collectionAddress,
+        string memory tokenIPFSPath, address paymentMode, uint256 nftId, uint256[] memory tokenIds, address[] memory collectionAddress,
         string[] memory properties,
         string[] memory values
     ) public payable returns (uint256 tokenId) {
         require(tokenAddress[paymentMode] == true, "Buddy: Payment mode is not accepted");
-        if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), feesAmount[paymentMode]);
-        } else { 
-            require(
-                msg.value >= feesAmount[paymentMode],
-                "Buddy: Fees Amount is low"
-            );
-            getBuddyTreasury().transfer(address(this).balance);
+        if(nftId == 0) {
+            if (paymentMode != address(0)) {
+                IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), feesAmount[paymentMode]);
+            } else { 
+                require(
+                    msg.value >= feesAmount[paymentMode],
+                    "Buddy: Fees Amount is low"
+                );
+                getBuddyTreasury().transfer(address(this).balance);
+            }
+        }
+        else {
+            require(msg.sender == collectionContract(paymentMode).ownerOf(nftId),"Buddy: You are not the owner");
+            collectionContract(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), nftId);
         }
 
         tokenId = nextTokenId++;
@@ -2685,7 +2696,7 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to update an NFT.
      */
-    function updateTokenURI(uint256 tokenId, string memory tokenIPFSPath, address paymentMode,uint256[] memory tokenIds, address[] memory collectionAddress,
+    function updateTokenURI(uint256 tokenId, string memory tokenIPFSPath, address paymentMode, uint256 nftId, uint256[] memory tokenIds, address[] memory collectionAddress,
         string[] memory properties,
         string[] memory values)
         public payable
@@ -2693,14 +2704,20 @@ abstract contract NFT721Mint is
         address owner = ownerOf(tokenId);
         require(msg.sender == owner, "NFT721Mint:ADDRESS_NOT_AUTHORIZED");
         require(tokenAddress[paymentMode] == true, "Buddy: Payment mode is not accepted");
-        if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), updateFee[paymentMode]);
-        } else { 
-            require(
-                msg.value >= updateFee[paymentMode],
-                "Buddy: Fees Amount is low"
-            );
-            getBuddyTreasury().transfer(address(this).balance);
+        if(nftId == 0) {
+            if (paymentMode != address(0)) {
+                IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), updateFee[paymentMode]);
+            } else { 
+                require(
+                    msg.value >= updateFee[paymentMode],
+                    "Buddy: Fees Amount is low"
+                );
+                getBuddyTreasury().transfer(address(this).balance);
+            }
+        }
+        else {
+            require(msg.sender == collectionContract(paymentMode).ownerOf(nftId),"Buddy: You are not the owner");
+            collectionContract(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), nftId);
         }
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         if(tokenIds[0]!=0) {
