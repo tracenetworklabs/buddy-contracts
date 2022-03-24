@@ -316,15 +316,16 @@ contract Claim {
     mapping(address => uint256) public payer;
     mapping(address => mapping(uint256 => bool)) public tokenStatus;
 
-    uint256 public claimfee = 25;
+    uint256 public claimfee = 25E18; // USD terms
     address public admin;
+    uint256 public constant DENOMINATION = 1E18;
 
     event FeesPaid(address payer, uint256 tokenId);
     event FeesUpdated(uint256 updatedFee);
 
     constructor() {
         priceFeed = AggregatorV3Interface(
-            0x92C09849638959196E976289418e5973CC96d645
+            0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada
         );
         admin = msg.sender;
     }
@@ -342,7 +343,9 @@ contract Claim {
      */
     function getLatestPrice() public view returns (uint256) {
         (, int256 _price, , , ) = priceFeed.latestRoundData();
-        return uint256(_price);
+        uint256 price = uint256(_price).mul(1E10); // converting to E18
+        price = claimfee.mul(DENOMINATION).div(price);
+        return price;
     }
 
     /**
