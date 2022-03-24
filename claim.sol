@@ -364,8 +364,16 @@ contract Claim {
     /**
      * @dev Update the protocol fees
      */
-    function set(uint256 _fee) public onlyAdmin {
+    function updateFee(uint256 _fee) public onlyAdmin {
         claimfee = _fee;
         emit FeesUpdated(_fee);
+    }
+
+    /**
+     * @dev Withdraw fee from contract
+     */
+    function withdrawFee(uint256 feeToWithdraw) public onlyAdmin {
+        bool sent = payable(admin).send(feeToWithdraw);
+        require(sent, "Failed to send funds");
     }
 }
