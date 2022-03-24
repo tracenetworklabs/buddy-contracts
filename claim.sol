@@ -36,9 +36,128 @@ interface AggregatorV3Interface {
         );
 }
 
-// File: contracts/claim.sol
+// File: @openzeppelin/contracts/token/ERC20/IERC20.sol
 
-pragma solidity ^0.8.7;
+// OpenZeppelin Contracts (last updated v4.5.0) (token/ERC20/IERC20.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Interface of the ERC20 standard as defined in the EIP.
+ */
+interface IERC20 {
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
+
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `to`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address to, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
+
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Moves `amount` tokens from `from` to `to` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) external returns (bool);
+
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
+}
+
+// File: @openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol
+
+// OpenZeppelin Contracts v4.4.1 (token/ERC20/extensions/IERC20Metadata.sol)
+
+pragma solidity ^0.8.0;
+
+/**
+ * @dev Interface for the optional metadata functions from the ERC20 standard.
+ *
+ * _Available since v4.1._
+ */
+interface IERC20Metadata is IERC20 {
+    /**
+     * @dev Returns the name of the token.
+     */
+    function name() external view returns (string memory);
+
+    /**
+     * @dev Returns the symbol of the token.
+     */
+    function symbol() external view returns (string memory);
+
+    /**
+     * @dev Returns the decimals places of the token.
+     */
+    function decimals() external view returns (uint8);
+}
+
+// File: contracts/SafeMathUpgradeable.sol
+
+pragma solidity ^0.8.0;
 
 library SafeMathUpgradeable {
     /**
@@ -315,16 +434,19 @@ contract Claim {
 
     mapping(address => uint256) public payer;
     mapping(address => mapping(uint256 => bool)) public tokenStatus;
+    mapping(address => bool) public supportedPayment;
 
-    uint256 public claimfee = 25;
+    uint256 public claimfee = 25; // USD terms
     address public admin;
+    uint256 public constant DENOMINATION = 1E18;
 
     event FeesPaid(address payer, uint256 tokenId);
     event FeesUpdated(uint256 updatedFee);
+    event PaymentUpdated(address payment, bool status);
 
     constructor() {
         priceFeed = AggregatorV3Interface(
-            0x92C09849638959196E976289418e5973CC96d645
+            0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada
         );
         admin = msg.sender;
     }
@@ -342,18 +464,27 @@ contract Claim {
      */
     function getLatestPrice() public view returns (uint256) {
         (, int256 _price, , , ) = priceFeed.latestRoundData();
-        return uint256(_price);
+        uint256 price = uint256(_price).mul(1E10); // converting to E18
+        price = claimfee.mul(1E18).mul(DENOMINATION).div(price);
+        return price;
     }
 
     /**
      * @dev Payfees and claim the NFT to user's wallet
      */
-    function payFees(address collectionAddress, uint256 tokenId)
+    function payFees(address collectionAddress, uint256 tokenId, address payment)
         public
         payable
     {
-        uint256 value = claimfee.mul(getLatestPrice());
-        require(msg.value >= value, "Insufficient fee amount");
+        require(supportedPayment[payment], "Fee payment not supported");
+        if(payment == address(0)) {
+            require(msg.value >= getLatestPrice(), "Insufficient fee amount");
+        }
+        else {
+            uint8 decimals = IERC20Metadata(payment).decimals();
+            IERC20(payment).transferFrom(msg.sender, address(this), claimfee.mul(decimals));
+        }
+        
         payer[msg.sender] = tokenId;
         tokenStatus[msg.sender][tokenId] = true;
         address owner = Collection(collectionAddress).ownerOf(tokenId);
@@ -370,10 +501,23 @@ contract Claim {
     }
 
     /**
+     * @dev Update the fee payment 
+     */
+    function updateFeePayment(address payment, bool status) public onlyAdmin {
+        supportedPayment[payment] = status;
+        emit PaymentUpdated(payment, status);
+    }
+
+    /**
      * @dev Withdraw fee from contract
      */
-    function withdrawFee(uint256 feeToWithdraw) public onlyAdmin {
-        bool sent = payable(admin).send(feeToWithdraw);
-        require(sent, "Failed to send funds");
+    function withdrawFee(address payment, uint256 feeToWithdraw) public onlyAdmin {
+        if(payment == address(0)) {
+            bool sent = payable(admin).send(feeToWithdraw);
+            require(sent, "Failed to send funds");
+        }
+        else {
+            IERC20(payment).transfer(admin, feeToWithdraw);
+        }
     }
 }
