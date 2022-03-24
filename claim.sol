@@ -316,7 +316,6 @@ contract Claim {
     mapping(address => uint256) public payer;
     mapping(address => mapping(uint256 => bool)) public tokenStatus;
 
-    uint256 public price;
     uint256 public claimfee = 25;
     address public admin;
 
@@ -341,10 +340,9 @@ contract Claim {
     /**
      * @dev Returns the latest price
      */
-    function getLatestPrice() public returns (int256) {
+    function getLatestPrice() public view returns (uint256) {
         (, int256 _price, , , ) = priceFeed.latestRoundData();
-        price = uint256(_price);
-        return _price;
+        return uint256(_price);
     }
 
     /**
@@ -354,7 +352,7 @@ contract Claim {
         public
         payable
     {
-        uint256 value = claimfee.mul(price);
+        uint256 value = claimfee.mul(getLatestPrice());
         require(msg.value >= value, "Insufficient fee amount");
         payer[msg.sender] = tokenId;
         tokenStatus[msg.sender][tokenId] = true;
