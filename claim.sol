@@ -1,44 +1,42 @@
 // SPDX-License-Identifier: UNLICENSED
 // File: @chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol
 
-
 pragma solidity ^0.8.0;
 
 interface AggregatorV3Interface {
-  function decimals() external view returns (uint8);
+    function decimals() external view returns (uint8);
 
-  function description() external view returns (string memory);
+    function description() external view returns (string memory);
 
-  function version() external view returns (uint256);
+    function version() external view returns (uint256);
 
-  // getRoundData and latestRoundData should both raise "No data present"
-  // if they do not have data to report, instead of returning unset values
-  // which could be misinterpreted as actual reported values.
-  function getRoundData(uint80 _roundId)
-    external
-    view
-    returns (
-      uint80 roundId,
-      int256 answer,
-      uint256 startedAt,
-      uint256 updatedAt,
-      uint80 answeredInRound
-    );
+    // getRoundData and latestRoundData should both raise "No data present"
+    // if they do not have data to report, instead of returning unset values
+    // which could be misinterpreted as actual reported values.
+    function getRoundData(uint80 _roundId)
+        external
+        view
+        returns (
+            uint80 roundId,
+            int256 answer,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        );
 
-  function latestRoundData()
-    external
-    view
-    returns (
-      uint80 roundId,
-      int256 answer,
-      uint256 startedAt,
-      uint256 updatedAt,
-      uint80 answeredInRound
-    );
+    function latestRoundData()
+        external
+        view
+        returns (
+            uint80 roundId,
+            int256 answer,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        );
 }
 
 // File: contracts/claim.sol
-
 
 pragma solidity ^0.8.7;
 
@@ -272,65 +270,104 @@ library SafeMathUpgradeable {
     }
 }
 
-interface CollectionContract {
-    
+/**
+ * @title NFTs implemented using the ERC-721 standard.
+ */
+
+interface Collection {
+    /**
+     * @dev Returns the owner of the `tokenId` token.
+     *
+     * Requirements:
+     *
+     * - `tokenId` must exist.
+     */
     function ownerOf(uint256 tokenId) external view returns (address);
+
+    /**
+     * @dev Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients
+     * are aware of the ERC721 protocol to prevent tokens from being forever locked.
+     *
+     * Requirements:
+     *
+     * - `from` cannot be the zero address.
+     * - `to` cannot be the zero address.
+     * - `tokenId` token must exist and be owned by `from`.
+     * - If the caller is not `from`, it must be have been allowed to move this token by either {approve} or {setApprovalForAll}.
+     * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
+     *
+     * Emits a {Transfer} event.
+     */
     function transferFrom(
         address from,
         address to,
         uint256 tokenId
     ) external;
-    
 }
+
+/**
+ * @notice Allows users to claim their NFT's
+ */
 
 contract Claim {
     using SafeMathUpgradeable for uint256;
-    mapping (address => uint256) public payer;
-    mapping(address => mapping(uint256 => bool)) public tokenStatus;
-    uint256 public price;
-    uint256 public fees = 25;
-    address admin;
     AggregatorV3Interface internal priceFeed;
 
+    mapping(address => uint256) public payer;
+    mapping(address => mapping(uint256 => bool)) public tokenStatus;
+
+    uint256 public price;
+    uint256 public claimfee = 25;
+    address public admin;
+
+    event FeesPaid(address payer, uint256 tokenId);
+    event FeesUpdated(uint256 updatedFee);
+
     constructor() {
-        priceFeed = AggregatorV3Interface(0x92C09849638959196E976289418e5973CC96d645);
+        priceFeed = AggregatorV3Interface(
+            0x92C09849638959196E976289418e5973CC96d645
+        );
         admin = msg.sender;
     }
 
+    /**
+     * @dev Modifier to check the caller
+     */
     modifier onlyAdmin() {
-        require(msg.sender == admin,"Claim: Caller does not have the Admin role");
+        require(msg.sender == admin, "Not Admin Address");
         _;
     }
-    event FeesPaid(address Payer, uint256 tokenId);
 
     /**
-     * Returns the latest price
+     * @dev Returns the latest price
      */
-    function getLatestPrice() public returns (int) {
-        (
-            /*uint80 roundID*/,
-            int _price,
-            /*uint startedAt*/,
-            /*uint timeStamp*/,
-            /*uint80 answeredInRound*/
-        ) = priceFeed.latestRoundData();
-        price = uint256 (_price);
+    function getLatestPrice() public returns (int256) {
+        (, int256 _price, , , ) = priceFeed.latestRoundData();
+        price = uint256(_price);
         return _price;
     }
 
-    function payFees(address collectionAddress, uint256 tokenId) public payable {
-        uint256 value;
-        value = fees.mul(price);
-        require(msg.value >= value, "Claim: Fee Amount is not enough");
-        payer[msg.sender]=tokenId;
-        tokenStatus[msg.sender][tokenId]=true;
-        
-        address owner = CollectionContract(collectionAddress).ownerOf(tokenId);
-        CollectionContract(collectionAddress).transferFrom(owner,msg.sender,tokenId);
+    /**
+     * @dev Payfees and claim the NFT to user's wallet
+     */
+    function payFees(address collectionAddress, uint256 tokenId)
+        public
+        payable
+    {
+        uint256 value = claimfee.mul(price);
+        require(msg.value >= value, "Insufficient fee amount");
+        payer[msg.sender] = tokenId;
+        tokenStatus[msg.sender][tokenId] = true;
+        address owner = Collection(collectionAddress).ownerOf(tokenId);
+        Collection(collectionAddress).transferFrom(owner, msg.sender, tokenId);
         emit FeesPaid(msg.sender, tokenId);
     }
 
-    function set(uint256 _fees) public onlyAdmin {
-        fees = _fees;
+    /**
+     * @dev Update the protocol fees
+     */
+    function set(uint256 _fee) public onlyAdmin {
+        claimfee = _fee;
+        emit FeesUpdated(_fee);
     }
 }
