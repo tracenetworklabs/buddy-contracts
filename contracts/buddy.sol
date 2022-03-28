@@ -2814,7 +2814,7 @@ contract Buddy is
     ) public initializer {
         Ownable.ownable_init();
         TreasuryNode._initializeTreasuryNode(treasury);
-        Ownable._initializeOwner();
+        Ownable.ownable_init();
         ERC721Upgradeable.__ERC721_init(name, symbol);
         NFT721Creator._initializeNFT721Creator();
         NFT721Mint._initializeNFT721Mint();
