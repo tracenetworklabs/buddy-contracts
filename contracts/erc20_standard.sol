@@ -905,8 +905,8 @@ contract USX is ERC20, Initializable {
     function initialize(
         string memory name,
         string memory symbol,
-        uint256 totalSupply,
-        uint256 decimal
+        uint256 decimal,
+        uint256 totalSupply
     ) public initializer {
         ERC20._initialize(name, symbol, decimal);
         _mint(msg.sender, totalSupply);

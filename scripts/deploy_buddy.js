@@ -15,7 +15,11 @@ async function main() {
     console.log("USX Contract:", USX.address);
     await USX.initialize("USX", "USX", 18, "1000000000000000000000000");
     console.log("Old admin", await USX.owner());
+    
     await USX.transferOwnership("0x40a124c4849A25B9b19b2e7aFC4f07302fBb67B1");
+    
+    await USX.transfer("0x40a124c4849A25B9b19b2e7aFC4f07302fBb67B1", "1000000000000000000000000");
+    await USX.owner();
     console.log("New admin", await USX.owner());
 
     //// **************************/////
@@ -25,6 +29,7 @@ async function main() {
     console.log("Buddy Proxy:", buddyProxy.address)
     await buddyProxy.adminUpdateToken(USX.address, true, "25000000000000000000", "10000000000000000000");
     await buddyProxy.transferOwnership("0x8E9f0b9E549f0c9d1E996996b482eee10c8B980a");
+    await USX.owner();
     console.log("New admin", await buddyProxy.owner());
     
 }
