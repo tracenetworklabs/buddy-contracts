@@ -2690,7 +2690,7 @@ abstract contract NFT721Mint is
     ) public payable returns (uint256 tokenId) {
         require(
             tokenAddress[paymentMode] == true,
-            "Buddy: Payment mode is not accepted"
+            "Buddy: Invalid payment mode"
         );
         if (paymentMode != address(0)) {
             IERC20(paymentMode).transferFrom(
@@ -2701,7 +2701,7 @@ abstract contract NFT721Mint is
         } else {
             require(
                 msg.value >= feesAmount[paymentMode],
-                "Buddy: Fees Amount is low"
+                "Buddy: Insufficient fee amount"
             );
             getBuddyTreasury().transfer(address(this).balance);
         }
@@ -2714,7 +2714,7 @@ abstract contract NFT721Mint is
                         CollectionContract(collectionAddress[i]).ownerOf(
                             tokenIds[i]
                         ),
-                    "Buddy: Not_Owner"
+                    "Buddy: Not owner"
                 );
                 CollectionContract(collectionAddress[i]).lock(tokenIds[i]);
                 mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
@@ -2752,10 +2752,10 @@ abstract contract NFT721Mint is
         string[] memory values
     ) public payable {
         address owner = ownerOf(tokenId);
-        require(msg.sender == owner, "Buddy:Not_Authorized");
+        require(msg.sender == owner, "Buddy:Not owner");
         require(
             tokenAddress[paymentMode] == true,
-            "Buddy: Payment mode is not accepted"
+            "Buddy: Invalid payment mode"
         );
         if (paymentMode != address(0)) {
             IERC20(paymentMode).transferFrom(
@@ -2766,7 +2766,7 @@ abstract contract NFT721Mint is
         } else {
             require(
                 msg.value >= updateFee[paymentMode],
-                "Buddy: Fees Amount is low"
+                "Buddy:  Insufficient fee amount"
             );
             getBuddyTreasury().transfer(address(this).balance);
         }
@@ -2778,7 +2778,7 @@ abstract contract NFT721Mint is
                         CollectionContract(collectionAddress[i]).ownerOf(
                             tokenIds[i]
                         ),
-                    "Buddy: Not_Owner"
+                    "Buddy: Not owner"
                 );
                 CollectionContract(collectionAddress[i]).lock(tokenIds[i]);
                 mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
