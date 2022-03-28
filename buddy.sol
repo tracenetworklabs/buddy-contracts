@@ -2529,9 +2529,6 @@ pragma solidity ^0.7.0;
  * @notice A mixin to extend the OpenZeppelin metadata implementation.
  */
 abstract contract NFT721Metadata is NFT721Creator {
-    //address DefaultNFT;
-    //address defaultNFTAdmin;
-    uint256 transferTokenId = 1;
     using StringsUpgradeable for uint256;
 
     /**
