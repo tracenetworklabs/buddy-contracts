@@ -94,6 +94,11 @@
       "address": "0x016506702D2e1B441ca661615EE929F798931B7e",
       "txHash": "0x283a7a4527afef03f6f21064015909e9f4c34fbc2f71e9a4ed5e9bc85dba094e",
       "kind": "transparent"
+    },
+    {
+      "address": "0xe3b560408A12962C8637ff4F167219C31a100116",
+      "txHash": "0x9d8ce969e6f5313d700542c6af88bd3c3c4f8aada058d1b8afb08df4f92e4774",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -2191,6 +2196,124 @@
               }
             ],
             "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "ba0e04f312dd638a51b7921b3a1adedce6e2624f67afb760c4861a10aa8a5258": {
+      "address": "0xDd71FD8c903fc038e7298a035590EA7253e108F5",
+      "txHash": "0xa683d0a0dfde7af8d501aaf1cf0ee778b10815fc92b9e93ddfb13ab6d5281e4f",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\claim.sol:659"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\claim.sol:664"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "contracts\\claim.sol:722"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "Ownable",
+            "src": "contracts\\claim.sol:742"
+          },
+          {
+            "label": "priceFeed",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_contract(AggregatorV3Interface)45",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:813"
+          },
+          {
+            "label": "payer",
+            "offset": 0,
+            "slot": "53",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:815"
+          },
+          {
+            "label": "tokenStatus",
+            "offset": 0,
+            "slot": "54",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_bool))",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:816"
+          },
+          {
+            "label": "supportedPayment",
+            "offset": 0,
+            "slot": "55",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:817"
+          },
+          {
+            "label": "claimfee",
+            "offset": 0,
+            "slot": "56",
+            "type": "t_uint256",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:819"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(AggregatorV3Interface)45": {
+            "label": "contract AggregatorV3Interface",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_bool))": {
+            "label": "mapping(address => mapping(uint256 => bool))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
           },
           "t_uint256": {
             "label": "uint256",
