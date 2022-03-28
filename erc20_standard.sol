@@ -241,7 +241,7 @@ abstract contract Ownable is Context {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor() {
+    function _initializeOwner() internal {
         _transferOwnership(_msgSender());
     }
 
@@ -937,6 +937,7 @@ contract USX is ERC20, Initializable {
         uint256 decimal
     ) public initializer {
         ERC20._initialize(name, symbol, decimal);
+        Ownable._initializeOwner();
         _mint(msg.sender, totalSupply);
     }
 }

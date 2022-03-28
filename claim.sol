@@ -749,7 +749,7 @@ abstract contract Ownable is ContextUpgradeable {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor() {
+    function _initializeOwner() internal {
         _transferOwnership(_msgSender());
     }
 
@@ -826,6 +826,7 @@ contract Claim is Initializable, Ownable {
             0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada
         );
         claimfee = 25;
+        Ownable._initializeOwner();
     }
 
     /**
