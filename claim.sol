@@ -819,7 +819,7 @@ contract Claim is
     mapping(address => bool) public supportedPayment;
 
     uint256 public claimfee; // USD terms
-    uint256 public constant DENOMINATION;
+    uint256 public DENOMINATION;
 
     event FeesPaid(address payer, uint256 tokenId);
     event FeesUpdated(uint256 updatedFee);
