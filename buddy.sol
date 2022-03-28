@@ -1719,7 +1719,7 @@ abstract contract Ownable is ContextUpgradeable {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor() {
+    function _initializeOwner() internal {
         _transferOwnership(_msgSender());
     }
 
@@ -2840,6 +2840,7 @@ contract Buddy is
         string memory symbol
     ) public initializer {
         TreasuryNode._initializeTreasuryNode(treasury);
+        Ownable._initializeOwner();
         ERC721Upgradeable.__ERC721_init(name, symbol);
         NFT721Creator._initializeNFT721Creator(); // leave
         NFT721Mint._initializeNFT721Mint();
