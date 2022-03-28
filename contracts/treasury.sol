@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: UNLICENSED
 
 // solhint-disable-next-line compiler-version
-pragma solidity >=0.4.24 <0.8.0;
+pragma solidity ^0.7.0;
 
 /**
  * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed
@@ -53,7 +53,7 @@ abstract contract Initializable {
 
 // File: contracts/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol
 
-pragma solidity >=0.4.24 <0.8.0;
+pragma solidity ^0.7.0;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -86,7 +86,7 @@ abstract contract ContextUpgradeable is Initializable {
 
 // File: contracts/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol
 
-pragma solidity >=0.4.24 <0.8.0;
+pragma solidity ^0.7.0;
 
 /**
  * @dev String operations.
@@ -157,7 +157,7 @@ library StringsUpgradeable {
 
 // File: contracts/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol
 
-pragma solidity >=0.4.24 <0.8.0;
+pragma solidity ^0.7.0;
 
 /**
  * @dev Interface of the ERC165 standard, as defined in the
@@ -274,7 +274,7 @@ interface IERC20 {
 
 // File: contracts/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol
 
-pragma solidity >=0.4.24 <0.8.0;
+pragma solidity ^0.7.0;
 
 /**
  * @dev Implementation of the {IERC165} interface.
@@ -315,7 +315,7 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
 
 // File: contracts/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol
 
-pragma solidity >=0.4.24 <0.8.0;
+pragma solidity ^0.7.0;
 
 /**
  * @dev External interface of AccessControl declared to support ERC165 detection.
@@ -694,7 +694,7 @@ abstract contract OperatorRole is Initializable, AccessControlUpgradeable {
 
 // File: contracts/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol
 
-pragma solidity >=0.4.24 <0.8.0;
+pragma solidity ^0.7.0;
 
 /**
  * @dev Collection of functions related to the address type

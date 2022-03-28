@@ -5,7 +5,7 @@
 
 // File @openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev Interface of the ERC165 standard, as defined in the
@@ -30,7 +30,7 @@ interface IERC165Upgradeable {
 
 // File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev Collection of functions related to the address type
@@ -249,7 +249,7 @@ library AddressUpgradeable {
 // File @openzeppelin/contracts-upgradeable/proxy/Initializable.sol@v3.4.1-solc-0.7
 
 // solhint-disable-next-line compiler-version
-pragma solidity >=0.4.24 <0.8.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed
@@ -304,7 +304,7 @@ abstract contract Initializable {
 
 // File @openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev Implementation of the {IERC165} interface.
@@ -369,7 +369,7 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
 
 // File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev Required interface of an ERC721 compliant contract.
@@ -528,7 +528,7 @@ interface IERC721Upgradeable is IERC165Upgradeable {
 
 // File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721MetadataUpgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @title ERC-721 Non-Fungible Token Standard, optional metadata extension
@@ -553,7 +553,7 @@ interface IERC721MetadataUpgradeable is IERC721Upgradeable {
 
 // File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721EnumerableUpgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @title ERC-721 Non-Fungible Token Standard, optional enumeration extension
@@ -583,7 +583,7 @@ interface IERC721EnumerableUpgradeable is IERC721Upgradeable {
 
 // File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @title ERC721 token receiver interface
@@ -610,7 +610,7 @@ interface IERC721ReceiverUpgradeable {
 
 // File @openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -857,7 +857,7 @@ library SafeMathUpgradeable {
 
 // File @openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity ^0.7.6;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -890,7 +890,7 @@ abstract contract ContextUpgradeable is Initializable {
 
 // File @openzeppelin/contracts-upgradeable/utils/EnumerableSetUpgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev Library for managing
@@ -1237,7 +1237,7 @@ library EnumerableSetUpgradeable {
 
 // File @openzeppelin/contracts-upgradeable/utils/EnumerableMapUpgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev Library for managing an enumerable variant of Solidity's
@@ -1562,7 +1562,7 @@ library EnumerableMapUpgradeable {
 
 // File @openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev String operations.
@@ -1603,7 +1603,7 @@ library StringsUpgradeable {
  * Copied from the OpenZeppelin repository in order to make `_tokenURIs` internal instead of private.
  */
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
@@ -2227,7 +2227,7 @@ contract ERC721Upgradeable is
 
 // File contracts/roles/FoundationTreasuryNode.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @notice A mixin that stores a reference to the Foundation treasury contract.
@@ -2264,7 +2264,7 @@ abstract contract FoundationTreasuryNode is Initializable {
 
 // File contracts/interfaces/IAdminRole.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @notice Interface for AdminRole which wraps the default admin role from
@@ -2276,7 +2276,7 @@ interface IAdminRole {
 
 // File contracts/roles/FoundationAdminRole.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @notice Allows a contract to leverage the admin role defined by the Foundation treasury.
@@ -2299,7 +2299,7 @@ abstract contract FoundationAdminRole is FoundationTreasuryNode {
 
 // File contracts/mixins/HasSecondarySaleFees.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @notice An interface for communicating fees to 3rd party marketplaces.
@@ -2336,7 +2336,7 @@ abstract contract HasSecondarySaleFees is Initializable, ERC165Upgradeable {
 
 // File contracts/mixins/NFT721Core.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @notice A place for common modifiers and functions used by various NFT721 mixins, if any.
@@ -2350,7 +2350,7 @@ abstract contract NFT721Core {
 
 // solhint-disable
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 interface IFNDNFTMarket {
     function getFeeConfig(address, uint256)
@@ -2373,7 +2373,7 @@ interface IFNDNFTMarket {
 
 // File @openzeppelin/contracts/utils/Address.sol@v3.1.0-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev Collection of functions related to the address type
@@ -2555,7 +2555,7 @@ library Address {
 
 // File contracts/interfaces/IERC1271.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @dev Interface of the ERC1271 standard signature validation method for
@@ -2577,7 +2577,7 @@ interface IERC1271 {
 
 // File contracts/mixins/NFT721Creator.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @notice Allows each token to be associated with a creator.
@@ -2709,7 +2709,7 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
 
 // File contracts/mixins/NFT721Market.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @notice Holds a reference to the Foundation Market and communicates fees to 3rd party marketplaces.
@@ -2790,7 +2790,7 @@ abstract contract NFT721Market is
 
 // File contracts/mixins/NFT721Metadata.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @notice A mixin to extend the OpenZeppelin metadata implementation.
@@ -2880,7 +2880,7 @@ abstract contract NFT721Metadata is NFT721Creator {
 
 // File contracts/mixins/NFT721Mint.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 pragma experimental ABIEncoderV2;
 
 /**
@@ -3062,7 +3062,7 @@ abstract contract NFT721Mint is
 
 // File contracts/FNDNFT721.sol
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.7.6;
 
 /**
  * @title Foundation NFTs implemented using the ERC-721 standard.
