@@ -34,6 +34,26 @@
       "address": "0xc0bdd8E0a957d5B7374686e5e8d8E6D545810446",
       "txHash": "0xca3ffc7c80ccb68f040b5a6da18ca6894fae14e69744f2a39b58f770961f5c90",
       "kind": "transparent"
+    },
+    {
+      "address": "0xd3898bB7778Dc94b67dA1D5Ed3c4C6025dF9b321",
+      "txHash": "0x8e69675837fed7fbae0fc0de6e204f7596ce2f980ab1ad9608fd0cbef968aff2",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x2351AF34d18f090477422108BdC42F140742FE08",
+      "txHash": "0x9c6f61be7ff58df4a40b5e72138e8e18909e9f361f943d583cbc62dbe92de969",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1DfFdCA92Cd2340cB93d1Bd1BEfAdaa18717fEE3",
+      "txHash": "0x3486efc8130f7f46a331024e5156a680ab8644a681147dd7ae8161e71c47fdf5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x34D5CDF7C8b4eEbE84C39B7515b3ea0Da1402E3c",
+      "txHash": "0x70877e1032b31a62832555cf7449b16af018fc2d811d6c4a9408f5dffe5ee28f",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -2000,6 +2020,134 @@
                 "type": "t_struct(Map)1541_storage",
                 "offset": 0,
                 "slot": "0"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "5574875dc36097ce3c0c26e8ec61e40de6f24dc1dc2001abdbd397390df27f68": {
+      "address": "0x48af84FEE11befa287bB9E15C9eB537ee42BD2A5",
+      "txHash": "0xb08d3b1d3e2b6777f8d440afaabb5ce783a9a52eb2b0a2c3c47e3e3e2019afc4",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\treasury.sol:24"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\treasury.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "contracts\\treasury.sol:84"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC165Upgradeable",
+            "src": "contracts\\treasury.sol:313"
+          },
+          {
+            "label": "_roles",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)503_storage)",
+            "contract": "AccessControlUpgradeable",
+            "src": "contracts\\treasury.sol:395"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "AccessControlUpgradeable",
+            "src": "contracts\\treasury.sol:620"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_array(t_uint256)1000_storage",
+            "contract": "AdminRole",
+            "src": "contracts\\treasury.sol:663"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1151",
+            "type": "t_array(t_uint256)1000_storage",
+            "contract": "CollateralManagement",
+            "src": "contracts\\treasury.sol:969"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)1000_storage": {
+            "label": "uint256[1000]",
+            "numberOfBytes": "32000"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)503_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(RoleData)503_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
               }
             ],
             "numberOfBytes": "64"
