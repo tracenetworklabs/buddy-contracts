@@ -3,8 +3,6 @@
 
 // File @openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol@v3.4.1-solc-0.7
 
-
-
 pragma solidity ^0.7.0;
 
 /**
@@ -431,7 +429,6 @@ interface IERC20 {
     );
 }
 
-
 pragma solidity ^0.7.0;
 
 /**
@@ -678,16 +675,10 @@ pragma solidity ^0.7.0;
  * @dev Interface for any contract that wants to support safeTransfers
  * from ERC721 asset contracts.
  */
-interface collectionContract {
-    
+interface CollectionContract {
     function lock(uint256 tokenId) external;
+
     function ownerOf(uint256 tokenId) external view returns (address);
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) external;
-    
 }
 
 // File @openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol@v3.4.1-solc-0.7
@@ -1677,6 +1668,110 @@ library StringsUpgradeable {
     }
 }
 
+// OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
+
+//pragma solidity ^0.7.0;
+
+/**
+ * @dev Provides information about the current execution context, including the
+ * sender of the transaction and its data. While these are generally available
+ * via msg.sender and msg.data, they should not be accessed in such a direct
+ * manner, since when dealing with meta-transactions the account sending and
+ * paying for execution may not be the actual sender (as far as an application
+ * is concerned).
+ *
+ * This contract is only required for intermediate, library-like contracts.
+ */
+/*abstract contract Context {
+    function _msgSender() internal view virtual returns (address) {
+        return msg.sender;
+    }
+
+    function _msgData() internal view virtual returns (bytes calldata) {
+        return msg.data;
+    }
+}
+*/
+// OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
+
+pragma solidity ^0.7.0;
+
+/**
+ * @dev Contract module which provides a basic access control mechanism, where
+ * there is an account (an owner) that can be granted exclusive access to
+ * specific functions.
+ *
+ * By default, the owner account will be the one that deploys the contract. This
+ * can later be changed with {transferOwnership}.
+ *
+ * This module is used through inheritance. It will make available the modifier
+ * `onlyOwner`, which can be applied to your functions to restrict their use to
+ * the owner.
+ */
+abstract contract Ownable is ContextUpgradeable {
+    address private _owner;
+
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    constructor() {
+        _transferOwnership(_msgSender());
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(
+            newOwner != address(0),
+            "Ownable: new owner is the zero address"
+        );
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Internal function without access restriction.
+     */
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
+}
+
 // File contracts/mixins/ERC721Upgradeable.sol
 
 // solhint-disable
@@ -2318,69 +2413,6 @@ abstract contract TreasuryNode is Initializable {
     uint256[2000] private __gap;
 }
 
-// File contracts/interfaces/IAdminRole.sol
-
-pragma solidity ^0.7.0;
-
-/**
- * @notice Interface for AdminRole which wraps the default admin role from
- * OpenZeppelin's AccessControl for easy integration.
- */
-interface IAdminRole {
-    function isAdmin(address account) external view returns (bool);
-}
-
-// File contracts/roles/BuddyAdminRole.sol
-
-pragma solidity ^0.7.0;
-
-/**
- * @notice Allows a contract to leverage the admin role defined by the Buddy treasury.
- */
-abstract contract BuddyAdminRole is TreasuryNode {
-    // This file uses 0 data slots (other than what's included via TreasuryNode)
-
-    modifier onlyBuddyAdmin() {
-        require(
-            _isBuddyAdmin(),
-            "BuddyAdminRole: caller does not have the Admin role"
-        );
-        _;
-    }
-
-    function _isBuddyAdmin() internal view returns (bool) {
-        return IAdminRole(getBuddyTreasury()).isAdmin(msg.sender);
-    }
-}
-
-// File contracts/interfaces/IOperatorRole.sol
-
-pragma solidity ^0.7.0;
-
-/**
- * @notice Interface for OperatorRole which wraps a role from
- * OpenZeppelin's AccessControl for easy integration.
- */
-interface IOperatorRole {
-    function isOperator(address account) external view returns (bool);
-}
-
-// File contracts/roles/BuddyOperatorRole.sol
-
-pragma solidity ^0.7.0;
-
-/**
- * @notice Allows a contract to leverage the operator role defined by the Buddy treasury.
- */
-abstract contract BuddyOperatorRole is TreasuryNode {
-    // This file uses 0 data slots (other than what's included via TreasuryNode)
-
-    function _isBuddyOperator() internal view returns (bool) {
-        return IOperatorRole(getBuddyTreasury()).isOperator(msg.sender);
-    }
-}
-
-
 // File contracts/mixins/NFT721Core.sol
 
 pragma solidity ^0.7.0;
@@ -2400,10 +2432,7 @@ pragma solidity ^0.7.0;
 /**
  * @notice Allows each token to be associated with a creator.
  */
-abstract contract NFT721Creator is
-    Initializable,
-    ERC721Upgradeable
-{
+abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
     mapping(uint256 => address payable) private tokenIdToCreator;
 
     /**
@@ -2502,7 +2531,7 @@ pragma solidity ^0.7.0;
 abstract contract NFT721Metadata is NFT721Creator {
     //address DefaultNFT;
     //address defaultNFTAdmin;
-    uint256 transferTokenId=1;
+    uint256 transferTokenId = 1;
     using StringsUpgradeable for uint256;
 
     /**
@@ -2583,6 +2612,7 @@ abstract contract NFT721Metadata is NFT721Creator {
 
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
+
 /**
  * @notice Allows creators to mint NFTs.
  */
@@ -2591,14 +2621,13 @@ abstract contract NFT721Mint is
     ERC721Upgradeable,
     NFT721Creator,
     NFT721Metadata,
-    BuddyAdminRole
+    TreasuryNode
 {
-     //mapping tokens to feesAmount
+    //mapping tokens to feesAmount
     mapping(address => uint256) public feesAmount;
     mapping(address => uint256) public updateFee;
     mapping(address => bool) public tokenAddress;
     mapping(uint256 => mapping(address => uint256[])) mapTokenIds;
-
 
     uint256 private nextTokenId;
 
@@ -2651,89 +2680,124 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-     function mint(
-        string memory tokenIPFSPath, address paymentMode, uint256 nftId, uint256[] memory tokenIds, address[] memory collectionAddress,
+    function mint(
+        string memory tokenIPFSPath,
+        address paymentMode,
+        uint256[] memory tokenIds,
+        address[] memory collectionAddress,
         string[] memory properties,
         string[] memory values
     ) public payable returns (uint256 tokenId) {
-        require(tokenAddress[paymentMode] == true, "Buddy: Payment mode is not accepted");
-        if(nftId == 0) {
-            if (paymentMode != address(0)) {
-                IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), feesAmount[paymentMode]);
-            } else { 
-                require(
-                    msg.value >= feesAmount[paymentMode],
-                    "Buddy: Fees Amount is low"
-                );
-                getBuddyTreasury().transfer(address(this).balance);
-            }
-        }
-        else {
-            require(msg.sender == collectionContract(paymentMode).ownerOf(nftId),"Buddy: You are not the owner");
-            collectionContract(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), nftId);
+        require(
+            tokenAddress[paymentMode] == true,
+            "Buddy: Payment mode is not accepted"
+        );
+        if (paymentMode != address(0)) {
+            IERC20(paymentMode).transferFrom(
+                msg.sender,
+                getBuddyTreasury(),
+                feesAmount[paymentMode]
+            );
+        } else {
+            require(
+                msg.value >= feesAmount[paymentMode],
+                "Buddy: Fees Amount is low"
+            );
+            getBuddyTreasury().transfer(address(this).balance);
         }
 
         tokenId = nextTokenId++;
-        if(tokenIds[0]!=0) {
-            for(uint256 i=0 ;i< tokenIds.length; i++) {
-                require(msg.sender == collectionContract(collectionAddress[i]).ownerOf(tokenIds[i]),"Buddy: You are not the owner");
-                collectionContract(collectionAddress[i]).lock(tokenIds[i]);
+        if (tokenIds[0] != 0) {
+            for (uint256 i = 0; i < tokenIds.length; i++) {
+                require(
+                    msg.sender ==
+                        CollectionContract(collectionAddress[i]).ownerOf(
+                            tokenIds[i]
+                        ),
+                    "Buddy: Not_Owner"
+                );
+                CollectionContract(collectionAddress[i]).lock(tokenIds[i]);
                 mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
             }
         }
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        for(uint256 i=0; i < properties.length; i++) {
+        for (uint256 i = 0; i < properties.length; i++) {
             tokenIdToProp[tokenId].push(properties[i]);
         }
-        for(uint256 i=0; i< properties.length; i++) {
+        for (uint256 i = 0; i < properties.length; i++) {
             propTovalue[tokenId][properties[i]].push(values[i]);
         }
-        emit Minted(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath, properties, values);
+        emit Minted(
+            msg.sender,
+            tokenId,
+            tokenIPFSPath,
+            tokenIPFSPath,
+            properties,
+            values
+        );
     }
 
     /**
      * @notice Allows a creator to update an NFT.
      */
-    function updateTokenURI(uint256 tokenId, string memory tokenIPFSPath, address paymentMode, uint256 nftId, uint256[] memory tokenIds, address[] memory collectionAddress,
+    function updateTokenURI(
+        uint256 tokenId,
+        string memory tokenIPFSPath,
+        address paymentMode,
+        uint256[] memory tokenIds,
+        address[] memory collectionAddress,
         string[] memory properties,
-        string[] memory values)
-        public payable
-    {
+        string[] memory values
+    ) public payable {
         address owner = ownerOf(tokenId);
-        require(msg.sender == owner, "NFT721Mint:ADDRESS_NOT_AUTHORIZED");
-        require(tokenAddress[paymentMode] == true, "Buddy: Payment mode is not accepted");
-        if(nftId == 0) {
-            if (paymentMode != address(0)) {
-                IERC20(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), updateFee[paymentMode]);
-            } else { 
-                require(
-                    msg.value >= updateFee[paymentMode],
-                    "Buddy: Fees Amount is low"
-                );
-                getBuddyTreasury().transfer(address(this).balance);
-            }
-        }
-        else {
-            require(msg.sender == collectionContract(paymentMode).ownerOf(nftId),"Buddy: You are not the owner");
-            collectionContract(paymentMode).transferFrom(msg.sender, getBuddyTreasury(), nftId);
+        require(msg.sender == owner, "Buddy:Not_Authorized");
+        require(
+            tokenAddress[paymentMode] == true,
+            "Buddy: Payment mode is not accepted"
+        );
+        if (paymentMode != address(0)) {
+            IERC20(paymentMode).transferFrom(
+                msg.sender,
+                getBuddyTreasury(),
+                updateFee[paymentMode]
+            );
+        } else {
+            require(
+                msg.value >= updateFee[paymentMode],
+                "Buddy: Fees Amount is low"
+            );
+            getBuddyTreasury().transfer(address(this).balance);
         }
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        if(tokenIds[0]!=0) {
-            for(uint256 i=0 ;i< tokenIds.length; i++) {
-                require(msg.sender == collectionContract(collectionAddress[i]).ownerOf(tokenIds[i]),"Buddy: You are not the owner");
-                collectionContract(collectionAddress[i]).lock(tokenIds[i]);
+        if (tokenIds[0] != 0) {
+            for (uint256 i = 0; i < tokenIds.length; i++) {
+                require(
+                    msg.sender ==
+                        CollectionContract(collectionAddress[i]).ownerOf(
+                            tokenIds[i]
+                        ),
+                    "Buddy: Not_Owner"
+                );
+                CollectionContract(collectionAddress[i]).lock(tokenIds[i]);
                 mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
             }
         }
-        for(uint256 i=0; i < properties.length; i++) {
+        for (uint256 i = 0; i < properties.length; i++) {
             tokenIdToProp[tokenId].push(properties[i]);
         }
-        for(uint256 i=0; i< properties.length; i++) {
+        for (uint256 i = 0; i < properties.length; i++) {
             propTovalue[tokenId][properties[i]].push(values[i]);
         }
-        emit Updated(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath, properties, values);
+        emit Updated(
+            msg.sender,
+            tokenId,
+            tokenIPFSPath,
+            tokenIPFSPath,
+            properties,
+            values
+        );
     }
 
     /**
@@ -2763,7 +2827,8 @@ contract Buddy is
     NFT721Creator,
     NFT721Metadata,
     TreasuryNode,
-    NFT721Mint    
+    NFT721Mint,
+    Ownable
 {
     /**
      * @notice Called once to configure the contract after the initial deployment.
@@ -2779,19 +2844,14 @@ contract Buddy is
         NFT721Creator._initializeNFT721Creator(); // leave
         NFT721Mint._initializeNFT721Mint();
         adminUpdateConfig("https://ipfs.io/ipfs/");
-
     }
 
     /**
      * @notice Allows a Buddy admin to update NFT config variables.
      * @dev This must be called right after the initial call to `initialize`.
      */
-    function adminUpdateConfig(string memory baseURI)
-        public
-        onlyBuddyAdmin
-    {
+    function adminUpdateConfig(string memory baseURI) public onlyOwner {
         _updateBaseURI(baseURI);
-
     }
 
     /**
@@ -2808,26 +2868,25 @@ contract Buddy is
     /**
      * @notice Allows Admin to add token address and set fees.
      */
-        function adminUpdateToken(
+    function adminUpdateToken(
         address _tokenAddress,
         bool status,
         uint256 _mintFee,
         uint256 _updateFee
-    ) public onlyBuddyAdmin {
+    ) public onlyOwner {
         tokenAddress[_tokenAddress] = status;
         feesAmount[_tokenAddress] = _mintFee;
         updateFee[_tokenAddress] = _updateFee;
-            emit TokenUpdated(_tokenAddress, status,_mintFee,_updateFee);
+        emit TokenUpdated(_tokenAddress, status, _mintFee, _updateFee);
     }
 
     function adminUpdateFees(
         address _tokenAddress,
         uint256 _mintFee,
         uint256 _updateFee
-    ) public onlyBuddyAdmin {
+    ) public onlyOwner {
         feesAmount[_tokenAddress] = _mintFee;
         updateFee[_tokenAddress] = _updateFee;
-        emit TokenFeesUpdated(_tokenAddress,_mintFee,_updateFee);
+        emit TokenFeesUpdated(_tokenAddress, _mintFee, _updateFee);
     }
 }
-
