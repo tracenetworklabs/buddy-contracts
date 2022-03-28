@@ -722,6 +722,7 @@ abstract contract ContextUpgradeable is Initializable {
     uint256[50] private __gap;
 }
 
+
 // OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
 
 pragma solidity 0.8.2;
@@ -806,7 +807,10 @@ abstract contract Ownable is ContextUpgradeable {
  * @notice Allows users to claim their NFT's
  */
 
-contract Claim is Initializable, Ownable {
+contract Claim is 
+    Initializable,
+    Ownable
+ {
     using SafeMathUpgradeable for uint256;
     AggregatorV3Interface internal priceFeed;
 
@@ -815,17 +819,18 @@ contract Claim is Initializable, Ownable {
     mapping(address => bool) public supportedPayment;
 
     uint256 public claimfee; // USD terms
-    uint256 public constant DENOMINATION = 1E18;
+    uint256 public constant DENOMINATION;
 
     event FeesPaid(address payer, uint256 tokenId);
     event FeesUpdated(uint256 updatedFee);
     event PaymentUpdated(address payment, bool status);
 
-    function initialize() public initializer {
+    function initialize() public initializer{
         priceFeed = AggregatorV3Interface(
             0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada
         );
         claimfee = 25;
+        DENOMINATION = 1E18;
         Ownable._initializeOwner();
     }
 
@@ -842,27 +847,21 @@ contract Claim is Initializable, Ownable {
     /**
      * @dev Payfees and claim the NFT to user's wallet
      */
-    function payFees(
-        address collectionAddress,
-        uint256 tokenId,
-        address payment
-    ) public payable {
+    function payFees(address collectionAddress, uint256 tokenId, address payment)
+        public
+        payable
+    {
         require(supportedPayment[payment], "Claim:Fee payment not supported");
-        if (payment == address(0)) {
+        if(payment == address(0)) {
             //require(msg.value >= getLatestPrice(), "Insufficient fee amount");
-            require(
-                msg.value > getLatestPrice() || msg.value == getLatestPrice(),
-                "Claim:Insufficient fee amount"
-            );
-        } else {
-            uint8 decimals = IERC20Metadata(payment).decimals();
-            IERC20(payment).transferFrom(
-                msg.sender,
-                address(this),
-                claimfee.mul(10**decimals)
-            );
+            require(msg.value > getLatestPrice() || msg.value == getLatestPrice(), 
+            "Claim:Insufficient fee amount");
         }
-
+        else {
+            uint8 decimals = IERC20Metadata(payment).decimals();
+            IERC20(payment).transferFrom(msg.sender, address(this), claimfee.mul(10**decimals));
+        }
+        
         payer[msg.sender] = tokenId;
         tokenStatus[msg.sender][tokenId] = true;
         address owner = Collection(collectionAddress).ownerOf(tokenId);
@@ -879,7 +878,7 @@ contract Claim is Initializable, Ownable {
     }
 
     /**
-     * @dev Update the fee payment
+     * @dev Update the fee payment 
      */
     function updateFeePayment(address payment, bool status) public onlyOwner {
         supportedPayment[payment] = status;
@@ -889,14 +888,12 @@ contract Claim is Initializable, Ownable {
     /**
      * @dev Withdraw fee from contract
      */
-    function withdrawFee(address payment, uint256 feeToWithdraw)
-        public
-        onlyOwner
-    {
-        if (payment == address(0)) {
+    function withdrawFee(address payment, uint256 feeToWithdraw) public onlyOwner {
+        if(payment == address(0)) {
             bool sent = payable(owner()).send(feeToWithdraw);
             require(sent, "Claim:Failed to send funds");
-        } else {
+        }
+        else {
             IERC20(payment).transfer(owner(), feeToWithdraw);
         }
     }
