@@ -23,7 +23,7 @@ async function main() {
     const Buddy = await ethers.getContractFactory("Buddy")
     const buddyProxy = await upgrades.deployProxy(Buddy, [treasuryProxy.address, "AVATAR", "AVT"],{ initializer: 'initialize' })
     console.log("Buddy Proxy:", buddyProxy.address)
-    await buddyProxy.adminUpdateToken(USX.address, true, "25000000000000000000", "25000000000000000000");
+    await buddyProxy.adminUpdateToken(USX.address, true, "25000000000000000000", "10000000000000000000");
     await buddyProxy.transferOwnership("0x8E9f0b9E549f0c9d1E996996b482eee10c8B980a");
     console.log("New admin", await buddyProxy.owner());
     
