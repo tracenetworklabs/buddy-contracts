@@ -1,6 +1,43 @@
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
 
+// File: @chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol
+
+pragma solidity ^0.7.6;
+
+interface AggregatorV3Interface {
+    function decimals() external view returns (uint8);
+
+    function description() external view returns (string memory);
+
+    function version() external view returns (uint256);
+
+    // getRoundData and latestRoundData should both raise "No data present"
+    // if they do not have data to report, instead of returning unset values
+    // which could be misinterpreted as actual reported values.
+    function getRoundData(uint80 _roundId)
+        external
+        view
+        returns (
+            uint80 roundId,
+            int256 answer,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        );
+
+    function latestRoundData()
+        external
+        view
+        returns (
+            uint80 roundId,
+            int256 answer,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80 answeredInRound
+        );
+}
+
 // File @openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -342,11 +379,6 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
  */
 interface IERC20 {
     /**
-     * @dev Returns the name of token.
-     */
-    function name() external view returns (string memory);
-
-    /**
      * @dev Returns the amount of tokens in existence.
      */
     function totalSupply() external view returns (uint256);
@@ -427,6 +459,30 @@ interface IERC20 {
         address indexed spender,
         uint256 value
     );
+}
+
+// File: @openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol
+
+/**
+ * @dev Interface for the optional metadata functions from the ERC20 standard.
+ *
+ * _Available since v4.1._
+ */
+interface IERC20Metadata is IERC20 {
+    /**
+     * @dev Returns the name of the token.
+     */
+    function name() external view returns (string memory);
+
+    /**
+     * @dev Returns the symbol of the token.
+     */
+    function symbol() external view returns (string memory);
+
+    /**
+     * @dev Returns the decimals places of the token.
+     */
+    function decimals() external view returns (uint8);
 }
 
 pragma solidity ^0.7.0;
@@ -2596,13 +2652,17 @@ abstract contract NFT721Mint is
     NFT721Metadata,
     TreasuryNode
 {
+    using SafeMathUpgradeable for uint256;
+    AggregatorV3Interface internal priceFeed;
+
     //mapping tokens to feesAmount
-    mapping(address => uint256) public feesAmount;
-    mapping(address => uint256) public updateFee;
     mapping(address => bool) public tokenAddress;
     mapping(uint256 => mapping(address => uint256[])) mapTokenIds;
 
+    uint256 public mintFee;
+    uint256 public updateFee;
     uint256 private nextTokenId;
+    uint256 public price;
 
     event Minted(
         address indexed creator,
@@ -2622,18 +2682,9 @@ abstract contract NFT721Mint is
         string[] values
     );
 
-    event TokenUpdated(
-        address indexed tokenAddress,
-        bool status,
-        uint256 mintFee,
-        uint256 uriUpdateFee
-    );
+    event TokenUpdated(address indexed tokenAddress, bool status);
 
-    event TokenFeesUpdated(
-        address indexed tokenAddress,
-        uint256 mintFee,
-        uint256 uriUpdateFee
-    );
+    event TokenFeesUpdated(uint256 mintFee, uint256 updateFee);
 
     /**
      * @notice Gets the tokenId of the next NFT minted.
@@ -2648,6 +2699,20 @@ abstract contract NFT721Mint is
     function _initializeNFT721Mint() internal initializer {
         // Use ID 1 for the first NFT tokenId
         nextTokenId = 1;
+        priceFeed = AggregatorV3Interface(
+            0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada // MATIC / USD Testnet
+        );
+    }
+
+    /**
+     * @dev Returns the latest price
+     */
+    function getLatestPrice1(uint256 _fee) public returns (uint256) {
+        (, int256 _price, , , ) = priceFeed.latestRoundData();
+        // int256 _price = 138662352;
+        price = uint256(_price).mul(1E10); // converting to E18
+        price = _fee.mul(1E18).mul(1E18).div(price);
+        return price;
     }
 
     /**
@@ -2655,28 +2720,26 @@ abstract contract NFT721Mint is
      */
     function mint(
         string memory tokenIPFSPath,
-        address paymentMode,
+        address paymentToken,
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
         string[] memory values
     ) public payable returns (uint256 tokenId) {
         require(
-            tokenAddress[paymentMode] == true,
+            tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(
+        if (paymentToken != address(0)) {
+            uint8 decimals = IERC20Metadata(paymentToken).decimals();
+            IERC20(paymentToken).transferFrom(
                 msg.sender,
                 getBuddyTreasury(),
-                feesAmount[paymentMode]
+                mintFee.mul(10**decimals)
             );
         } else {
-            require(
-                msg.value >= feesAmount[paymentMode],
-                "Buddy: Insufficient fee amount"
-            );
-            getBuddyTreasury().transfer(address(this).balance);
+            require(msg.value >= price, "Buddy: Insufficient fee amount");
+            getBuddyTreasury().send(address(this).balance);
         }
 
         tokenId = nextTokenId++;
@@ -2702,6 +2765,7 @@ abstract contract NFT721Mint is
         for (uint256 i = 0; i < properties.length; i++) {
             propTovalue[tokenId][properties[i]].push(values[i]);
         }
+        getLatestPrice1(mintFee);
         emit Minted(
             msg.sender,
             tokenId,
@@ -2718,7 +2782,7 @@ abstract contract NFT721Mint is
     function updateTokenURI(
         uint256 tokenId,
         string memory tokenIPFSPath,
-        address paymentMode,
+        address paymentToken,
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
@@ -2727,24 +2791,23 @@ abstract contract NFT721Mint is
         address owner = ownerOf(tokenId);
         require(msg.sender == owner, "Buddy: Not Authorized");
         require(
-            tokenAddress[paymentMode] == true,
+            tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(
+        if (paymentToken != address(0)) {
+            uint8 decimals = IERC20Metadata(paymentToken).decimals();
+            IERC20(paymentToken).transferFrom(
                 msg.sender,
                 getBuddyTreasury(),
-                updateFee[paymentMode]
+                mintFee.mul(10**decimals)
             );
         } else {
-            require(
-                msg.value >= updateFee[paymentMode],
-                "Buddy: Insufficient fee amount"
-            );
-            getBuddyTreasury().transfer(address(this).balance);
+            require(msg.value >= price, "Buddy: Insufficient fee amount");
+            getBuddyTreasury().send(address(this).balance);
         }
+
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        
+
         if (tokenIds[0] != 0) {
             for (uint256 i = 0; i < tokenIds.length; i++) {
                 require(
@@ -2764,6 +2827,7 @@ abstract contract NFT721Mint is
         for (uint256 i = 0; i < properties.length; i++) {
             propTovalue[tokenId][properties[i]].push(values[i]);
         }
+        getLatestPrice1(updateFee);
         emit Updated(
             msg.sender,
             tokenId,
@@ -2843,28 +2907,23 @@ contract BuddyV1 is
     /**
      * @notice Allows Admin to add token address and set fees.
      */
-    function adminUpdateToken(
-        address _tokenAddress,
-        bool status,
-        uint256 _mintFee,
-        uint256 _updateFee
-    ) public onlyOwner {
+    function adminUpdateToken(address _tokenAddress, bool status)
+        public
+        onlyOwner
+    {
         tokenAddress[_tokenAddress] = status;
-        feesAmount[_tokenAddress] = _mintFee;
-        updateFee[_tokenAddress] = _updateFee;
-        emit TokenUpdated(_tokenAddress, status, _mintFee, _updateFee);
+        emit TokenUpdated(_tokenAddress, status);
     }
 
     /**
      * @notice Allows Admin to set fees.
      */
-    // function adminUpdateFees(
-    //     address _tokenAddress,
-    //     uint256 _mintFee,
-    //     uint256 _updateFee
-    // ) public onlyOwner {
-    //     feesAmount[_tokenAddress] = _mintFee;
-    //     updateFee[_tokenAddress] = _updateFee;
-    //     emit TokenFeesUpdated(_tokenAddress, _mintFee, _updateFee);
-    // }
+    function adminUpdateFees(uint256 _mintFee, uint256 _updateFee)
+        public
+        onlyOwner
+    {
+        mintFee = _mintFee;
+        updateFee = _updateFee;
+        emit TokenFeesUpdated(_mintFee, _updateFee);
+    }
 }
