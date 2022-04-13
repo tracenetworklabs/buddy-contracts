@@ -2656,10 +2656,16 @@ abstract contract NFT721Mint is
         nextTokenId = 1;
     }
 
+    /**
+     * @notice Returns the mintFees.
+     */
     function getMintFee() public view returns(uint256) {
         return mintFee;
     }
 
+    /**
+     * @notice Returns the updateFees.
+     */
     function getUpdateFee() public view returns(uint256) {
         return updateFee;
     }
