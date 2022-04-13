@@ -2692,9 +2692,12 @@ abstract contract NFT721Mint is
         }
     }
 
-    function checkDeviation(uint256 feeAmount, uint256 price) internal  view{
-        require(feeAmount >= price.sub(price.mul(deviationPercentage)).div(100) || 
-                feeAmount <= price.add(price.mul(deviationPercentage)).div(100));
+    function checkDeviation(uint256 feeAmount, uint256 price) public view {
+        require(
+            feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) ||
+                feeAmount <=
+                price.add((price.mul(deviationPercentage)).div(100))
+        );
     }
 
     /**
@@ -2713,7 +2716,7 @@ abstract contract NFT721Mint is
             tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        checkFees(paymentToken,feeAmount);
+        checkFees(paymentToken, feeAmount);
 
         tokenId = nextTokenId++;
         if (tokenIds[0] != 0) {
