@@ -1,5 +1,5 @@
 async function main() {
-    const Buddy = await ethers.getContractFactory("BuddyV1")
+    const Buddy = await ethers.getContractFactory("Buddy")
     let buddyProxy = await upgrades.upgradeProxy("0x223352b25b3Fd974a5c9E8b675F127E187756D55", Buddy)
     console.log("Your upgraded proxy is done!", buddyProxy.address);
     // const buddyProxy = await Buddy.attach("0x016506702D2e1B441ca661615EE929F798931B7e");

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
+
 // File: @chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol
 
 pragma solidity ^0.8.2;
@@ -808,7 +809,7 @@ pragma solidity ^0.8.2;
  * @notice Allows users to claim their NFT's
  */
 
-contract Claim is Ownable {
+contract ClaimV1 is Ownable {
     using SafeMathUpgradeable for uint256;
     AggregatorV3Interface internal priceFeed;
 
@@ -825,9 +826,6 @@ contract Claim is Ownable {
 
     function initialize() public initializer {
         Ownable.ownable_init();
-        priceFeed = AggregatorV3Interface(
-            0xAB594600376Ec9fD91F8e885dADF0CE036862dE0
-        );
         claimfee = 25;
     }
 
@@ -835,8 +833,8 @@ contract Claim is Ownable {
      * @dev Returns the latest price
      */
     function getLatestPrice() public view returns (uint256) {
-        (, int256 _price, , , ) = priceFeed.latestRoundData();
-        uint256 price = uint256(_price).mul(1E10); // converting to E18
+        uint256 price = 160000000;
+        price = price.mul(1E10); // converting to E18
         price = claimfee.mul(1E18).mul(DENOMINATION).div(price);
         return price;
     }
