@@ -2864,7 +2864,7 @@ contract BuddyV1 is
     }
 
     /**
-     * @notice Allows Admin to add token address and set fees.
+     * @notice Allows Admin to set fees.
      */
     function adminUpdateFeeAmount(uint256 _mintFee, uint256 _updateFee)
         public
@@ -2875,6 +2875,9 @@ contract BuddyV1 is
         emit BaseTokenAdded(_mintFee, _updateFee);
     }
 
+    /**
+     * @notice Allows Admin to add token address.
+     */
     function adminUpdateFeeToken(address _tokenAddress, bool status)
         public
         onlyOwner
