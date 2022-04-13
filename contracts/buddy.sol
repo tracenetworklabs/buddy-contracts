@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at polygonscan.com on 2022-03-29
+*/
+
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
 
@@ -1633,6 +1637,12 @@ library EnumerableMapUpgradeable {
     }
 }
 
+interface Conversion {
+     function convertMintFee(address paymentToken,uint256 mintFee) external returns(uint256);
+     function convertUpdateFee(address paymentToken, uint256 updateFee) external returns(uint256);
+
+}
+
 // File @openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -2596,12 +2606,12 @@ abstract contract NFT721Mint is
     NFT721Metadata,
     TreasuryNode
 {
-    //mapping tokens to feesAmount
-    mapping(address => uint256) public feesAmount;
-    mapping(address => uint256) public updateFee;
     mapping(address => bool) public tokenAddress;
+    uint256 internal mintFee;
+    uint256 internal updateFee;
+    address public baseTokenAddress;
     mapping(uint256 => mapping(address => uint256[])) mapTokenIds;
-
+    address public conversionAddress;
     uint256 private nextTokenId;
 
     event Minted(
@@ -2622,17 +2632,15 @@ abstract contract NFT721Mint is
         string[] values
     );
 
-    event TokenUpdated(
+    event BaseTokenAdded(
         address indexed tokenAddress,
-        bool status,
         uint256 mintFee,
         uint256 uriUpdateFee
     );
 
-    event TokenFeesUpdated(
+    event TokenUpdated(
         address indexed tokenAddress,
-        uint256 mintFee,
-        uint256 uriUpdateFee
+        bool status
     );
 
     /**
@@ -2650,30 +2658,39 @@ abstract contract NFT721Mint is
         nextTokenId = 1;
     }
 
+    function getMintFee() public view returns(uint256) {
+        return mintFee;
+    }
+
+    function getUpdateFee() public view returns(uint256) {
+        return updateFee;
+    }
+
     /**
      * @notice Allows a creator to mint an NFT.
      */
     function mint(
         string memory tokenIPFSPath,
-        address paymentMode,
+        address paymentToken,
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
         string[] memory values
     ) public payable returns (uint256 tokenId) {
         require(
-            tokenAddress[paymentMode] == true,
+            tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(
+        uint256 price = Conversion(conversionAddress).convertMintFee(paymentToken,getMintFee());
+        if (paymentToken != address(0)) {
+            IERC20(paymentToken).transferFrom(
                 msg.sender,
                 getBuddyTreasury(),
-                feesAmount[paymentMode]
+                price
             );
         } else {
             require(
-                msg.value >= feesAmount[paymentMode],
+                msg.value >= price,
                 "Buddy: Insufficient fee amount"
             );
             getBuddyTreasury().transfer(address(this).balance);
@@ -2718,7 +2735,7 @@ abstract contract NFT721Mint is
     function updateTokenURI(
         uint256 tokenId,
         string memory tokenIPFSPath,
-        address paymentMode,
+        address paymentToken,
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
@@ -2727,18 +2744,19 @@ abstract contract NFT721Mint is
         address owner = ownerOf(tokenId);
         require(msg.sender == owner, "Buddy: Not Authorized");
         require(
-            tokenAddress[paymentMode] == true,
+            tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(
+        uint256 price = Conversion(conversionAddress).convertUpdateFee(paymentToken,getUpdateFee());
+        if (paymentToken != address(0)) {
+            IERC20(paymentToken).transferFrom(
                 msg.sender,
                 getBuddyTreasury(),
-                updateFee[paymentMode]
+                price
             );
         } else {
             require(
-                msg.value >= updateFee[paymentMode],
+                msg.value >= price,
                 "Buddy: Insufficient fee amount"
             );
             getBuddyTreasury().transfer(address(this).balance);
@@ -2810,7 +2828,8 @@ contract Buddy is
     function initialize(
         address payable treasury,
         string memory name,
-        string memory symbol
+        string memory symbol,
+        address conversion
     ) public initializer {
         TreasuryNode._initializeTreasuryNode(treasury);
         Ownable.ownable_init();
@@ -2818,6 +2837,7 @@ contract Buddy is
         NFT721Creator._initializeNFT721Creator();
         NFT721Mint._initializeNFT721Mint();
         adminUpdateConfig("https://ipfs.io/ipfs/");
+        conversionAddress = conversion;
     }
 
     /**
@@ -2842,28 +2862,23 @@ contract Buddy is
     /**
      * @notice Allows Admin to add token address and set fees.
      */
-    function adminUpdateToken(
+    function adminAddBaseToken(
         address _tokenAddress,
-        bool status,
         uint256 _mintFee,
         uint256 _updateFee
     ) public onlyOwner {
-        tokenAddress[_tokenAddress] = status;
-        feesAmount[_tokenAddress] = _mintFee;
-        updateFee[_tokenAddress] = _updateFee;
-        emit TokenUpdated(_tokenAddress, status, _mintFee, _updateFee);
+        baseTokenAddress = _tokenAddress;
+        mintFee = _mintFee;
+        updateFee = _updateFee;
+        emit BaseTokenAdded(_tokenAddress, _mintFee, _updateFee);
     }
 
-    /**
-     * @notice Allows Admin to set fees.
-     */
-    function adminUpdateFees(
+    function adminUpdateSuportedToken(
         address _tokenAddress,
-        uint256 _mintFee,
-        uint256 _updateFee
+        bool status
     ) public onlyOwner {
-        feesAmount[_tokenAddress] = _mintFee;
-        updateFee[_tokenAddress] = _updateFee;
-        emit TokenFeesUpdated(_tokenAddress, _mintFee, _updateFee);
+        tokenAddress[_tokenAddress] = status;
+        emit TokenUpdated(_tokenAddress, status);
     }
+
 }
