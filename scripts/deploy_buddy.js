@@ -39,26 +39,22 @@ async function main() {
     await conversion.addToken(USDT, PRICE_USDT_USD);
 
     //// ************ DEPLOY BUDDY **************/////
-    console.log("here");
     const Buddy = await ethers.getContractFactory("BuddyV1")
     const buddyProxy = await upgrades.deployProxy(Buddy, [treasuryProxy.address, "AVATAR", "AVT", conversion.address], { initializer: 'initialize' })
     await new Promise(res => setTimeout(res, 5000));
     console.log("Buddy Proxy:", buddyProxy.address);
 
-    await buddyProxy.adminUpdatefeeConfig(2,2); // Update mint and update fee
+    await buddyProxy.adminUpdateFeeAmount(2,2); // Update mint and update fee
 
     //// ************ ADD TOKEN TO BUDDY **************/////
     await new Promise(res => setTimeout(res, 5000));
-    await buddyProxy.adminUpdateToken(MATIC, true); // Matic
+    await buddyProxy.adminUpdateFeeToken(MATIC, true); // Matic
 
     await new Promise(res => setTimeout(res, 5000));
-    await buddyProxy.adminUpdateToken(USDT, true); // USDT
+    await buddyProxy.adminUpdateFeeToken(USDT, true); // USDT
 
     await new Promise(res => setTimeout(res, 5000));
-    await buddyProxy.adminUpdateToken(USDC, true); // USDC
-
-    await new Promise(res => setTimeout(res, 5000));
-    await buddyProxy.adminUpdateFees(1, 1);
+    await buddyProxy.adminUpdateFeeToken(USDC, true); // USDC
 
     await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.transferOwnership(accounts[0]);
@@ -73,7 +69,7 @@ async function main() {
     //Test Mint
     console.log("Next token ID", await buddyProxy.getNextTokenId());
     await buddyProxy.mint("QmQh36CsceXZoqS7v9YQLUyxXdRmWd8YWTBUz7WCXsiVty", "0x0000000000000000000000000000000000000000", ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], {
-        value: await ethers.utils.parseEther(await buddyProxy.getMintFee()),
+        value: await ethers.utils.parseEther('2'),
     });
     await new Promise(res => setTimeout(res, 5000));
     console.log("Next token ID", await buddyProxy.getNextTokenId());

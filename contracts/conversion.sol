@@ -1,11 +1,12 @@
 /**
  *Submitted for verification at polygonscan.com on 2022-04-13
-*/
+ */
 
 // SPDX-License-Identifier: UNLICENSED
 // File: @chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol
 
 pragma solidity 0.7.6;
+
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
  */
@@ -24,7 +25,7 @@ interface IERC20 {
      * @dev Returns the decimals places of the token.
      */
     function decimals() external view returns (uint256);
-    
+
     /**
      * @dev Returns the amount of tokens in existence.
      */
@@ -34,7 +35,6 @@ interface IERC20 {
      * @dev Returns the amount of tokens owned by `account`.
      */
     function balanceOf(address account) external view returns (uint256);
-
 }
 
 interface AggregatorV3Interface {
@@ -571,8 +571,7 @@ library SafeMathUpgradeable {
     }
 }
 
-contract Conversion is Initializable
-{
+contract Conversion is Initializable {
     using SafeMathUpgradeable for uint256;
 
     address public admin;
@@ -581,52 +580,63 @@ contract Conversion is Initializable
 
     function initialize() public initializer {
         admin = msg.sender;
-    }  
+    }
 
     /**
      * @dev Returns the latest price.
      */
-    function getLatestPrice(AggregatorV3Interface fetchPrice) public view returns (uint256) {
+    function getLatestPrice(AggregatorV3Interface fetchPrice)
+        public
+        view
+        returns (uint256)
+    {
         (, int256 _price, , , ) = fetchPrice.latestRoundData();
-        uint256 price = uint256(_price).mul(1E10); 
+        uint256 price = uint256(_price).mul(1E10);
         return price;
     }
 
-    /** 
+    /**
      * @notice To convert usd to equivalent amount of token.
      */
-    function convertMintFee(address paymentToken,uint256 mintFee) public  view returns(uint256) {
+    function convertMintFee(address paymentToken, uint256 mintFee)
+        public
+        view
+        returns (uint256)
+    {
         AggregatorV3Interface fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
         );
         uint256 price = getLatestPrice(fetchPrice);
         uint256 decimal = 18;
-        if(paymentToken!=address(0)) {
+        if (paymentToken != address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
         price = mintFee.mul(1E18).mul(10**decimal).div(price);
         return price;
     }
 
-    /** 
+    /**
      * @notice To convert usd to equivalent amount of token.
      */
-    function convertUpdateFee(address paymentToken, uint256 updateFee) public view returns(uint256) {
+    function convertUpdateFee(address paymentToken, uint256 updateFee)
+        public
+        view
+        returns (uint256)
+    {
         AggregatorV3Interface fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
         );
         uint256 price = getLatestPrice(fetchPrice);
         uint256 decimal = 18;
-        if(paymentToken!=address(0)) {
+        if (paymentToken != address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
         price = updateFee.mul(1E18).mul(10**decimal).div(price);
         return price;
     }
 
-    function addToken(address paymentToken, address baseToken, address _priceFeed) public {
+    function addToken(address paymentToken, address _priceFeed) public {
         require(msg.sender == admin, "Conversion: INVALID_ACCESS");
-        require(baseToken == address(0),"Conversion: INVALID_ADDRESS");
-        priceFeed[paymentToken][baseToken]=_priceFeed;
+        priceFeed[paymentToken][address(0)] = _priceFeed;
     }
 }
