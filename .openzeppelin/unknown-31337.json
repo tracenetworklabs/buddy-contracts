@@ -6,33 +6,8 @@
   },
   "proxies": [
     {
-      "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-      "txHash": "0x9f9db639265daeec09c091398d748bc5adafbab99b890e6ab20165424c6db9e0",
-      "kind": "transparent"
-    },
-    {
       "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
       "txHash": "0x4fc8f9da854840914a58894a9bef2c0ea4b7e028c3454f6b31159abc22cf68f8",
-      "kind": "transparent"
-    },
-    {
-      "address": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
-      "txHash": "0x634c7ed1b2676f282b646ac4cc5f36a8138a04e2b57df6b16f38afb9ad6e9b30",
-      "kind": "transparent"
-    },
-    {
-      "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
-      "txHash": "0xb12f5f91472ccdd6f4a4564bcbea6ad4f864ced222ea81ec89d22746d2b36ff1",
-      "kind": "transparent"
-    },
-    {
-      "address": "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
-      "txHash": "0x4aa3c54a73bfc79a96fd2bf5d1bbe541d6228f13d325d684958644f614a7deb9",
-      "kind": "transparent"
-    },
-    {
-      "address": "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
-      "txHash": "0x89c43253dea42ca5945cb0dff321e44e4468490e0d4b1ef4eac544cf7cd5ea49",
       "kind": "transparent"
     },
     {
@@ -173,6 +148,61 @@
     {
       "address": "0x18E317A7D70d8fBf8e6E893616b52390EbBdb629",
       "txHash": "0xdf47816410cc26da0842c4991e13ee090268eb91e7e043f2d9737d07de94b1c4",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+      "txHash": "0x9f9db639265daeec09c091398d748bc5adafbab99b890e6ab20165424c6db9e0",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      "txHash": "0x058bd58f314897c00c80ab47fc3ee08b8fa26a78e2732679eaf28899a5d12d25",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      "txHash": "0x29144491cb7ccf09ee903c7d7d21681cb542c0fef6b6ad0307c574f39046290b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+      "txHash": "0xadb6164dda3b37cfd39b5c0b3045731fd3fd6ee7edbfd3b8746f67cb44f54201",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+      "txHash": "0x81244bb296758fd690fc1d1111febb7cd51fe6fda22cd3288e19e6da3551b182",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
+      "txHash": "0x4180a3800159eba6c63f2bce1f9d66be6fb917d9b568583852b0a74b0554ec07",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x610178dA211FEF7D417bC0e6FeD39F05609AD788",
+      "txHash": "0xe53b9b4c26e03cd69caa0e9e138691a8230ebb61e5082d3ae55aed13947c8f2b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+      "txHash": "0x5cb209887fbb992f94868b750d13a8be748dda461c97e99269c0a67202fb8d90",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+      "txHash": "0xce055bcc4bc6d0d9bc468d8b663e05e6a9fd72ffe45b868190d3c054758bf001",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
+      "txHash": "0x6bce828f2f8790de91412af288e7b63ed12e9f62c227a01cd92495a39668200f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9A676e781A523b5d0C0e43731313A708CB607508",
+      "txHash": "0x2645c79834f2f97c99070685cd93593597f0365934c95e18587354222bf95dac",
       "kind": "transparent"
     }
   ],
@@ -4604,6 +4634,134 @@
           },
           "t_uint256": {
             "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "bb89cb65a1c228af03540d304fb102e5101c82bd19da31fd67514499568dafdb": {
+      "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      "txHash": "0xf5e7c1c5f9b4883cd54f08b7301f1552acfd3e69c32c008e87deb7231cf3bca8",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\conversion.sol:301"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\conversion.sol:306"
+          },
+          {
+            "label": "fetchPrice",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_contract(AggregatorV3Interface)79",
+            "contract": "Conversion",
+            "src": "contracts\\conversion.sol:578"
+          },
+          {
+            "label": "admin",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address",
+            "contract": "Conversion",
+            "src": "contracts\\conversion.sol:580"
+          },
+          {
+            "label": "priceFeed",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_address))",
+            "contract": "Conversion",
+            "src": "contracts\\conversion.sol:581"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(AggregatorV3Interface)79": {
+            "label": "contract AggregatorV3Interface",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_address))": {
+            "label": "mapping(address => mapping(address => address))",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "fb6edefd85314011ab63383d31f554846a82e8fa96b2c0ee78cfd5a4bd80acb4": {
+      "address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
+      "txHash": "0xdab14e4ff480ba914ebfdd91c7ee6ce7e508a12b66f9a6a24e66a22f29d5bf83",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\conversion.sol:307"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\conversion.sol:312"
+          },
+          {
+            "label": "admin",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "Conversion",
+            "src": "contracts\\conversion.sol:580"
+          },
+          {
+            "label": "priceFeed",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_address))",
+            "contract": "Conversion",
+            "src": "contracts\\conversion.sol:581"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_address))": {
+            "label": "mapping(address => mapping(address => address))",
             "numberOfBytes": "32"
           }
         }

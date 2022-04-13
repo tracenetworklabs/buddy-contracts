@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at polygonscan.com on 2022-04-13
+*/
+
 // SPDX-License-Identifier: UNLICENSED
 // File: @chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol
 
@@ -569,15 +573,9 @@ library SafeMathUpgradeable {
     }
 }
 
-interface Buddy {
-    function getMintFee() external view returns(uint256);
-    function getUpdateFee() external view returns(uint256);
-}
-
 contract Conversion is Initializable
 {
     using SafeMathUpgradeable for uint256;
-    AggregatorV3Interface internal fetchPrice;
 
     address public admin;
     mapping(address => mapping(address => address)) public priceFeed;
@@ -590,7 +588,7 @@ contract Conversion is Initializable
     /**
      * @dev Returns the latest price.
      */
-    function getLatestPrice() public view returns (uint256) {
+    function getLatestPrice(AggregatorV3Interface fetchPrice) public view returns (uint256) {
         (, int256 _price, , , ) = fetchPrice.latestRoundData();
         uint256 price = uint256(_price).mul(1E10); 
         return price;
@@ -599,35 +597,37 @@ contract Conversion is Initializable
     /** 
      * @notice To convert usd to equivalent amount of token.
      */
-
-    function convertMintFee(address paymentToken,uint256 amount) public {
-        fetchPrice = AggregatorV3Interface(
+    function convertMintFee(address paymentToken,uint256 mintFee) public  view returns(uint256) {
+        AggregatorV3Interface fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
         );
-        uint256 price = getLatestPrice();
+        uint256 price = getLatestPrice(fetchPrice);
         uint256 decimal = 18;
         if(paymentToken!=address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
-        price = amount.mul(1E18).mul(10**decimal).div(price);
+        price = mintFee.mul(1E18).mul(10**decimal).div(price);
+        return price;
     }
 
 
-    function convertUpdateFee(address paymentToken, uint256 amount) public {
-        fetchPrice = AggregatorV3Interface(
+    function convertUpdateFee(address paymentToken, uint256 updateFee) public view returns(uint256) {
+        AggregatorV3Interface fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
         );
-        uint256 price = getLatestPrice();
+        uint256 price = getLatestPrice(fetchPrice);
         uint256 decimal = 18;
         if(paymentToken!=address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
-        price = amount.mul(1E18).mul(10**decimal).div(price);
+        price = updateFee.mul(1E18).mul(10**decimal).div(price);
+        return price;
+
     }
 
     function addToken(address paymentToken, address baseToken, address _priceFeed) public {
         require(msg.sender == admin, "Conversion: INVALID_ACCESS");
-        require(baseToken == address(0),"Conversion: INVALID_ADDress");
+        require(baseToken == address(0),"Conversion: INVALID_ADDRESS");
         priceFeed[paymentToken][baseToken]=_priceFeed;
     }
 }

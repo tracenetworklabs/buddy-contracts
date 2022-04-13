@@ -1,6 +1,6 @@
 /**
  *Submitted for verification at polygonscan.com on 2022-03-29
-*/
+ */
 
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
@@ -1637,10 +1637,16 @@ library EnumerableMapUpgradeable {
     }
 }
 
-interface Conversion {
-     function convertMintFee(address paymentToken,uint256 mintFee) external returns(uint256);
-     function convertUpdateFee(address paymentToken, uint256 updateFee) external returns(uint256);
+interface ConversionInt {
+    function convertMintFee(address paymentToken, uint256 mintFee)
+        external
+        view
+        returns (uint256);
 
+    function convertUpdateFee(address paymentToken, uint256 updateFee)
+        external
+        view
+        returns (uint256);
 }
 
 // File @openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol@v3.4.1-solc-0.7
@@ -2631,15 +2637,9 @@ abstract contract NFT721Mint is
         string[] values
     );
 
-    event BaseTokenAdded(
-        uint256 mintFee,
-        uint256 uriUpdateFee
-    );
+    event BaseTokenAdded(uint256 mintFee, uint256 uriUpdateFee);
 
-    event TokenUpdated(
-        address indexed tokenAddress,
-        bool status
-    );
+    event TokenUpdated(address indexed tokenAddress, bool status);
 
     /**
      * @notice Gets the tokenId of the next NFT minted.
@@ -2656,11 +2656,17 @@ abstract contract NFT721Mint is
         nextTokenId = 1;
     }
 
-    function getMintFee() public view returns(uint256) {
+    /**
+     * @dev Get USD fee for mint
+     */
+    function getMintFee() public view returns (uint256) {
         return mintFee;
     }
 
-    function getUpdateFee() public view returns(uint256) {
+    /**
+     * @dev Get USD fee for Update
+     */
+    function getUpdateFee() public view returns (uint256) {
         return updateFee;
     }
 
@@ -2679,7 +2685,10 @@ abstract contract NFT721Mint is
             tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        uint256 price = Conversion(conversionAddress).convertMintFee(paymentToken,getMintFee());
+        uint256 price = ConversionInt(conversionAddress).convertMintFee(
+            paymentToken,
+            getMintFee()
+        );
         if (paymentToken != address(0)) {
             IERC20(paymentToken).transferFrom(
                 msg.sender,
@@ -2687,10 +2696,7 @@ abstract contract NFT721Mint is
                 price
             );
         } else {
-            require(
-                msg.value >= price,
-                "Buddy: Insufficient fee amount"
-            );
+            require(msg.value >= price, "Buddy: Insufficient fee amount");
             getBuddyTreasury().transfer(address(this).balance);
         }
 
@@ -2745,7 +2751,10 @@ abstract contract NFT721Mint is
             tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        uint256 price = Conversion(conversionAddress).convertUpdateFee(paymentToken,getUpdateFee());
+        uint256 price = ConversionInt(conversionAddress).convertUpdateFee(
+            paymentToken,
+            getUpdateFee()
+        );
         if (paymentToken != address(0)) {
             IERC20(paymentToken).transferFrom(
                 msg.sender,
@@ -2753,10 +2762,7 @@ abstract contract NFT721Mint is
                 price
             );
         } else {
-            require(
-                msg.value >= price,
-                "Buddy: Insufficient fee amount"
-            );
+            require(msg.value >= price, "Buddy: Insufficient fee amount");
             getBuddyTreasury().transfer(address(this).balance);
         }
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
@@ -2809,7 +2815,7 @@ pragma solidity ^0.7.0;
  * @title Buddy NFTs implemented using the ERC-721 standard.
  * @dev This top level file holds no data directly to ease future upgrades.
  */
-contract Buddy is
+contract BuddyV1 is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Core,
@@ -2834,7 +2840,7 @@ contract Buddy is
         ERC721Upgradeable.__ERC721_init(name, symbol);
         NFT721Creator._initializeNFT721Creator();
         NFT721Mint._initializeNFT721Mint();
-        adminUpdateConfig("https://ipfs.io/ipfs/");
+        adminUpdateBaseURI("https://ipfs.io/ipfs/");
         conversionAddress = conversion;
     }
 
@@ -2842,7 +2848,7 @@ contract Buddy is
      * @notice Allows a Buddy admin to update NFT config variables.
      * @dev This must be called right after the initial call to `initialize`.
      */
-    function adminUpdateConfig(string memory baseURI) public onlyOwner {
+    function adminUpdateBaseURI(string memory baseURI) public onlyOwner {
         _updateBaseURI(baseURI);
     }
 
@@ -2860,21 +2866,20 @@ contract Buddy is
     /**
      * @notice Allows Admin to add token address and set fees.
      */
-    function adminAddBaseToken(
-        uint256 _mintFee,
-        uint256 _updateFee
-    ) public onlyOwner {
+    function adminUpdatefeeConfig(uint256 _mintFee, uint256 _updateFee)
+        public
+        onlyOwner
+    {
         mintFee = _mintFee;
         updateFee = _updateFee;
         emit BaseTokenAdded(_mintFee, _updateFee);
     }
 
-    function adminUpdateSuportedToken(
-        address _tokenAddress,
-        bool status
-    ) public onlyOwner {
+    function adminUpdateSuportedToken(address _tokenAddress, bool status)
+        public
+        onlyOwner
+    {
         tokenAddress[_tokenAddress] = status;
         emit TokenUpdated(_tokenAddress, status);
     }
-
 }
