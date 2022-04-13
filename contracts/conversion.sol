@@ -575,11 +575,13 @@ contract Conversion is Initializable {
     using SafeMathUpgradeable for uint256;
 
     address public admin;
+    uint256 public USDDecimals;
     mapping(address => mapping(address => address)) public priceFeed;
     event TokenAdded(address indexed tokenAddress);
 
     function initialize() public initializer {
         admin = msg.sender;
+        USDDecimals = 1E8;
     }
 
     /**
@@ -611,7 +613,7 @@ contract Conversion is Initializable {
         if (paymentToken != address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
-        price = mintFee.mul(1E18).mul(10**decimal).div(price);
+        price = mintFee.mul(1E18).mul(10**decimal).div(price).div(USDDecimals);
         return price;
     }
 
@@ -631,7 +633,9 @@ contract Conversion is Initializable {
         if (paymentToken != address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
-        price = updateFee.mul(1E18).mul(10**decimal).div(price);
+        price = updateFee.mul(1E18).mul(10**decimal).div(price).div(
+            USDDecimals
+        );
         return price;
     }
 
