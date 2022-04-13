@@ -33,8 +33,6 @@ interface IERC20 {
 
 }
 
-
-
 interface AggregatorV3Interface {
     function decimals() external view returns (uint8);
 
@@ -569,17 +567,13 @@ library SafeMathUpgradeable {
     }
 }
 
-interface Buddy {
-    function getMintFee() external view returns(uint256);
-    function getUpdateFee() external view returns(uint256);
-}
-
 contract Conversion is Initializable
 {
     using SafeMathUpgradeable for uint256;
     AggregatorV3Interface internal fetchPrice;
 
     address public admin;
+    uint256 public fee;
     mapping(address => mapping(address => address)) public priceFeed;
     event TokenAdded(address indexed tokenAddress);
 
@@ -599,8 +593,7 @@ contract Conversion is Initializable
     /** 
      * @notice To convert usd to equivalent amount of token.
      */
-
-    function convertMintFee(address paymentToken,uint256 amount) public {
+    function convertMintFee(address paymentToken,uint256 mintFee) public returns(uint256) {
         fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
         );
@@ -609,11 +602,13 @@ contract Conversion is Initializable
         if(paymentToken!=address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
-        price = amount.mul(1E18).mul(10**decimal).div(price);
+        price = mintFee.mul(1E18).mul(10**decimal).div(price);
+        fee = price;
+        return price;
     }
 
 
-    function convertUpdateFee(address paymentToken, uint256 amount) public {
+    function convertUpdateFee(address paymentToken, uint256 updateFee) public returns(uint256) {
         fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
         );
@@ -622,12 +617,15 @@ contract Conversion is Initializable
         if(paymentToken!=address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
-        price = amount.mul(1E18).mul(10**decimal).div(price);
+        price = updateFee.mul(1E18).mul(10**decimal).div(price);
+        fee = price;
+        return price;
+
     }
 
     function addToken(address paymentToken, address baseToken, address _priceFeed) public {
         require(msg.sender == admin, "Conversion: INVALID_ACCESS");
-        require(baseToken == address(0),"Conversion: INVALID_ADDress");
+        require(baseToken == address(0),"Conversion: INVALID_ADDRESS");
         priceFeed[paymentToken][baseToken]=_priceFeed;
     }
 }
