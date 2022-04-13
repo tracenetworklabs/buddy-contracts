@@ -2612,12 +2612,14 @@ abstract contract NFT721Mint is
     NFT721Metadata,
     TreasuryNode
 {
+    using SafeMathUpgradeable for uint256;
     mapping(address => bool) public tokenAddress;
     uint256 internal mintFee;
     uint256 internal updateFee;
     mapping(uint256 => mapping(address => uint256[])) mapTokenIds;
     address public conversionAddress;
     uint256 private nextTokenId;
+    uint256 public deviationPercentage;
 
     event Minted(
         address indexed creator,
@@ -2640,6 +2642,8 @@ abstract contract NFT721Mint is
     event BaseTokenAdded(uint256 mintFee, uint256 uriUpdateFee);
 
     event TokenUpdated(address indexed tokenAddress, bool status);
+
+    event DeviationPercentage(uint256 percentage);
 
     /**
      * @notice Gets the tokenId of the next NFT minted.
@@ -2670,12 +2674,36 @@ abstract contract NFT721Mint is
         return updateFee;
     }
 
+    function checkFees(address paymentToken, uint256 feeAmount) internal {
+        uint256 price = ConversionInt(conversionAddress).convertMintFee(
+            paymentToken,
+            getMintFee()
+        );
+        if (paymentToken != address(0)) {
+            checkDeviation(feeAmount, price);
+            IERC20(paymentToken).transferFrom(
+                msg.sender,
+                getBuddyTreasury(),
+                feeAmount
+            );
+        } else {
+            checkDeviation(msg.value, price);
+            getBuddyTreasury().transfer(address(this).balance);
+        }
+    }
+
+    function checkDeviation(uint256 feeAmount, uint256 price) internal  view{
+        require(feeAmount >= price.sub(price.mul(deviationPercentage)).div(100) || 
+                feeAmount <= price.add(price.mul(deviationPercentage)).div(100));
+    }
+
     /**
      * @notice Allows a creator to mint an NFT.
      */
     function mint(
         string memory tokenIPFSPath,
         address paymentToken,
+        uint256 feeAmount,
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
@@ -2685,20 +2713,7 @@ abstract contract NFT721Mint is
             tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        uint256 price = ConversionInt(conversionAddress).convertMintFee(
-            paymentToken,
-            getMintFee()
-        );
-        if (paymentToken != address(0)) {
-            IERC20(paymentToken).transferFrom(
-                msg.sender,
-                getBuddyTreasury(),
-                price
-            );
-        } else {
-            require(msg.value >= price, "Buddy: Insufficient fee amount");
-            getBuddyTreasury().transfer(address(this).balance);
-        }
+        checkFees(paymentToken,feeAmount);
 
         tokenId = nextTokenId++;
         if (tokenIds[0] != 0) {
@@ -2853,17 +2868,6 @@ contract BuddyV1 is
     }
 
     /**
-     * @dev This is a no-op, just an explicit override to address compile errors due to inheritance.
-     */
-    function _burn(uint256 tokenId)
-        internal
-        virtual
-        override(ERC721Upgradeable, NFT721Creator, NFT721Metadata, NFT721Mint)
-    {
-        super._burn(tokenId);
-    }
-
-    /**
      * @notice Allows Admin to set fees.
      */
     function adminUpdateFeeAmount(uint256 _mintFee, uint256 _updateFee)
@@ -2884,5 +2888,27 @@ contract BuddyV1 is
     {
         tokenAddress[_tokenAddress] = status;
         emit TokenUpdated(_tokenAddress, status);
+    }
+
+    /**
+     * @notice Allows Admin to add token address.
+     */
+    function adminUpdateDeviation(uint256 _deviationPercentage)
+        public
+        onlyOwner
+    {
+        deviationPercentage = _deviationPercentage;
+        emit DeviationPercentage(_deviationPercentage);
+    }
+
+    /**
+     * @dev This is a no-op, just an explicit override to address compile errors due to inheritance.
+     */
+    function _burn(uint256 tokenId)
+        internal
+        virtual
+        override(ERC721Upgradeable, NFT721Creator, NFT721Metadata, NFT721Mint)
+    {
+        super._burn(tokenId);
     }
 }
