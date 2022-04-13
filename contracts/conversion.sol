@@ -570,10 +570,8 @@ library SafeMathUpgradeable {
 contract Conversion is Initializable
 {
     using SafeMathUpgradeable for uint256;
-    AggregatorV3Interface internal fetchPrice;
 
     address public admin;
-    uint256 public fee;
     mapping(address => mapping(address => address)) public priceFeed;
     event TokenAdded(address indexed tokenAddress);
 
@@ -584,7 +582,7 @@ contract Conversion is Initializable
     /**
      * @dev Returns the latest price.
      */
-    function getLatestPrice() public view returns (uint256) {
+    function getLatestPrice(AggregatorV3Interface fetchPrice) public view returns (uint256) {
         (, int256 _price, , , ) = fetchPrice.latestRoundData();
         uint256 price = uint256(_price).mul(1E10); 
         return price;
@@ -593,34 +591,33 @@ contract Conversion is Initializable
     /** 
      * @notice To convert usd to equivalent amount of token.
      */
-    function convertMintFee(address paymentToken,uint256 mintFee) public returns(uint256) {
-        fetchPrice = AggregatorV3Interface(
+    function convertMintFee(address paymentToken,uint256 mintFee) public view returns(uint256) {
+        AggregatorV3Interface fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
         );
-        uint256 price = getLatestPrice();
+        uint256 price = getLatestPrice(fetchPrice);
         uint256 decimal = 18;
         if(paymentToken!=address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
         price = mintFee.mul(1E18).mul(10**decimal).div(price);
-        fee = price;
         return price;
     }
 
-
-    function convertUpdateFee(address paymentToken, uint256 updateFee) public returns(uint256) {
-        fetchPrice = AggregatorV3Interface(
+    /** 
+     * @notice To convert usd to equivalent amount of token.
+     */
+    function convertUpdateFee(address paymentToken, uint256 updateFee) public view returns(uint256) {
+        AggregatorV3Interface fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
         );
-        uint256 price = getLatestPrice();
+        uint256 price = getLatestPrice(fetchPrice);
         uint256 decimal = 18;
         if(paymentToken!=address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
         price = updateFee.mul(1E18).mul(10**decimal).div(price);
-        fee = price;
         return price;
-
     }
 
     function addToken(address paymentToken, address baseToken, address _priceFeed) public {
