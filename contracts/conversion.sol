@@ -37,8 +37,6 @@ interface IERC20 {
 
 }
 
-
-
 interface AggregatorV3Interface {
     function decimals() external view returns (uint8);
 
@@ -610,7 +608,9 @@ contract Conversion is Initializable
         return price;
     }
 
-
+    /** 
+     * @notice To convert usd to equivalent amount of token.
+     */
     function convertUpdateFee(address paymentToken, uint256 updateFee) public view returns(uint256) {
         AggregatorV3Interface fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
@@ -622,7 +622,6 @@ contract Conversion is Initializable
         }
         price = updateFee.mul(1E18).mul(10**decimal).div(price);
         return price;
-
     }
 
     function addToken(address paymentToken, address baseToken, address _priceFeed) public {
