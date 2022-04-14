@@ -2676,6 +2676,7 @@ abstract contract NFT721Mint is
 
     function checkFees(address paymentToken, uint256 feeAmount, uint256 value) internal {
         uint256 price;
+        address payable treasury = getBuddyTreasury();
         if(value == 0) {
             price = ConversionInt(conversionAddress).convertMintFee(
                 paymentToken,
@@ -2692,12 +2693,12 @@ abstract contract NFT721Mint is
             checkDeviation(feeAmount, price);
             IERC20(paymentToken).transferFrom(
                 msg.sender,
-                getBuddyTreasury(),
+                treasury,
                 feeAmount
             );
         } else {
             checkDeviation(msg.value, price);
-            getBuddyTreasury().send(msg.value);
+            treasury.transfer(msg.value);
         }
     }
 
@@ -2727,7 +2728,6 @@ abstract contract NFT721Mint is
             "Buddy: Invalid payment mode"
         );
         checkFees(paymentToken, feeAmount, 0);
-
         tokenId = nextTokenId++;
         if (tokenIds[0] != 0) {
             for (uint256 i = 0; i < tokenIds.length; i++) {
