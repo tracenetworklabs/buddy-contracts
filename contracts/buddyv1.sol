@@ -2674,11 +2674,20 @@ abstract contract NFT721Mint is
         return updateFee;
     }
 
-    function checkFees(address paymentToken, uint256 feeAmount) internal {
-        uint256 price = ConversionInt(conversionAddress).convertMintFee(
-            paymentToken,
-            getMintFee()
-        );
+    function checkFees(address paymentToken, uint256 feeAmount, uint256 value) internal {
+        uint256 price;
+        if(value == 0) {
+            price = ConversionInt(conversionAddress).convertMintFee(
+                paymentToken,
+                getMintFee()
+            );
+        }
+        else {
+            price = ConversionInt(conversionAddress).convertUpdateFee(
+                paymentToken,
+                getUpdateFee()
+            );
+        }
         if (paymentToken != address(0)) {
             checkDeviation(feeAmount, price);
             IERC20(paymentToken).transferFrom(
@@ -2688,7 +2697,7 @@ abstract contract NFT721Mint is
             );
         } else {
             checkDeviation(msg.value, price);
-            getBuddyTreasury().transfer(msg.value);
+            getBuddyTreasury().send(msg.value);
         }
     }
 
@@ -2717,7 +2726,7 @@ abstract contract NFT721Mint is
             tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        checkFees(paymentToken, feeAmount);
+        checkFees(paymentToken, feeAmount, 0);
 
         tokenId = nextTokenId++;
         if (tokenIds[0] != 0) {
@@ -2759,6 +2768,7 @@ abstract contract NFT721Mint is
         uint256 tokenId,
         string memory tokenIPFSPath,
         address paymentToken,
+        uint256 feeAmount,
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
@@ -2770,20 +2780,7 @@ abstract contract NFT721Mint is
             tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        uint256 price = ConversionInt(conversionAddress).convertUpdateFee(
-            paymentToken,
-            getUpdateFee()
-        );
-        if (paymentToken != address(0)) {
-            IERC20(paymentToken).transferFrom(
-                msg.sender,
-                getBuddyTreasury(),
-                price
-            );
-        } else {
-            require(msg.value >= price, "Buddy: Insufficient fee amount");
-            getBuddyTreasury().transfer(address(this).balance);
-        }
+        checkFees(paymentToken, feeAmount, 1);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         if (tokenIds[0] != 0) {
             for (uint256 i = 0; i < tokenIds.length; i++) {
