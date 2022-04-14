@@ -2698,7 +2698,7 @@ abstract contract NFT721Mint is
             );
         } else {
             checkDeviation(msg.value, price);
-            treasury.transfer(msg.value);
+            treasury.send(msg.value);
         }
     }
 
