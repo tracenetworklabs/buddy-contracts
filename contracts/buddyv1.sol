@@ -2688,7 +2688,7 @@ abstract contract NFT721Mint is
             );
         } else {
             checkDeviation(msg.value, price);
-            getBuddyTreasury().send(address(this).balance);
+            getBuddyTreasury().transfer(address(this).balance);
         }
     }
 
@@ -2696,7 +2696,8 @@ abstract contract NFT721Mint is
         require(
             feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) &&
                 feeAmount <=
-                price.add((price.mul(deviationPercentage)).div(100))
+                price.add((price.mul(deviationPercentage)).div(100)),
+            "Amount not within deviation percentage"
         );
     }
 
