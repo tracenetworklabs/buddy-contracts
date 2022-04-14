@@ -2688,13 +2688,13 @@ abstract contract NFT721Mint is
             );
         } else {
             checkDeviation(msg.value, price);
-            getBuddyTreasury().transfer(address(this).balance);
+            getBuddyTreasury().send(address(this).balance);
         }
     }
 
     function checkDeviation(uint256 feeAmount, uint256 price) public view {
         require(
-            feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) ||
+            feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) &&
                 feeAmount <=
                 price.add((price.mul(deviationPercentage)).div(100))
         );

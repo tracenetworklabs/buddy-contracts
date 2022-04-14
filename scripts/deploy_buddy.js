@@ -44,7 +44,7 @@ async function main() {
     await new Promise(res => setTimeout(res, 5000));
     console.log("Buddy Proxy:", buddyProxy.address);
 
-    await buddyProxy.adminUpdateFeeAmount(2,2); // Update mint and update fee
+    await buddyProxy.adminUpdateFeeAmount(0, 0); // Update mint and update fee
 
     //// ************ ADD TOKEN TO BUDDY **************/////
     await new Promise(res => setTimeout(res, 5000));
@@ -63,16 +63,22 @@ async function main() {
     console.log("New admin Buddy", await buddyProxy.owner());
 
     await new Promise(res => setTimeout(res, 5000));
+    console.log("New admin Buddy", await buddyProxy.adminUpdateDeviation(5));
+
+    await new Promise(res => setTimeout(res, 5000));
     console.log("Mint fee", await buddyProxy.getMintFee());
+
+    await new Promise(res => setTimeout(res, 5000));
+    console.log("Matic price", await conversion.convertMintFee(MATIC, 0));
 
     await new Promise(res => setTimeout(res, 5000));
     //Test Mint
     console.log("Next token ID", await buddyProxy.getNextTokenId());
-    await buddyProxy.mint("QmQh36CsceXZoqS7v9YQLUyxXdRmWd8YWTBUz7WCXsiVty", "0x0000000000000000000000000000000000000000", ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], {
-        value: await ethers.utils.parseEther('2'),
-    });
-    await new Promise(res => setTimeout(res, 5000));
-    console.log("Next token ID", await buddyProxy.getNextTokenId());
+    // await buddyProxy.mint("QmQh36CsceXZoqS7v9YQLUyxXdRmWd8YWTBUz7WCXsiVty", "0x0000000000000000000000000000000000000000", 0, ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], {
+    //     value: await ethers.utils.parseEther('2'),
+    // });
+    // await new Promise(res => setTimeout(res, 5000));
+    // console.log("Next token ID", await buddyProxy.getNextTokenId());
 }
 
 main()
