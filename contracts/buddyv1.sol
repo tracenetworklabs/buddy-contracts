@@ -1,4 +1,8 @@
 /**
+ *Submitted for verification at polygonscan.com on 2022-04-14
+*/
+
+/**
  *Submitted for verification at polygonscan.com on 2022-03-29
  */
 
@@ -2674,31 +2678,43 @@ abstract contract NFT721Mint is
         return updateFee;
     }
 
-    function checkFees(address paymentToken, uint256 feeAmount, uint256 value) internal {
-        uint256 price;
-        address payable treasury = getBuddyTreasury();
-        if(value == 0) {
-            price = ConversionInt(conversionAddress).convertMintFee(
-                paymentToken,
-                getMintFee()
-            );
-        }
-        else {
-            price = ConversionInt(conversionAddress).convertUpdateFee(
-                paymentToken,
-                getUpdateFee()
-            );
-        }
+    function checkMintFees(address paymentToken, uint256 feeAmount) internal {
+        address payable treasury_ = getBuddyTreasury();
+        uint256 price = ConversionInt(conversionAddress).convertMintFee(
+            paymentToken,
+            getMintFee()
+        );
         if (paymentToken != address(0)) {
             checkDeviation(feeAmount, price);
             IERC20(paymentToken).transferFrom(
                 msg.sender,
-                treasury,
+                getBuddyTreasury(),
                 feeAmount
             );
         } else {
             checkDeviation(msg.value, price);
-            treasury.send(msg.value);
+            (bool success, ) = treasury_.call{value: msg.value}("");
+            require(success, "Transfer failed.");
+        }
+    }
+
+    function checkUpdateFees(address paymentToken, uint256 feeAmount) internal {
+        address payable treasury_ = getBuddyTreasury();
+        uint256 price = ConversionInt(conversionAddress).convertMintFee(
+            paymentToken,
+            getUpdateFee()
+        );
+        if (paymentToken != address(0)) {
+            checkDeviation(feeAmount, price);
+            IERC20(paymentToken).transferFrom(
+                msg.sender,
+                getBuddyTreasury(),
+                feeAmount
+            );
+        } else {
+            checkDeviation(msg.value, price);
+            (bool success, ) = treasury_.call{value: msg.value}("");
+            require(success, "Transfer failed.");
         }
     }
 
@@ -2727,7 +2743,8 @@ abstract contract NFT721Mint is
             tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        checkFees(paymentToken, feeAmount, 0);
+        checkMintFees(paymentToken, feeAmount);
+
         tokenId = nextTokenId++;
         if (tokenIds[0] != 0) {
             for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -2776,11 +2793,9 @@ abstract contract NFT721Mint is
     ) public payable {
         address owner = ownerOf(tokenId);
         require(msg.sender == owner, "Buddy: Not Authorized");
-        require(
-            tokenAddress[paymentToken] == true,
-            "Buddy: Invalid payment mode"
-        );
-        checkFees(paymentToken, feeAmount, 1);
+
+        checkUpdateFees(paymentToken, feeAmount);
+
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         if (tokenIds[0] != 0) {
             for (uint256 i = 0; i < tokenIds.length; i++) {
