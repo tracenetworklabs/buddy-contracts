@@ -2907,7 +2907,7 @@ contract BuddyV1 is
     }
 
     /**
-     * @notice Allows Admin to add token address.
+     * @notice Allows Admin to update deviation percentage
      */
     function adminUpdateDeviation(uint256 _deviationPercentage)
         public
