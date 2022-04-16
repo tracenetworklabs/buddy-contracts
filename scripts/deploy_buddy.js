@@ -9,8 +9,8 @@ async function main() {
     const MATIC = "0x0000000000000000000000000000000000000000"
 
     const PRICE_MATIC_USD = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0"
-    const PRICE_USDT_USD = "0x92C09849638959196E976289418e5973CC96d645";
-    const PRICE_USDC_USD = "0x0A6513e40db6EB1b165753AD52E80663aeA50545";
+    const PRICE_USDT_USD = "0x0A6513e40db6EB1b165753AD52E80663aeA50545";
+    const PRICE_USDC_USD = "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7";
 
     const treasuryOwner = "0x40a124c4849A25B9b19b2e7aFC4f07302fBb67B1";
 
@@ -37,7 +37,7 @@ async function main() {
 
     //// ************ ADD PRICE FEED ADDRESS **************/////
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await conversion.addToken(MATIC, PRICE_MATIC_USD);
 
     await new Promise(res => setTimeout(res, 5000));
@@ -65,13 +65,13 @@ async function main() {
     await buddyProxy.adminUpdateFeeToken(USDC, true); // USDC
 
     await new Promise(res => setTimeout(res, 5000));
+    console.log("Deviation percent", await buddyProxy.adminUpdateDeviation(5));
+
+    await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.transferOwnership(buddyOwner);
 
     await new Promise(res => setTimeout(res, 5000));
     console.log("New admin Buddy", await buddyProxy.owner());
-
-    await new Promise(res => setTimeout(res, 5000));
-    console.log("New admin Buddy", await buddyProxy.adminUpdateDeviation(5));
 
     await new Promise(res => setTimeout(res, 5000));
     console.log("Mint fee", await buddyProxy.getMintFee());
