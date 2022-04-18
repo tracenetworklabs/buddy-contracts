@@ -897,7 +897,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata, Ownable {
 
 // File: contracts/Contract_Name.sol
 
-contract USX is ERC20, Initializable {
+contract Token is ERC20, Initializable {
     /**
      * @notice Called once to configure the contract after the initial deployment.
      * @dev This farms the initialize call out to inherited contracts as needed.
