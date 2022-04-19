@@ -4,7 +4,7 @@ async function main() {
     const accounts = await ethers.provider.listAccounts();
     console.log("Accounts", accounts[0]);
 
-    const treasuryOwner = accounts[0];
+    const claimOwner = accounts[0];
 
     //// ************ DEPLOY TREASURY **************/////
 
@@ -40,23 +40,26 @@ async function main() {
     await claimProxy.adminUpdateFeeToken(USDC, true); // USDC
 
     await new Promise(res => setTimeout(res, 5000));
+    await claimProxy.adminUpdateDeviation(5);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await claimProxy.transferOwnership(claimOwner);
+
+    await new Promise(res => setTimeout(res, 5000));
     const Buddy = await ethers.getContractFactory("BuddyV1");
     const buddyProxy = await Buddy.attach("0x922613f26d1d7fd3e4674d967738d3bac63a35ca");
     await buddyProxy.approve(claimProxy.address, 1);
 
     const Conversion = await ethers.getContractFactory("Conversion");
-    var price = await Conversion.attach(conversion);
-    price = price.toString();
-    console.log("Price", price);
+    var conversionProxy = await Conversion.attach(conversion);
+    var price = await conversionProxy.convertMintFee(MATIC, claimFee);
+
     // const Claim = await ethers.getContractFactory("Claim");
-    // const claimProxy = await Claim.attach("0xaa828f6c31722d1a9991f86dc1681bf2fa3b1e98");
+    // const claimProxy = await Claim.attach("0x6AAd430F663c1e9be6c49EB6d7F20acEfE327944");
 
     await new Promise(res => setTimeout(res, 5000));
-    await claimProxy.adminUpdateDeviation(5);
-
-    await new Promise(res => setTimeout(res, 5000));
-    await claimProxy.payFees("0x922613f26d1d7fd3e4674d967738d3bac63a35ca", 1, MATIC, 0, {
-        value: await ethers.utils.parseEther(price),
+    await claimProxy.payFees("0x922613f26d1d7fd3e4674d967738d3bac63a35ca", 1, "0x0000000000000000000000000000000000000000", 0, {
+        value: price,
     });
 }
 

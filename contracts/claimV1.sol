@@ -803,7 +803,7 @@ abstract contract Ownable is ContextUpgradeable {
     }
 }
 
-interface Conversion {
+interface ConversionInt {
     function convertMintFee(address paymentToken, uint256 mintFee)
         external
         view
@@ -884,7 +884,7 @@ contract ClaimV1 is Ownable, TreasuryNode {
 
     function checkClaimFees(address paymentToken, uint256 feeAmount) internal {
         address payable treasury_ = getBuddyTreasury();
-        uint256 price = Conversion(conversion).convertMintFee(
+        uint256 price = ConversionInt(conversion).convertMintFee(
             paymentToken,
             claimfee
         );
