@@ -803,13 +803,58 @@ abstract contract Ownable is ContextUpgradeable {
     }
 }
 
+interface Conversion {
+    function convertMintFee(address paymentToken, uint256 mintFee)
+        external
+        view
+        returns (uint256);
+
+    function convertUpdateFee(address paymentToken, uint256 updateFee)
+        external
+        view
+        returns (uint256);
+}
+
+/**
+ * @notice A mixin that stores a reference to the Buddy treasury contract.
+ */
+abstract contract TreasuryNode is Initializable {
+    using AddressUpgradeable for address payable;
+
+    address payable private treasury;
+
+    /**
+     * @dev Called once after the initial deployment to set the Buddy treasury address.
+     */
+    function _initializeTreasuryNode(address payable _treasury)
+        internal
+        initializer
+    {
+        require(
+            _treasury.isContract(),
+            "TreasuryNode: Address is not a contract"
+        );
+        treasury = _treasury;
+    }
+
+    /**
+     * @notice Returns the address of the Buddy treasury.
+     */
+    function getBuddyTreasury() public view returns (address payable) {
+        return treasury;
+    }
+
+    // `______gap` is added to each mixin to allow adding new data slots or additional mixins in an upgrade-safe way.
+    uint256[2000] private __gap;
+}
+
 pragma solidity ^0.8.2;
 
 /**
  * @notice Allows users to claim their NFT's
  */
 
-contract ClaimV1 is Ownable {
+contract ClaimV1 is Ownable, TreasuryNode {
     using SafeMathUpgradeable for uint256;
     AggregatorV3Interface internal priceFeed;
 
@@ -818,25 +863,52 @@ contract ClaimV1 is Ownable {
     mapping(address => bool) public supportedPayment;
 
     uint256 public claimfee; // USD terms
-    uint256 public constant DENOMINATION = 1E18;
+    address public conversion;
+    uint256 public deviationPercentage;
 
     event FeesPaid(address payer, uint256 tokenId);
     event FeesUpdated(uint256 updatedFee);
     event PaymentUpdated(address payment, bool status);
+    event DeviationPercentage(uint256 percentage);
 
-    function initialize() public initializer {
+    function initialize(
+        address payable treasury,
+        address _conversion,
+        uint256 _claimFee
+    ) public initializer {
+        TreasuryNode._initializeTreasuryNode(treasury);
         Ownable.ownable_init();
-        claimfee = 25;
+        claimfee = _claimFee;
+        conversion = _conversion;
     }
 
-    /**
-     * @dev Returns the latest price
-     */
-    function getLatestPrice() public view returns (uint256) {
-        uint256 price = 160000000;
-        price = price.mul(1E10); // converting to E18
-        price = claimfee.mul(1E18).mul(DENOMINATION).div(price);
-        return price;
+    function checkClaimFees(address paymentToken, uint256 feeAmount) internal {
+        address payable treasury_ = getBuddyTreasury();
+        uint256 price = Conversion(conversion).convertMintFee(
+            paymentToken,
+            claimfee
+        );
+        if (paymentToken != address(0)) {
+            checkDeviation(feeAmount, price);
+            IERC20(paymentToken).transferFrom(
+                msg.sender,
+                getBuddyTreasury(),
+                feeAmount
+            );
+        } else {
+            checkDeviation(msg.value, price);
+            (bool success, ) = treasury_.call{value: msg.value}("");
+            require(success, "Transfer failed.");
+        }
+    }
+
+    function checkDeviation(uint256 feeAmount, uint256 price) public view {
+        require(
+            feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) &&
+                feeAmount <=
+                price.add((price.mul(deviationPercentage)).div(100)),
+            "Amount not within deviation percentage"
+        );
     }
 
     /**
@@ -845,22 +917,12 @@ contract ClaimV1 is Ownable {
     function payFees(
         address collectionAddress,
         uint256 tokenId,
-        address payment
+        address payment,
+        uint256 feeAmount
     ) public payable {
         require(supportedPayment[payment], "Claim : Invalid payment mode");
-        if (payment == address(0)) {
-            require(
-                msg.value >= getLatestPrice(),
-                "Claim : Insufficient fee amount"
-            );
-        } else {
-            uint8 decimals = IERC20Metadata(payment).decimals();
-            IERC20(payment).transferFrom(
-                msg.sender,
-                address(this),
-                claimfee.mul(10**decimals)
-            );
-        }
+
+        checkClaimFees(payment, feeAmount);
 
         payer[msg.sender] = tokenId;
         tokenStatus[msg.sender][tokenId] = true;
@@ -872,7 +934,7 @@ contract ClaimV1 is Ownable {
     /**
      * @dev Update the protocol fees
      */
-    function updateFee(uint256 _fee) public onlyOwner {
+    function adminUpdateFee(uint256 _fee) public onlyOwner {
         claimfee = _fee;
         emit FeesUpdated(_fee);
     }
@@ -880,23 +942,22 @@ contract ClaimV1 is Ownable {
     /**
      * @dev Update the fee payment
      */
-    function updateFeePayment(address payment, bool status) public onlyOwner {
+    function adminUpdateFeeToken(address payment, bool status)
+        public
+        onlyOwner
+    {
         supportedPayment[payment] = status;
         emit PaymentUpdated(payment, status);
     }
 
     /**
-     * @dev Withdraw fee from contract
+     * @notice Allows Admin to update deviation percentage
      */
-    function withdrawFee(address payment, uint256 feeToWithdraw)
+    function adminUpdateDeviation(uint256 _deviationPercentage)
         public
         onlyOwner
     {
-        if (payment == address(0)) {
-            bool sent = payable(owner()).send(feeToWithdraw);
-            require(sent, "Claim : Transfer failed");
-        } else {
-            IERC20(payment).transfer(owner(), feeToWithdraw);
-        }
+        deviationPercentage = _deviationPercentage;
+        emit DeviationPercentage(_deviationPercentage);
     }
 }

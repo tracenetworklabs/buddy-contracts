@@ -23,7 +23,7 @@ async function main() {
     const USDC = "0xb0040280A0C97F20C92c09513b8C6e6Ff9Aa86DC"
     const MATIC = "0x0000000000000000000000000000000000000000"
 
-    const Claim = await ethers.getContractFactory("Claim")
+    const Claim = await ethers.getContractFactory("ClaimV1")
     console.log("Deploying Claim, ProxyAdmin, and then Proxy...")
     const claimProxy = await upgrades.deployProxy(Claim, [Treasury, conversion, claimFee], { initializer: 'initialize' })
     console.log("Proxy of Claim deployed to:", claimProxy.address);
@@ -44,11 +44,20 @@ async function main() {
     const buddyProxy = await Buddy.attach("0x922613f26d1d7fd3e4674d967738d3bac63a35ca");
     await buddyProxy.approve(claimProxy.address, 1);
 
+    const Conversion = await ethers.getContractFactory("Conversion");
+    var price = await Conversion.attach(conversion);
+    price = price.toString();
+    console.log("Price", price);
     // const Claim = await ethers.getContractFactory("Claim");
     // const claimProxy = await Claim.attach("0xaa828f6c31722d1a9991f86dc1681bf2fa3b1e98");
 
     await new Promise(res => setTimeout(res, 5000));
-    await claimProxy.payFees("0x922613f26d1d7fd3e4674d967738d3bac63a35ca", 1, MATIC, 0);
+    await claimProxy.adminUpdateDeviation(5);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await claimProxy.payFees("0x922613f26d1d7fd3e4674d967738d3bac63a35ca", 1, MATIC, 0, {
+        value: await ethers.utils.parseEther(price),
+    });
 }
 
 main()
