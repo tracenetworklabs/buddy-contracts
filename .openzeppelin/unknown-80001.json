@@ -179,6 +179,21 @@
       "address": "0xdA20bbDAD25f2D113fe667bEC55C21DB8cd46280",
       "txHash": "0xeba60fc5e0e43635c8fd31eb179348c0f9d75edc50ad514c54b61bb7bd5c047b",
       "kind": "transparent"
+    },
+    {
+      "address": "0x9cCB05c9C9B067152986F4B5e29cab02AE53A756",
+      "txHash": "0x1eb409ea37b85b67bf88928c5b10c0379b8c9180db7c0678be5cc0971fedca62",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x918605B96050f66959E553c2C7D5000C730A2bEF",
+      "txHash": "0xb06a8000f52c9b8e9a59d0b4436b3db386b96053356940cfe6c50c252323505f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xAa828F6c31722D1a9991f86dc1681BF2Fa3B1E98",
+      "txHash": "0xe02ccb8b250fe77d7227c8a77810af03a04a214f0f0791d2f58cb624c420fe27",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -8694,6 +8709,164 @@
               }
             ],
             "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "80e8deb7f10814042e81fe0e8a926fa705a0032b68e0e402b4516bb12b86648b": {
+      "address": "0x0c681518DB3Df4043B902a7BfE206CA0B1350524",
+      "txHash": "0xc6d9024f254a54bc81d90dda9540080fef7fe43e3a186c61c684251903a078bf",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\claim.sol:660"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\claim.sol:665"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "contracts\\claim.sol:723"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "Ownable",
+            "src": "contracts\\claim.sol:743"
+          },
+          {
+            "label": "treasury",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_address_payable",
+            "contract": "TreasuryNode",
+            "src": "contracts\\claim.sol:824"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "53",
+            "type": "t_array(t_uint256)2000_storage",
+            "contract": "TreasuryNode",
+            "src": "contracts\\claim.sol:848"
+          },
+          {
+            "label": "priceFeed",
+            "offset": 0,
+            "slot": "2053",
+            "type": "t_contract(AggregatorV3Interface)45",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:859"
+          },
+          {
+            "label": "payer",
+            "offset": 0,
+            "slot": "2054",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:861"
+          },
+          {
+            "label": "tokenStatus",
+            "offset": 0,
+            "slot": "2055",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_bool))",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:862"
+          },
+          {
+            "label": "supportedPayment",
+            "offset": 0,
+            "slot": "2056",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:863"
+          },
+          {
+            "label": "claimfee",
+            "offset": 0,
+            "slot": "2057",
+            "type": "t_uint256",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:865"
+          },
+          {
+            "label": "conversion",
+            "offset": 0,
+            "slot": "2058",
+            "type": "t_address",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:866"
+          },
+          {
+            "label": "deviationPercentage",
+            "offset": 0,
+            "slot": "2059",
+            "type": "t_uint256",
+            "contract": "Claim",
+            "src": "contracts\\claim.sol:867"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)2000_storage": {
+            "label": "uint256[2000]",
+            "numberOfBytes": "64000"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(AggregatorV3Interface)45": {
+            "label": "contract AggregatorV3Interface",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_bool))": {
+            "label": "mapping(address => mapping(uint256 => bool))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
           },
           "t_uint256": {
             "label": "uint256",
