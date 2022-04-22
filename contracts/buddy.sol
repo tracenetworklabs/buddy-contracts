@@ -1,3 +1,11 @@
+/**
+ *Submitted for verification at polygonscan.com on 2022-04-14
+ */
+
+/**
+ *Submitted for verification at polygonscan.com on 2022-03-29
+ */
+
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
 
@@ -1633,6 +1641,18 @@ library EnumerableMapUpgradeable {
     }
 }
 
+interface ConversionInt {
+    function convertMintFee(address paymentToken, uint256 mintFee)
+        external
+        view
+        returns (uint256);
+
+    function convertUpdateFee(address paymentToken, uint256 updateFee)
+        external
+        view
+        returns (uint256);
+}
+
 // File @openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -2596,13 +2616,14 @@ abstract contract NFT721Mint is
     NFT721Metadata,
     TreasuryNode
 {
-    //mapping tokens to feesAmount
-    mapping(address => uint256) public feesAmount;
-    mapping(address => uint256) public updateFee;
+    using SafeMathUpgradeable for uint256;
     mapping(address => bool) public tokenAddress;
+    uint256 internal mintFee;
+    uint256 internal updateFee;
     mapping(uint256 => mapping(address => uint256[])) mapTokenIds;
-
+    address public conversionAddress;
     uint256 private nextTokenId;
+    uint256 public deviationPercentage;
 
     event Minted(
         address indexed creator,
@@ -2622,18 +2643,11 @@ abstract contract NFT721Mint is
         string[] values
     );
 
-    event TokenUpdated(
-        address indexed tokenAddress,
-        bool status,
-        uint256 mintFee,
-        uint256 uriUpdateFee
-    );
+    event FeeUpdate(uint256 mintFee, uint256 uriUpdateFee);
 
-    event TokenFeesUpdated(
-        address indexed tokenAddress,
-        uint256 mintFee,
-        uint256 uriUpdateFee
-    );
+    event TokenUpdate(address indexed tokenAddress, bool status);
+
+    event DeviationPercentageUpdate(uint256 percentage);
 
     /**
      * @notice Gets the tokenId of the next NFT minted.
@@ -2651,33 +2665,85 @@ abstract contract NFT721Mint is
     }
 
     /**
+     * @dev Get USD fee for mint
+     */
+    function getMintFee() public view returns (uint256) {
+        return mintFee;
+    }
+
+    /**
+     * @dev Get USD fee for Update
+     */
+    function getUpdateFee() public view returns (uint256) {
+        return updateFee;
+    }
+
+    function checkMintFees(address paymentToken, uint256 feeAmount) internal {
+        address payable treasury_ = getBuddyTreasury();
+        uint256 price = ConversionInt(conversionAddress).convertMintFee(
+            paymentToken,
+            getMintFee()
+        );
+        if (paymentToken != address(0)) {
+            checkDeviation(feeAmount, price);
+            IERC20(paymentToken).transferFrom(
+                msg.sender,
+                getBuddyTreasury(),
+                feeAmount
+            );
+        } else {
+            checkDeviation(msg.value, price);
+            (bool success, ) = treasury_.call{value: msg.value}("");
+            require(success, "Transfer failed.");
+        }
+    }
+
+    function checkUpdateFees(address paymentToken, uint256 feeAmount) internal {
+        address payable treasury_ = getBuddyTreasury();
+        uint256 price = ConversionInt(conversionAddress).convertMintFee(
+            paymentToken,
+            getUpdateFee()
+        );
+        if (paymentToken != address(0)) {
+            checkDeviation(feeAmount, price);
+            IERC20(paymentToken).transferFrom(
+                msg.sender,
+                getBuddyTreasury(),
+                feeAmount
+            );
+        } else {
+            checkDeviation(msg.value, price);
+            (bool success, ) = treasury_.call{value: msg.value}("");
+            require(success, "Transfer failed.");
+        }
+    }
+
+    function checkDeviation(uint256 feeAmount, uint256 price) public view {
+        require(
+            feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) &&
+                feeAmount <=
+                price.add((price.mul(deviationPercentage)).div(100)),
+            "Amount not within deviation percentage"
+        );
+    }
+
+    /**
      * @notice Allows a creator to mint an NFT.
      */
     function mint(
         string memory tokenIPFSPath,
-        address paymentMode,
+        address paymentToken,
+        uint256 feeAmount,
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
         string[] memory values
     ) public payable returns (uint256 tokenId) {
         require(
-            tokenAddress[paymentMode] == true,
+            tokenAddress[paymentToken] == true,
             "Buddy: Invalid payment mode"
         );
-        if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(
-                msg.sender,
-                getBuddyTreasury(),
-                feesAmount[paymentMode]
-            );
-        } else {
-            require(
-                msg.value >= feesAmount[paymentMode],
-                "Buddy: Insufficient fee amount"
-            );
-            getBuddyTreasury().transfer(address(this).balance);
-        }
+        checkMintFees(paymentToken, feeAmount);
 
         tokenId = nextTokenId++;
         if (tokenIds[0] != 0) {
@@ -2718,7 +2784,8 @@ abstract contract NFT721Mint is
     function updateTokenURI(
         uint256 tokenId,
         string memory tokenIPFSPath,
-        address paymentMode,
+        address paymentToken,
+        uint256 feeAmount,
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
@@ -2726,23 +2793,9 @@ abstract contract NFT721Mint is
     ) public payable {
         address owner = ownerOf(tokenId);
         require(msg.sender == owner, "Buddy: Not Authorized");
-        require(
-            tokenAddress[paymentMode] == true,
-            "Buddy: Invalid payment mode"
-        );
-        if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(
-                msg.sender,
-                getBuddyTreasury(),
-                updateFee[paymentMode]
-            );
-        } else {
-            require(
-                msg.value >= updateFee[paymentMode],
-                "Buddy: Insufficient fee amount"
-            );
-            getBuddyTreasury().transfer(address(this).balance);
-        }
+
+        checkUpdateFees(paymentToken, feeAmount);
+
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         if (tokenIds[0] != 0) {
             for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -2810,22 +2863,58 @@ contract Buddy is
     function initialize(
         address payable treasury,
         string memory name,
-        string memory symbol
+        string memory symbol,
+        address conversion
     ) public initializer {
         TreasuryNode._initializeTreasuryNode(treasury);
         Ownable.ownable_init();
         ERC721Upgradeable.__ERC721_init(name, symbol);
         NFT721Creator._initializeNFT721Creator();
         NFT721Mint._initializeNFT721Mint();
-        adminUpdateConfig("https://ipfs.io/ipfs/");
+        adminUpdateBaseURI("https://ipfs.io/ipfs/");
+        conversionAddress = conversion;
     }
 
     /**
      * @notice Allows a Buddy admin to update NFT config variables.
      * @dev This must be called right after the initial call to `initialize`.
      */
-    function adminUpdateConfig(string memory baseURI) public onlyOwner {
+    function adminUpdateBaseURI(string memory baseURI) public onlyOwner {
         _updateBaseURI(baseURI);
+    }
+
+    /**
+     * @notice Allows Admin to set fees.
+     */
+    function adminUpdateFeeAmount(uint256 _mintFee, uint256 _updateFee)
+        public
+        onlyOwner
+    {
+        mintFee = _mintFee;
+        updateFee = _updateFee;
+        emit FeeUpdate(_mintFee, _updateFee);
+    }
+
+    /**
+     * @notice Allows Admin to add token address.
+     */
+    function adminUpdateFeeToken(address _tokenAddress, bool status)
+        public
+        onlyOwner
+    {
+        tokenAddress[_tokenAddress] = status;
+        emit TokenUpdate(_tokenAddress, status);
+    }
+
+    /**
+     * @notice Allows Admin to update deviation percentage
+     */
+    function adminUpdateDeviation(uint256 _deviationPercentage)
+        public
+        onlyOwner
+    {
+        deviationPercentage = _deviationPercentage;
+        emit DeviationPercentageUpdate(_deviationPercentage);
     }
 
     /**
@@ -2837,33 +2926,5 @@ contract Buddy is
         override(ERC721Upgradeable, NFT721Creator, NFT721Metadata, NFT721Mint)
     {
         super._burn(tokenId);
-    }
-
-    /**
-     * @notice Allows Admin to add token address and set fees.
-     */
-    function adminUpdateToken(
-        address _tokenAddress,
-        bool status,
-        uint256 _mintFee,
-        uint256 _updateFee
-    ) public onlyOwner {
-        tokenAddress[_tokenAddress] = status;
-        feesAmount[_tokenAddress] = _mintFee;
-        updateFee[_tokenAddress] = _updateFee;
-        emit TokenUpdated(_tokenAddress, status, _mintFee, _updateFee);
-    }
-
-    /**
-     * @notice Allows Admin to set fees.
-     */
-    function adminUpdateFees(
-        address _tokenAddress,
-        uint256 _mintFee,
-        uint256 _updateFee
-    ) public onlyOwner {
-        feesAmount[_tokenAddress] = _mintFee;
-        updateFee[_tokenAddress] = _updateFee;
-        emit TokenFeesUpdated(_tokenAddress, _mintFee, _updateFee);
     }
 }

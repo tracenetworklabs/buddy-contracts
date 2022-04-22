@@ -854,8 +854,8 @@ pragma solidity ^0.8.2;
  * @notice Allows users to claim their NFT's
  */
 
-contract Claim is Ownable,TreasuryNode {
-    // using SafeMathUpgradeable for uint256;
+contract ClaimV1 is Ownable, TreasuryNode {
+    using SafeMathUpgradeable for uint256;
     AggregatorV3Interface internal priceFeed;
 
     mapping(address => uint256) public payer;
@@ -871,7 +871,11 @@ contract Claim is Ownable,TreasuryNode {
     event PaymentUpdated(address payment, bool status);
     event DeviationPercentage(uint256 percentage);
 
-    function initialize(address payable treasury,address _conversion, uint256 _claimFee) public initializer {
+    function initialize(
+        address payable treasury,
+        address _conversion,
+        uint256 _claimFee
+    ) public initializer {
         TreasuryNode._initializeTreasuryNode(treasury);
         Ownable.ownable_init();
         claimfee = _claimFee;
@@ -900,9 +904,9 @@ contract Claim is Ownable,TreasuryNode {
 
     function checkDeviation(uint256 feeAmount, uint256 price) public view {
         require(
-            feeAmount >= price - ((price * (deviationPercentage)) / (100)) &&
+            feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) &&
                 feeAmount <=
-                price + ((price * (deviationPercentage)) / (100)),
+                price.add((price.mul(deviationPercentage)).div(100)),
             "Amount not within deviation percentage"
         );
     }
@@ -918,7 +922,7 @@ contract Claim is Ownable,TreasuryNode {
     ) public payable {
         require(supportedPayment[payment], "Claim : Invalid payment mode");
 
-        checkClaimFees(payment,feeAmount);
+        checkClaimFees(payment, feeAmount);
 
         payer[msg.sender] = tokenId;
         tokenStatus[msg.sender][tokenId] = true;
@@ -938,7 +942,10 @@ contract Claim is Ownable,TreasuryNode {
     /**
      * @dev Update the fee payment
      */
-    function adminUpdateFeeToken(address payment, bool status) public onlyOwner {
+    function adminUpdateFeeToken(address payment, bool status)
+        public
+        onlyOwner
+    {
         supportedPayment[payment] = status;
         emit PaymentUpdated(payment, status);
     }
@@ -953,5 +960,4 @@ contract Claim is Ownable,TreasuryNode {
         deviationPercentage = _deviationPercentage;
         emit DeviationPercentage(_deviationPercentage);
     }
-
 }

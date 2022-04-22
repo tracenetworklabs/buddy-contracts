@@ -23,7 +23,7 @@ async function main() {
     const USDC = "0xb0040280A0C97F20C92c09513b8C6e6Ff9Aa86DC"
     const MATIC = "0x0000000000000000000000000000000000000000"
 
-    const Claim = await ethers.getContractFactory("ClaimV1")
+    const Claim = await ethers.getContractFactory("Claim")
     console.log("Deploying Claim, ProxyAdmin, and then Proxy...")
     const claimProxy = await upgrades.deployProxy(Claim, [Treasury, conversion, claimFee], { initializer: 'initialize' })
     console.log("Proxy of Claim deployed to:", claimProxy.address);
@@ -46,7 +46,7 @@ async function main() {
     await claimProxy.transferOwnership(claimOwner);
 
     await new Promise(res => setTimeout(res, 5000));
-    const Buddy = await ethers.getContractFactory("BuddyV1");
+    const Buddy = await ethers.getContractFactory("Buddy");
     const buddyProxy = await Buddy.attach("0x922613f26d1d7fd3e4674d967738d3bac63a35ca");
     await buddyProxy.approve(claimProxy.address, 1);
 

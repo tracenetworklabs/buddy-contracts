@@ -8,9 +8,14 @@ async function main() {
     const USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
     const MATIC = "0x0000000000000000000000000000000000000000"
 
-    const PRICE_MATIC_USD = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0"
-    const PRICE_USDT_USD = "0x0A6513e40db6EB1b165753AD52E80663aeA50545";
-    const PRICE_USDC_USD = "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7";
+    // Mainnet
+    // const PRICE_MATIC_USD = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0"
+    // const PRICE_USDT_USD = "0x0A6513e40db6EB1b165753AD52E80663aeA50545";
+    // const PRICE_USDC_USD = "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7";
+
+    const PRICE_MATIC_USD = "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada"
+    const PRICE_USDT_USD = "0x92C09849638959196E976289418e5973CC96d645";
+    const PRICE_USDC_USD = "0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0";
 
     const treasuryOwner = "0x40a124c4849A25B9b19b2e7aFC4f07302fBb67B1";
 
@@ -47,7 +52,7 @@ async function main() {
     await conversion.addToken(USDT, PRICE_USDT_USD);
 
     //// ************ DEPLOY BUDDY **************/////
-    const Buddy = await ethers.getContractFactory("BuddyV1")
+    const Buddy = await ethers.getContractFactory("Buddy")
     const buddyProxy = await upgrades.deployProxy(Buddy, [treasuryProxy.address, "TRACE BUDDY", "BUDDY", conversion.address], { initializer: 'initialize' })
     await new Promise(res => setTimeout(res, 5000));
     console.log("Buddy Proxy:", buddyProxy.address);
