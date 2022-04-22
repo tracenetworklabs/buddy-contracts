@@ -686,6 +686,8 @@ pragma solidity ^0.7.0;
 interface CollectionContract {
     function lock(uint256 tokenId) external;
 
+    function release(uint256 tokenId) external;
+
     function ownerOf(uint256 tokenId) external view returns (address);
 }
 
@@ -2787,7 +2789,9 @@ abstract contract NFT721Mint is
         address paymentToken,
         uint256 feeAmount,
         uint256[] memory tokenIds,
-        address[] memory collectionAddress,
+        address[] memory collectionAddresses,
+        uint256[] memory releaseTokenIds,
+        address[] memory releaseColAddresses,
         string[] memory properties,
         string[] memory values
     ) public payable {
@@ -2797,17 +2801,22 @@ abstract contract NFT721Mint is
         checkUpdateFees(paymentToken, feeAmount);
 
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
+        if (releaseTokenIds[0] != 0) {
+            for (uint256 i = 0; i < releaseTokenIds.length; i++) {
+                CollectionContract(releaseColAddresses[i]).release(tokenIds[i]);
+            }
+        }
         if (tokenIds[0] != 0) {
             for (uint256 i = 0; i < tokenIds.length; i++) {
                 require(
                     msg.sender ==
-                        CollectionContract(collectionAddress[i]).ownerOf(
+                        CollectionContract(collectionAddresses[i]).ownerOf(
                             tokenIds[i]
                         ),
                     "Buddy: Not Authorized"
                 );
-                CollectionContract(collectionAddress[i]).lock(tokenIds[i]);
-                mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
+                CollectionContract(collectionAddresses[i]).lock(tokenIds[i]);
+                mapTokenIds[tokenId][collectionAddresses[i]].push(tokenIds[i]);
             }
         }
         for (uint256 i = 0; i < properties.length; i++) {

@@ -1909,7 +1909,10 @@ contract ERC721Upgradeable is
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
-        require(status[tokenId]==false,"ERC721: Token cannot be transferred");
+        require(
+            status[tokenId] == false,
+            "ERC721: Token cannot be transferred"
+        );
 
         _transfer(from, to, tokenId);
     }
@@ -1938,7 +1941,10 @@ contract ERC721Upgradeable is
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
-        require(status[tokenId]==false,"ERC721: Token cannot be transferred");
+        require(
+            status[tokenId] == false,
+            "ERC721: Token cannot be transferred"
+        );
         _safeTransfer(from, to, tokenId, _data);
     }
 
@@ -2006,9 +2012,12 @@ contract ERC721Upgradeable is
             getApproved(tokenId) == spender ||
             isApprovedForAll(owner, spender));
     }
-    
+
     function lock(uint256 tokenId) external {
-        require(_exists(tokenId),"ERC721: operator query for nonexistent token");
+        require(
+            _exists(tokenId),
+            "ERC721: operator query for nonexistent token"
+        );
         status[tokenId] = true;
     }
 
@@ -2974,10 +2983,10 @@ abstract contract NFT721Mint is
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        for(uint256 i=0; i < properties.length; i++) {
-        tokenIdToProp[tokenId].push(properties[i]);
+        for (uint256 i = 0; i < properties.length; i++) {
+            tokenIdToProp[tokenId].push(properties[i]);
         }
-        for(uint256 i=0; i< properties.length; i++) {
+        for (uint256 i = 0; i < properties.length; i++) {
             propTovalue[tokenId][properties[i]].push(values[i]);
         }
         emit Minted(
@@ -3006,7 +3015,13 @@ abstract contract NFT721Mint is
             tokenCreatorPaymentAddress != address(0),
             "NFT721Mint:TOKEN_CREATOR_PAYMENT_ADDRESS_IS_REQUIRED"
         );
-        tokenId = mint(tokenIPFSPath, royalty, marketContract, properties, values);
+        tokenId = mint(
+            tokenIPFSPath,
+            royalty,
+            marketContract,
+            properties,
+            values
+        );
         _setTokenCreatorPaymentAddress(tokenId, tokenCreatorPaymentAddress);
     }
 
@@ -3120,7 +3135,8 @@ contract BlingCollection is
      * @dev This must be called right after the initial call to `initialize`.
      */
     function adminUpdateConfig(string memory baseURI) public {
-        require(msg.sender == blingMaster || _isFoundationAdmin(),
+        require(
+            msg.sender == blingMaster || _isFoundationAdmin(),
             "BlingCollection:ADDRESS_NOT_AUTHORIZED"
         );
         _updateBaseURI(baseURI);
