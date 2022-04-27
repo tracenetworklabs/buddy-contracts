@@ -686,6 +686,8 @@ pragma solidity ^0.7.0;
 interface CollectionContract {
     function lock(uint256 tokenId) external;
 
+    function release(uint256 tokenId) external;
+
     function ownerOf(uint256 tokenId) external view returns (address);
 }
 
@@ -2643,11 +2645,11 @@ abstract contract NFT721Mint is
         string[] values
     );
 
-    event BaseTokenAdded(uint256 mintFee, uint256 uriUpdateFee);
+    event FeeUpdate(uint256 mintFee, uint256 uriUpdateFee);
 
-    event TokenUpdated(address indexed tokenAddress, bool status);
+    event TokenUpdate(address indexed tokenAddress, bool status);
 
-    event DeviationPercentage(uint256 percentage);
+    event DeviationPercentageUpdate(uint256 percentage);
 
     /**
      * @notice Gets the tokenId of the next NFT minted.
@@ -2787,7 +2789,9 @@ abstract contract NFT721Mint is
         address paymentToken,
         uint256 feeAmount,
         uint256[] memory tokenIds,
-        address[] memory collectionAddress,
+        address[] memory collectionAddresses,
+        uint256[] memory releaseTokenIds,
+        address[] memory releaseColAddresses,
         string[] memory properties,
         string[] memory values
     ) public payable {
@@ -2797,17 +2801,22 @@ abstract contract NFT721Mint is
         checkUpdateFees(paymentToken, feeAmount);
 
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
+        if (releaseTokenIds[0] != 0) {
+            for (uint256 i = 0; i < releaseTokenIds.length; i++) {
+                CollectionContract(releaseColAddresses[i]).release(tokenIds[i]);
+            }
+        }
         if (tokenIds[0] != 0) {
             for (uint256 i = 0; i < tokenIds.length; i++) {
                 require(
                     msg.sender ==
-                        CollectionContract(collectionAddress[i]).ownerOf(
+                        CollectionContract(collectionAddresses[i]).ownerOf(
                             tokenIds[i]
                         ),
                     "Buddy: Not Authorized"
                 );
-                CollectionContract(collectionAddress[i]).lock(tokenIds[i]);
-                mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
+                CollectionContract(collectionAddresses[i]).lock(tokenIds[i]);
+                mapTokenIds[tokenId][collectionAddresses[i]].push(tokenIds[i]);
             }
         }
         for (uint256 i = 0; i < properties.length; i++) {
@@ -2892,7 +2901,7 @@ contract BuddyV1 is
     {
         mintFee = _mintFee;
         updateFee = _updateFee;
-        emit BaseTokenAdded(_mintFee, _updateFee);
+        emit FeeUpdate(_mintFee, _updateFee);
     }
 
     /**
@@ -2903,7 +2912,7 @@ contract BuddyV1 is
         onlyOwner
     {
         tokenAddress[_tokenAddress] = status;
-        emit TokenUpdated(_tokenAddress, status);
+        emit TokenUpdate(_tokenAddress, status);
     }
 
     /**
@@ -2914,10 +2923,10 @@ contract BuddyV1 is
         onlyOwner
     {
         deviationPercentage = _deviationPercentage;
-        emit DeviationPercentage(_deviationPercentage);
+        emit DeviationPercentageUpdate(_deviationPercentage);
     }
 
-    function adminUpdateConversion(address _conversionAddress) public onlyOwner {
+     function adminUpdateConversion(address _conversionAddress) public onlyOwner {
         conversionAddress = _conversionAddress;
     }
 
