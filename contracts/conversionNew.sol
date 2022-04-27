@@ -694,7 +694,7 @@ contract Conversion is Initializable, Ownable {
     address public admin;
     address public USX;
     address public Trace;
-    address constant USD = 0x3813e82e6f7098b9583FC0F33a962D02018B6803;
+    address constant USD = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
 
     // address constant 
 
@@ -705,14 +705,15 @@ contract Conversion is Initializable, Ownable {
     event TokenAdded(address indexed tokenAddress);
 
     function initialize() public initializer {
+        ownable_init();
         admin = msg.sender;
         USDDecimals = 1E8;
     }
 
     function adminUpdate(address _USX, address _Trace, QuickswapRouter _router) public onlyOwner {
-        USX = _USX;
+        USX = _USX; // 0x107065A122F92636a1358A70A0efe0F1A080a7e5
         Trace = _Trace;
-        router = _router;
+        router = _router; // 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff
     }
 
     /**
@@ -758,8 +759,8 @@ contract Conversion is Initializable, Ownable {
 
     function getTraceAmount(uint256 mintFee) internal view returns(uint256) {
         address[] memory path = new address[](2);
-        path[0] = USD ;//0x3813e82e6f7098b9583FC0F33a962D02018B6803; // USDT
-        path[1] = Trace; //0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889; 
+        path[0] = USD ; 
+        path[1] = Trace; // 0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4; 
         return router.getAmountsOut(mintFee, path)[1];
     }
 
