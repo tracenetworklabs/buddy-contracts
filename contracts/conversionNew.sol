@@ -690,8 +690,6 @@ interface QuickswapRouter {
 
 contract Conversion is Initializable, Ownable {
     using SafeMathUpgradeable for uint256;
-
-    address public admin;
     address public USX;
     address public Trace;
     address constant USD = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
@@ -706,7 +704,6 @@ contract Conversion is Initializable, Ownable {
 
     function initialize() public initializer {
         ownable_init();
-        admin = msg.sender;
         USDDecimals = 1E8;
     }
 
@@ -787,7 +784,6 @@ contract Conversion is Initializable, Ownable {
     }
 
     function addToken(address paymentToken, address _priceFeed) public onlyOwner{
-        require(msg.sender == admin, "Conversion: INVALID_ACCESS");
         priceFeed[paymentToken][address(0)] = _priceFeed;
     }
 }
