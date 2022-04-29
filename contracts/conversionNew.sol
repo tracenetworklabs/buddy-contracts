@@ -783,25 +783,28 @@ contract ConversionV1 is Initializable, Ownable {
         return price;
     }
 
-    function getTraceAmount(uint256 mintFee) internal view returns (uint256) {
-        address[] memory path = new address[](2);
-        path[0] = USD;
-        path[1] = Trace; // 0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4;
-        return router.getAmountsOut(mintFee, path)[1];
+    function getTraceAmount(uint256 mintFee) public view returns (uint256) {
+        return mintFee.mul(getSwapPrice(USD,Trace));
+        // address[] memory path = new address[](2);
+        // path[0] = USD;
+        // path[1] = Trace; // 0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4;
+        // return router.getAmountsOut(mintFee, path)[1];
     }
 
     function getSwapPrice(address tokenA, address tokenB)
-        internal
+        public
         view
         returns (uint256)
     {
         (uint256 reserves0, uint256 reserves1, ) = QuickswapPair(
             factory.getPair(tokenA, tokenB)
         ).getReserves();
-        uint256 price = reserves0
-            .mul(10**(18 - USD_DECIMALS))
-            .mul(PRICE_PRECISION)
-            .div(reserves1);
+        // (uint256 reserves0, uint256 reserves1, ) = (
+        //     37002896775,
+        //     40296064800861622494258,
+        //     56
+        // );
+        uint256 price = reserves1.div(reserves0).div(10000);
         return price;
     }
 
