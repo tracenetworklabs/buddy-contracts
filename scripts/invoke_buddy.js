@@ -5,13 +5,13 @@ async function main() {
     const Buddy = await ethers.getContractFactory("BuddyV1")
     const buddyProxy = await Buddy.attach("0xf7c8913DF28B004F5C16DcC9ba021D03d76DEEF0")
 
-//     await new Promise(res => setTimeout(res, 5000));
-//     await buddyProxy.adminUpdateFeeToken(USX, true); // USX
+    await new Promise(res => setTimeout(res, 5000));
+    await buddyProxy.adminUpdateConversion("0x4b91e74485f7213Fa9310124a1933e47635c7FD1"); // USX
 
 //     await new Promise(res => setTimeout(res, 5000));
 //     await buddyProxy.adminUpdateFeeToken(Trace, true); // Trace
 //     console.log(await buddyProxy.owner());
-// }
+}
 
 main()
     .then(() => process.exit(0))

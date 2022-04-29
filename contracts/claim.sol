@@ -870,6 +870,7 @@ contract ClaimV1 is Ownable, TreasuryNode {
     event FeesUpdated(uint256 updatedFee);
     event PaymentUpdated(address payment, bool status);
     event DeviationPercentage(uint256 percentage);
+    event PriceConversion(address conversion);
 
     function initialize(
         address payable treasury,
@@ -959,5 +960,16 @@ contract ClaimV1 is Ownable, TreasuryNode {
     {
         deviationPercentage = _deviationPercentage;
         emit DeviationPercentage(_deviationPercentage);
+    }
+
+    /**
+     * @notice Allows Admin to update price conversion
+     */
+    function adminUpdateConversion(address _conversion)
+        public
+        onlyOwner
+    {
+        conversion = _conversion;
+        emit PriceConversion(_conversion);
     }
 }
