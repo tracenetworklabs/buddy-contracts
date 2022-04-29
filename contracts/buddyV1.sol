@@ -2926,7 +2926,13 @@ contract BuddyV1 is
         emit DeviationPercentageUpdate(_deviationPercentage);
     }
 
-     function adminUpdateConversion(address _conversionAddress) public onlyOwner {
+    /**
+     * @notice Allows Admin to update price conversion contract
+     */
+    function adminUpdateConversion(address _conversionAddress)
+        public
+        onlyOwner
+    {
         conversionAddress = _conversionAddress;
     }
 

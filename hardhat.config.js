@@ -16,7 +16,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
-const MAINNET_RPC_URL = "https://matic-mainnet.chainstacklabs.com"
+const MAINNET_RPC_URL = "https://rpc-mainnet.maticvigil.com"
 const MAINNET_PRIVATE_KEY = process.env.MAINNET_PRIVATE_KEY;
 
 const MUMBAI_RPC_URL = "https://rpc-mumbai.maticvigil.com";

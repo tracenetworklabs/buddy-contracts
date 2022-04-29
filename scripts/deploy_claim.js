@@ -23,7 +23,7 @@ async function main() {
     const USDC = "0xb0040280A0C97F20C92c09513b8C6e6Ff9Aa86DC"
     const MATIC = "0x0000000000000000000000000000000000000000"
 
-    const Claim = await ethers.getContractFactory("Claim")
+    const Claim = await ethers.getContractFactory("ClaimV1")
     console.log("Deploying Claim, ProxyAdmin, and then Proxy...")
     const claimProxy = await upgrades.deployProxy(Claim, [Treasury, conversion, claimFee], { initializer: 'initialize' })
     console.log("Proxy of Claim deployed to:", claimProxy.address);

@@ -1,13 +1,17 @@
 async function main() {
+    const USX = "0xBE72D7FDDB9d7969507beF69f439840957E0b47c"
+    const Trace = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889"
+    
     const Buddy = await ethers.getContractFactory("BuddyV1")
-    // let buddyProxy = await upgrades.upgradeProxy("0x5a11B3d6a2aD6a5cad39A9A84154bA95bD248Da1", Buddy)
-    const buddyProxy = await Claim.attach("0x68d029Af1130E1Dc7fC82869aAa2188d664CE1f2")
-    await buddyProxy.mint("QmQh36CsceXZoqS7v9YQLUyxXdRmWd8YWTBUz7WCXsiVty", "0x0000000000000000000000000000000000000000", 0, ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], {
-        value: await ethers.utils.parseEther('2'),
-    });
-    // console.log("Your upgraded proxy is done!", buddyProxy.address);
-    console.log(await buddyProxy.owner());
-}
+    const buddyProxy = await Buddy.attach("0xf7c8913DF28B004F5C16DcC9ba021D03d76DEEF0")
+
+//     await new Promise(res => setTimeout(res, 5000));
+//     await buddyProxy.adminUpdateFeeToken(USX, true); // USX
+
+//     await new Promise(res => setTimeout(res, 5000));
+//     await buddyProxy.adminUpdateFeeToken(Trace, true); // Trace
+//     console.log(await buddyProxy.owner());
+// }
 
 main()
     .then(() => process.exit(0))

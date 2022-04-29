@@ -1,6 +1,4 @@
-
 // SPDX-License-Identifier: UNLICENSED
-
 
 // File: @chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol
 
@@ -683,34 +681,63 @@ abstract contract Ownable is ContextUpgradeable {
     }
 }
 
-
 interface QuickswapRouter {
-    function getAmountsOut(uint amountIn, address[] memory path) external view returns (uint[] memory amounts);
+    function getAmountsOut(uint256 amountIn, address[] memory path)
+        external
+        view
+        returns (uint256[] memory amounts);
 }
 
-contract Conversion is Initializable, Ownable {
+interface QuickswapFactory {
+    function getPair(address tokenA, address tokenB)
+        external
+        view
+        returns (address pair);
+}
+
+interface QuickswapPair {
+    function getReserves()
+        external
+        view
+        returns (
+            uint112 reserve0,
+            uint112 reserve1,
+            uint32 blockTimestampLast
+        );
+}
+
+contract ConversionV1 is Initializable, Ownable {
     using SafeMathUpgradeable for uint256;
     address public USX;
     address public Trace;
-    address constant USD = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+    address constant USD = 0x3813e82e6f7098b9583FC0F33a962D02018B6803; // Mainnet - 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
 
-    // address constant 
+    // address constant
 
     QuickswapRouter public router;
+    QuickswapFactory public factory;
 
-    uint256 public USDDecimals;
+    uint256 public PRICE_PRECISION;
+    uint256 public USD_DECIMALS;
     mapping(address => mapping(address => address)) public priceFeed;
     event TokenAdded(address indexed tokenAddress);
 
     function initialize() public initializer {
         ownable_init();
-        USDDecimals = 1E8;
+        PRICE_PRECISION = 1E8;
+        USD_DECIMALS = 8;
     }
 
-    function adminUpdate(address _USX, address _Trace, QuickswapRouter _router) public onlyOwner {
+    function adminUpdate(
+        address _USX,
+        address _Trace,
+        QuickswapRouter _router,
+        QuickswapFactory _factory
+    ) public onlyOwner {
         USX = _USX; // 0x107065A122F92636a1358A70A0efe0F1A080a7e5
         Trace = _Trace;
         router = _router; // 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff
+        factory = _factory;
     }
 
     /**
@@ -738,10 +765,10 @@ contract Conversion is Initializable, Ownable {
         if (paymentToken != address(0)) {
             decimal = IERC20(paymentToken).decimals();
         }
-        if(paymentToken == USX) {
-            return mintFee.mul(10 ** decimal).div(USDDecimals);
+        if (paymentToken == USX) {
+            return mintFee.mul(10**decimal).div(PRICE_PRECISION);
         }
-        if(paymentToken == Trace) {
+        if (paymentToken == Trace) {
             return getTraceAmount(mintFee);
         }
 
@@ -749,16 +776,33 @@ contract Conversion is Initializable, Ownable {
             priceFeed[paymentToken][address(0)]
         );
         uint256 price = getLatestPrice(fetchPrice);
-        
-        price = mintFee.mul(1E18).mul(10**decimal).div(price).div(USDDecimals);
+
+        price = mintFee.mul(1E18).mul(10**decimal).div(price).div(
+            PRICE_PRECISION
+        );
         return price;
     }
 
-    function getTraceAmount(uint256 mintFee) internal view returns(uint256) {
+    function getTraceAmount(uint256 mintFee) internal view returns (uint256) {
         address[] memory path = new address[](2);
-        path[0] = USD ; 
-        path[1] = Trace; // 0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4; 
+        path[0] = USD;
+        path[1] = Trace; // 0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4;
         return router.getAmountsOut(mintFee, path)[1];
+    }
+
+    function getSwapPrice(address tokenA, address tokenB)
+        internal
+        view
+        returns (uint256)
+    {
+        (uint256 reserves0, uint256 reserves1, ) = QuickswapPair(
+            factory.getPair(tokenA, tokenB)
+        ).getReserves();
+        uint256 price = reserves0
+            .mul(10**(18 - USD_DECIMALS))
+            .mul(PRICE_PRECISION)
+            .div(reserves1);
+        return price;
     }
 
     /**
@@ -778,12 +822,15 @@ contract Conversion is Initializable, Ownable {
             decimal = IERC20(paymentToken).decimals();
         }
         price = updateFee.mul(1E18).mul(10**decimal).div(price).div(
-            USDDecimals
+            PRICE_PRECISION
         );
         return price;
     }
 
-    function addToken(address paymentToken, address _priceFeed) public onlyOwner{
+    function addToken(address paymentToken, address _priceFeed)
+        public
+        onlyOwner
+    {
         priceFeed[paymentToken][address(0)] = _priceFeed;
     }
 }
