@@ -309,6 +309,11 @@
       "address": "0x021E5475dE8d84FAcFe7e2E2F91dA9A60B22084D",
       "txHash": "0xdc59e37159de3aefbd22bee857dc9aec5921d98dc03e784e028bc0eb0e44a356",
       "kind": "transparent"
+    },
+    {
+      "address": "0xC5990f8EbBB8A65100bBe4Cc822fc1D436ff21eB",
+      "txHash": "0x9080b9426ca53495e0629a2e802990e7a685b6e973b7cd953172f28cbb134a44",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -10143,6 +10148,136 @@
     "1d532486ea71576e2bdd047f18c574d086923b59a6674da92c40f64e8f9b6039": {
       "address": "0xb36Dc5259958Da619546A1B1e87aEb91F87e8C51",
       "txHash": "0x1a8f9045de4992492848851ae359bb4807fc8da185d124c2078e4c10f567cce1",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\conversionNew.sol:302"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\conversionNew.sol:307"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "contracts\\conversionNew.sol:601"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "Ownable",
+            "src": "contracts\\conversionNew.sol:621"
+          },
+          {
+            "label": "USX",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_address",
+            "contract": "ConversionV1",
+            "src": "contracts\\conversionNew.sol:711"
+          },
+          {
+            "label": "Trace",
+            "offset": 0,
+            "slot": "53",
+            "type": "t_address",
+            "contract": "ConversionV1",
+            "src": "contracts\\conversionNew.sol:712"
+          },
+          {
+            "label": "router",
+            "offset": 0,
+            "slot": "54",
+            "type": "t_contract(QuickswapRouter)897",
+            "contract": "ConversionV1",
+            "src": "contracts\\conversionNew.sol:717"
+          },
+          {
+            "label": "factory",
+            "offset": 0,
+            "slot": "55",
+            "type": "t_contract(QuickswapFactory)907",
+            "contract": "ConversionV1",
+            "src": "contracts\\conversionNew.sol:718"
+          },
+          {
+            "label": "PRICE_PRECISION",
+            "offset": 0,
+            "slot": "56",
+            "type": "t_uint256",
+            "contract": "ConversionV1",
+            "src": "contracts\\conversionNew.sol:720"
+          },
+          {
+            "label": "USD_DECIMALS",
+            "offset": 0,
+            "slot": "57",
+            "type": "t_uint256",
+            "contract": "ConversionV1",
+            "src": "contracts\\conversionNew.sol:721"
+          },
+          {
+            "label": "priceFeed",
+            "offset": 0,
+            "slot": "58",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_address))",
+            "contract": "ConversionV1",
+            "src": "contracts\\conversionNew.sol:722"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(QuickswapFactory)907": {
+            "label": "contract QuickswapFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(QuickswapRouter)897": {
+            "label": "contract QuickswapRouter",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_address))": {
+            "label": "mapping(address => mapping(address => address))",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "728eb99c66e31cedbdf8fa7d070f82d7e43cb82cd19e289dfb505c7ca18987d9": {
+      "address": "0xE3136f80918225C1B53082688CEcDCeCed782b30",
+      "txHash": "0xecc96d739f0b3cfd7dafabb81d5bbc6588d9f6debebcb20177bcf5fd76585039",
       "layout": {
         "storage": [
           {

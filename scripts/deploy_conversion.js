@@ -34,9 +34,9 @@ async function main() {
     await conversion.adminUpdate("0xBE72D7FDDB9d7969507beF69f439840957E0b47c", "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889", "0x8954AfA98594b838bda56FE4C12a09D7739D179b", "0x5757371414417b8c6caad45baef941abc7d3ab32");
     console.log("here");
     await new Promise(res => setTimeout(res, 5000));
-    console.log(await conversion.getSwapPrice("0x3813e82e6f7098b9583FC0F33a962D02018B6803", "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889"));
+    console.log((await conversion.getSwapPrice("0x3813e82e6f7098b9583FC0F33a962D02018B6803", "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889")) / (100000000));
 
-    console.log(await conversion.getTraceAmount(2500000000));
+    console.log((await conversion.getTraceAmount(2500000000)) / 1000000000000000000);
 }
 
 main()

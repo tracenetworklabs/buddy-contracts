@@ -784,7 +784,7 @@ contract ConversionV1 is Initializable, Ownable {
     }
 
     function getTraceAmount(uint256 mintFee) public view returns (uint256) {
-        return mintFee.mul(getSwapPrice(USD,Trace));
+        return mintFee.mul(getSwapPrice(USD,Trace)).mul(100);
         // address[] memory path = new address[](2);
         // path[0] = USD;
         // path[1] = Trace; // 0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4;
