@@ -2855,7 +2855,7 @@ pragma solidity ^0.7.0;
  * @title Buddy NFTs implemented using the ERC-721 standard.
  * @dev This top level file holds no data directly to ease future upgrades.
  */
-contract Buddy is
+contract BuddyV1 is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Core,
@@ -2924,6 +2924,16 @@ contract Buddy is
     {
         deviationPercentage = _deviationPercentage;
         emit DeviationPercentageUpdate(_deviationPercentage);
+    }
+
+    /**
+     * @notice Allows Admin to update price conversion contract
+     */
+    function adminUpdateConversion(address _conversionAddress)
+        public
+        onlyOwner
+    {
+        conversionAddress = _conversionAddress;
     }
 
     /**

@@ -710,7 +710,7 @@ contract ConversionV1 is Initializable, Ownable {
     using SafeMathUpgradeable for uint256;
     address public USX;
     address public Trace;
-    address constant USD = 0x3813e82e6f7098b9583FC0F33a962D02018B6803; // Mainnet - 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+    address public constant USD = 0x3813e82e6f7098b9583FC0F33a962D02018B6803; // Mainnet - 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
 
     // address constant
 

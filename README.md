@@ -17,6 +17,10 @@ OLD
 
 Buddy Proxy: 0xb7531662174615f125D5Dc6F68a274294a0acd22
 
+Token ID : 5 : https://ipfs.io/ipfs/QmNR8Z4S7UwZGzkET1dqgHvPkcyvzCRohaiFsKRuXjSEda/metadata.json
+
+Token ID : 265 : https://ipfs.io/ipfs/QmPXwmj4eK5cDE6BvTVRDmJoikHiXmEDEgdApgysor8ifc/metadata.json
+
 New 
 
 Treasury proxy 0xd350854f1cA77EC5a2F151F5162121FEacc679F0
