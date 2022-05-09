@@ -708,17 +708,15 @@ interface QuickswapPair {
 
 contract ConversionV1 is Initializable, Ownable {
     using SafeMathUpgradeable for uint256;
-    address public USX;
-    address public Trace;
-    address public constant USD = 0x3813e82e6f7098b9583FC0F33a962D02018B6803; // Mainnet - 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+    address internal USX;
+    address internal Trace;
+    address constant USD = 0xb0040280A0C97F20C92c09513b8C6e6Ff9Aa86DC;
 
-    // address constant
+    QuickswapRouter router;
+    QuickswapFactory factory;
 
-    QuickswapRouter public router;
-    QuickswapFactory public factory;
-
-    uint256 public PRICE_PRECISION;
-    uint256 public USD_DECIMALS;
+    uint256 PRICE_PRECISION;
+    uint256 USD_DECIMALS;
     mapping(address => mapping(address => address)) public priceFeed;
     event TokenAdded(address indexed tokenAddress);
 
@@ -734,9 +732,9 @@ contract ConversionV1 is Initializable, Ownable {
         QuickswapRouter _router,
         QuickswapFactory _factory
     ) public onlyOwner {
-        USX = _USX; // 0x107065A122F92636a1358A70A0efe0F1A080a7e5
+        USX = _USX;
         Trace = _Trace;
-        router = _router; // 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff
+        router = _router;
         factory = _factory;
     }
 
@@ -761,6 +759,7 @@ contract ConversionV1 is Initializable, Ownable {
         view
         returns (uint256)
     {
+        if(priceFeed[paymentToken][])
         uint256 decimal = 18;
         if (paymentToken != address(0)) {
             decimal = IERC20(paymentToken).decimals();
@@ -783,29 +782,24 @@ contract ConversionV1 is Initializable, Ownable {
         return price;
     }
 
-    function getTraceAmount(uint256 mintFee) internal view returns (uint256) {
-        return mintFee.mul(getSwapPrice(USD,Trace)).mul(100);
-        // address[] memory path = new address[](2);
-        // path[0] = USD;
-        // path[1] = Trace; // 0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4;
-        // return router.getAmountsOut(mintFee, path)[1];
+    function getTraceAmount(uint256 mintFee) public view returns (uint256) {
+        return mintFee.mul(getSwapPrice(address(0), USD, Trace)).mul(100);
     }
 
-    function getSwapPrice(address tokenA, address tokenB)
-        public
-        view
-        returns (uint256)
-    {
-        (uint256 reserves0, uint256 reserves1, ) = QuickswapPair(
-            factory.getPair(tokenA, tokenB)
-        ).getReserves();
-        // (uint256 reserves0, uint256 reserves1, ) = (
-        //     37002896775,
-        //     40296064800861622494258,
-        //     56
-        // );
-        uint256 price = reserves1.div(reserves0).div(10000);
-        return price;
+    function getSwapPrice(
+        address _USX,
+        address tokenA,
+        address tokenB
+    ) public view returns (uint256) {
+        if (_USX == USX) {
+            return 100000000;
+        } else {
+            (uint256 reserves0, uint256 reserves1, ) = QuickswapPair(
+                factory.getPair(tokenA, tokenB)
+            ).getReserves();
+            uint256 price = reserves1.div(reserves0).div(10000);
+            return price;
+        }
     }
 
     /**
@@ -830,10 +824,14 @@ contract ConversionV1 is Initializable, Ownable {
         return price;
     }
 
-    function addToken(address paymentToken, address _priceFeed)
+    function addToken(address token0, address token1, address _priceFeed)
         public
         onlyOwner
     {
-        priceFeed[paymentToken][address(0)] = _priceFeed;
+        priceFeed[token0][address(0)] = _priceFeed;
+        if(_priceFeed == router) {
+            status[token0] = 
+            priceFeed[token0][token1] = router;
+        }
     }
 }
