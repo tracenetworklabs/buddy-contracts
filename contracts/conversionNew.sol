@@ -759,7 +759,6 @@ contract ConversionV1 is Initializable, Ownable {
         view
         returns (uint256)
     {
-        if(priceFeed[paymentToken][])
         uint256 decimal = 18;
         if (paymentToken != address(0)) {
             decimal = IERC20(paymentToken).decimals();
@@ -824,14 +823,10 @@ contract ConversionV1 is Initializable, Ownable {
         return price;
     }
 
-    function addToken(address token0, address token1, address _priceFeed)
+    function addToken(address token0, address _priceFeed)
         public
         onlyOwner
     {
         priceFeed[token0][address(0)] = _priceFeed;
-        if(_priceFeed == router) {
-            status[token0] = 
-            priceFeed[token0][token1] = router;
-        }
     }
 }

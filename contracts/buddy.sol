@@ -1,10 +1,6 @@
 /**
- *Submitted for verification at polygonscan.com on 2022-04-14
- */
-
-/**
- *Submitted for verification at polygonscan.com on 2022-03-29
- */
+ *Submitted for verification at polygonscan.com on 2022-04-28
+*/
 
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
@@ -2855,7 +2851,7 @@ pragma solidity ^0.7.0;
  * @title Buddy NFTs implemented using the ERC-721 standard.
  * @dev This top level file holds no data directly to ease future upgrades.
  */
-contract BuddyV1 is
+contract Buddy is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Core,

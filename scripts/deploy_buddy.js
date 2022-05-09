@@ -26,9 +26,15 @@ async function main() {
     const PRICE_USDT_USD = "0x92C09849638959196E976289418e5973CC96d645";
     const PRICE_USDC_USD = "0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0";
 
+    const USX = "0xBE72D7FDDB9d7969507beF69f439840957E0b47c"
+    const Trace = "0xb0A2D971803e74843f158B22c4DAEc154f038515"
+    const router = "0x8954AfA98594b838bda56FE4C12a09D7739D179b"
+    const factory = "0x5757371414417b8c6caad45baef941abc7d3ab32"
+    const StableToken = USDC
+
     const treasuryOwner = accounts[0];
     const buddyOwner = accounts[0];
-    
+
     const mintFee = 1000000;
 
     const updateFee = 0;
@@ -50,10 +56,7 @@ async function main() {
 
     //// ************ ADD PRICE FEED ADDRESS **************/////
 
-    await new Promise(res => setTimeout(res, 10000));
-    await conversion.adminUpdate("0xBE72D7FDDB9d7969507beF69f439840957E0b47c", "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889", "0x8954AfA98594b838bda56FE4C12a09D7739D179b");
-
-    await new Promise(res => setTimeout(res, 10000));
+    await new Promise(res => setTimeout(res, 5000));
     await conversion.addToken(MATIC, PRICE_MATIC_USD);
 
     await new Promise(res => setTimeout(res, 5000));
@@ -61,6 +64,15 @@ async function main() {
 
     await new Promise(res => setTimeout(res, 5000));
     await conversion.addToken(USDT, PRICE_USDT_USD);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.addToken(USX, router);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.addToken(Trace, router);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.adminUpdate(USX, Trace, router, factory);
 
     //// ************ DEPLOY BUDDY **************/////
     const Buddy = await ethers.getContractFactory("BuddyV1")
@@ -72,16 +84,34 @@ async function main() {
 
     //// ************ ADD TOKEN TO BUDDY **************/////
     await new Promise(res => setTimeout(res, 5000));
-    await buddyProxy.adminUpdateFeeToken(MATIC, true); // Matic
+    await buddyProxy.adminUpdateERC20FeeToken(MATIC, true); // Matic
 
     await new Promise(res => setTimeout(res, 5000));
-    await buddyProxy.adminUpdateFeeToken(USDT, true); // USDT
+    await buddyProxy.adminUpdateERC20FeeToken(USDT, true); // USDT
 
     await new Promise(res => setTimeout(res, 5000));
-    await buddyProxy.adminUpdateFeeToken(USDC, true); // USDC
+    await buddyProxy.adminUpdateERC20FeeToken(USDC, true); // USDC
+
+    const token721 = await ethers.getContractFactory("Token721");
+    const Token721 = await token721.deploy();
+    await Token721.deployed();
+
+    console.log("ERC721 Token Contract:", Token721.address);
+    await Token721.initialize("Test", "Test721");
 
     await new Promise(res => setTimeout(res, 5000));
-    console.log("Deviation percent", await buddyProxy.adminUpdateDeviation(5));
+    await Token721.mint(accounts[0], 1);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await Token721.approve(buddyProxy.address, 1);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await buddyProxy.adminUpdateERC721FeeToken(Token721.address, true); // USDC
+
+    console.log("Is token added", await buddyProxy.erc721tokenAddress(Token721.address));
+
+    await new Promise(res => setTimeout(res, 5000));
+    await buddyProxy.adminUpdateDeviation(5);
 
     await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.transferOwnership(buddyOwner);
@@ -92,17 +122,18 @@ async function main() {
     await new Promise(res => setTimeout(res, 5000));
     console.log("Mint fee", await buddyProxy.getMintFee());
 
-    await new Promise(res => setTimeout(res, 5000));
-    console.log("Matic price", await conversion.convertMintFee(MATIC, mintFee));
+    // await new Promise(res => setTimeout(res, 5000));
+    // console.log("Matic price", await conversion.convertMintFee(MATIC, mintFee));
 
     await new Promise(res => setTimeout(res, 5000));
     //Test Mint
     console.log("Next token ID", await buddyProxy.getNextTokenId());
-    // await buddyProxy.mint("QmQh36CsceXZoqS7v9YQLUyxXdRmWd8YWTBUz7WCXsiVty", "0x0000000000000000000000000000000000000000", 0, ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], {
-    //     value: await ethers.utils.parseEther('2'),
-    // });
-    // await new Promise(res => setTimeout(res, 5000));
-    // console.log("Next token ID", await buddyProxy.getNextTokenId());
+
+    await buddyProxy.mint("QmQh36CsceXZoqS7v9YQLUyxXdRmWd8YWTBUz7WCXsiVty", Token721.address, 1, ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], "ERC721", {
+        // value: await ethers.utils.parseEther('2'),
+    });
+    await new Promise(res => setTimeout(res, 5000));
+    console.log("Next token ID", await buddyProxy.getNextTokenId());
 }
 
 main()
