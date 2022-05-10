@@ -1,11 +1,3 @@
-/**
- *Submitted for verification at polygonscan.com on 2022-04-14
- */
-
-/**
- *Submitted for verification at polygonscan.com on 2022-03-29
- */
-
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
 
@@ -2619,8 +2611,7 @@ abstract contract NFT721Mint is
     TreasuryNode
 {
     using SafeMathUpgradeable for uint256;
-    mapping(address => bool) public erc20tokenAddress;
-    mapping(address => bool) public erc721tokenAddress;
+    mapping(address => bool) public tokenAddress;
     uint256 internal mintFee;
     uint256 internal updateFee;
     mapping(uint256 => mapping(address => uint256[])) mapTokenIds;
@@ -2648,11 +2639,11 @@ abstract contract NFT721Mint is
 
     event FeeUpdate(uint256 mintFee, uint256 uriUpdateFee);
 
-    event ERC20TokenUpdated(address indexed tokenAddress, bool status);
-
-    event ERC721TokenUpdated(address indexed tokenAddress, bool status);
+    event TokenUpdate(address indexed tokenAddress, bool status);
 
     event DeviationPercentageUpdate(uint256 percentage);
+
+    event ConversionUpdated(address conversion);
 
     /**
      * @notice Gets the tokenId of the next NFT minted.
@@ -2683,18 +2674,26 @@ abstract contract NFT721Mint is
         return updateFee;
     }
 
-    function checkMintFees(
-        address paymentToken,
-        uint256 feeAmount,
-        string memory _type
-    ) internal {
+    function checkMintFees(address paymentToken, uint256 feeAmount) internal {
         address payable treasury_ = getBuddyTreasury();
-        if (
-            keccak256(abi.encodePacked((_type))) ==
-            keccak256(abi.encodePacked(("ERC20")))
-        ) {
+        if (IERC721Upgradeable(paymentToken).supportsInterface(0x80ac58cd)) {
             require(
-                erc20tokenAddress[paymentToken] == true,
+                tokenAddress[paymentToken] == true,
+                "NFT721Mint : PaymentToken ERC721 Not Supported"
+            );
+            require(
+                msg.sender ==
+                    IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
+                "NFT721Mint : Caller is not the owner"
+            );
+            IERC721Upgradeable(paymentToken).transferFrom(
+                msg.sender,
+                treasury_,
+                feeAmount
+            );
+        } else {
+            require(
+                tokenAddress[paymentToken] == true,
                 "NFT721Mint : PaymentToken ERC20 Not Supported"
             );
             uint256 price = ConversionInt(conversionAddress).convertMintFee(
@@ -2713,24 +2712,6 @@ abstract contract NFT721Mint is
                 (bool success, ) = treasury_.call{value: msg.value}("");
                 require(success, "Transfer failed.");
             }
-        } else if (
-            keccak256(abi.encodePacked((_type))) ==
-            keccak256(abi.encodePacked(("ERC721")))
-        ) {
-            require(
-                erc721tokenAddress[paymentToken] == true,
-                "NFT721Mint : PaymentToken ERC721 Not Supported"
-            );
-            require(
-                msg.sender ==
-                    IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
-                "NFT721Mint : Caller is not the owner"
-            );
-            IERC721Upgradeable(paymentToken).transferFrom(
-                msg.sender,
-                treasury_,
-                feeAmount
-            );
         }
     }
 
@@ -2773,10 +2754,9 @@ abstract contract NFT721Mint is
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
-        string[] memory values,
-        string memory _type
+        string[] memory values
     ) public payable returns (uint256 tokenId) {
-        checkMintFees(paymentToken, feeAmount, _type);
+        checkMintFees(paymentToken, feeAmount);
 
         tokenId = nextTokenId++;
         if (tokenIds[0] != 0) {
@@ -2938,23 +2918,12 @@ contract BuddyV1 is
     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateERC20FeeToken(address _tokenAddress, bool status)
+    function adminUpdateFeeToken(address _tokenAddress, bool status)
         public
         onlyOwner
     {
-        erc20tokenAddress[_tokenAddress] = status;
-        emit ERC20TokenUpdated(_tokenAddress, status);
-    }
-
-    /**
-     * @notice Allows Admin to add nft address.
-     */
-    function adminUpdateERC721FeeToken(address _nftAddress, bool status)
-        public
-        onlyOwner
-    {
-        erc721tokenAddress[_nftAddress] = status;
-        emit ERC721TokenUpdated(_nftAddress, status);
+        tokenAddress[_tokenAddress] = status;
+        emit TokenUpdate(_tokenAddress, status);
     }
 
     /**
@@ -2976,6 +2945,7 @@ contract BuddyV1 is
         onlyOwner
     {
         conversionAddress = _conversionAddress;
+        emit ConversionUpdated(conversionAddress);
     }
 
     /**
@@ -2988,5 +2958,4 @@ contract BuddyV1 is
     {
         super._burn(tokenId);
     }
-
 }

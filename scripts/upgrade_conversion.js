@@ -3,14 +3,9 @@ async function main() {
     const Trace = "0xD028C2a5156069c7eFaeA40acCA7d9Da6f219A5f"
     const router = "0x8954AfA98594b838bda56FE4C12a09D7739D179b"
 
-    const Conversion = await ethers.getContractFactory("ConversionV1")
-    let conversionProxy = await upgrades.upgradeProxy("0x1E9b7F07c7c277827c167Ec49Cd611aA546cba18", Conversion)
+    const Conversion = await ethers.getContractFactory("Conversion")
+    let conversionProxy = await upgrades.upgradeProxy("0x703dD648C5A13a0C33b3A09054E540b743a6108F", Conversion)
     console.log("Your upgraded proxy is done!", conversionProxy.address);
-    await new Promise(res => setTimeout(res, 5000));
-    await conversionProxy.addToken(USX, router);
-
-    await new Promise(res => setTimeout(res, 5000));
-    await conversionProxy.addToken(Trace, router);
     console.log(await conversionProxy.owner());
 }
 
