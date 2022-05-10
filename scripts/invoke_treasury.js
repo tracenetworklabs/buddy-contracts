@@ -4,15 +4,12 @@ async function main() {
     const accounts = await ethers.provider.listAccounts();
     console.log("Accounts", accounts[0]);
 
-    const treasuryOwner = "0x40a124c4849A25B9b19b2e7aFC4f07302fBb67B1";
-
-    //// ************ DEPLOY TREASURY **************/////
-
-    const buddyTreasury = await ethers.getContractFactory("BuddyTreasury");
-    const treasuryProxy = await upgrades.deployProxy(buddyTreasury, [treasuryOwner], { initializer: 'initialize' })
-    await new Promise(res => setTimeout(res, 5000));
-    console.log("Treasury proxy", treasuryProxy.address);
-    console.log("Treasury admin", await treasuryProxy.isAdmin(treasuryOwner));
+    const treasury = await ethers.getContractFactory("BuddyTreasury")
+    let treasuryProxy = await upgrades.upgradeProxy("0x8099ce938AceB379b48E377f17a12E332aa85941", treasury, {
+        // unsafeSkipStorageCheck: true
+    })
+    console.log("Your upgraded proxy is done!", treasuryProxy.address);
+    // console.log(await treasuryProxy.owner());
 
 }
 
