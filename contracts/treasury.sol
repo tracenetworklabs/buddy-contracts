@@ -51,33 +51,6 @@ abstract contract Initializable {
     }
 }
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol@v3.4.1-solc-0.7
-
-pragma solidity ^0.7.0;
-
-/**
- * @title ERC721 token receiver interface
- * @dev Interface for any contract that wants to support safeTransfers
- * from ERC721 asset contracts.
- */
-interface IERC721ReceiverUpgradeable {
-    /**
-     * @dev Whenever an {IERC721} `tokenId` token is transferred to this contract via {IERC721-safeTransferFrom}
-     * by `operator` from `from`, this function is called.
-     *
-     * It must return its Solidity selector to confirm the token transfer.
-     * If any other value is returned or the interface is not implemented by the recipient, the transfer will be reverted.
-     *
-     * The selector can be obtained in Solidity with `IERC721.onERC721Received.selector`.
-     */
-    function onERC721Received(
-        address operator,
-        address from,
-        uint256 tokenId,
-        bytes calldata data
-    ) external returns (bytes4);
-}
-
 // File: contracts/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol
 
 pragma solidity ^0.7.0;
@@ -495,6 +468,32 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
     }
 
     uint256[50] private __gap;
+}
+
+/**
+ * @dev ERC-721 interface for accepting safe transfers.
+ * See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md.
+ */
+interface ERC721TokenReceiver {
+    /**
+     * @dev Handle the receipt of a NFT. The ERC721 smart contract calls this function on the
+     * recipient after a `transfer`. This function MAY throw to revert and reject the transfer. Return
+     * of other than the magic value MUST result in the transaction being reverted.
+     * Returns `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))` unless throwing.
+     * @notice The contract address is always the message sender. A wallet/broker/auction application
+     * MUST implement the wallet interface if it will accept safe transfers.
+     * @param _operator The address which called `safeTransferFrom` function.
+     * @param _from The address which previously owned the token.
+     * @param _tokenId The NFT identifier which is being transferred.
+     * @param _data Additional data with no specified format.
+     * @return Returns `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`.
+     */
+    function onERC721Received(
+        address _operator,
+        address _from,
+        uint256 _tokenId,
+        bytes calldata _data
+    ) external returns (bytes4);
 }
 
 // File: contracts/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol
@@ -1102,6 +1101,11 @@ pragma solidity ^0.7.0;
  * @notice Enables deposits and withdrawals.
  */
 abstract contract CollateralManagement is AdminRole {
+
+    // Equals to `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`
+    // which can be also obtained as `IERC721Receiver(0).onERC721Received.selector`
+    bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
+
     using AddressUpgradeable for address payable;
 
     event FundsWithdrawn(address indexed to, uint256 amount);
@@ -1162,6 +1166,7 @@ abstract contract CollateralManagement is AdminRole {
         address to,
         uint256 id
     ) public onlyAdmin {
+        require(id > 0);
         require(
             address(this) == IERC721Upgradeable(tokenAddress).ownerOf(id),
             "Contract is not the Owner"
@@ -1171,6 +1176,19 @@ abstract contract CollateralManagement is AdminRole {
             to,
             id
         );
+    }
+
+    function onERC721Received(
+        address _operator,
+        address _from,
+        uint256 _tokenId,
+        bytes calldata _data
+    ) external returns (bytes4) {
+        _operator;
+        _from;
+        _tokenId;
+        _data;
+        return 0x150b7a02;
     }
 
     uint256[1000] private __gap;

@@ -335,7 +335,7 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
     uint256[49] private __gap;
 }
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol@v3.4.1-solc-0.7
+// File @openzeppelin/contracts-upgradeable/token/IERC20/IERC20.sol@v3.4.1-solc-0.7
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -2595,6 +2595,16 @@ abstract contract NFT721Metadata is NFT721Creator {
     uint256[999] private ______gap;
 }
 
+interface NftContract {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external;
+
+    function ownerOf(uint256 tokenId) external view returns (address owner);
+}
+
 // File contracts/mixins/NFT721Mint.sol
 
 pragma solidity ^0.7.0;
@@ -2676,26 +2686,21 @@ abstract contract NFT721Mint is
 
     function checkMintFees(address paymentToken, uint256 feeAmount) internal {
         address payable treasury_ = getBuddyTreasury();
+        require(
+            tokenAddress[paymentToken] == true,
+            "NFT721Mint : PaymentToken Not Supported"
+        );
         if (IERC721Upgradeable(paymentToken).supportsInterface(0x80ac58cd)) {
             require(
-                tokenAddress[paymentToken] == true,
-                "NFT721Mint : PaymentToken ERC721 Not Supported"
-            );
-            require(
-                msg.sender ==
-                    IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
+                msg.sender == IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
                 "NFT721Mint : Caller is not the owner"
             );
-            IERC721Upgradeable(paymentToken).transferFrom(
+            IERC721Upgradeable(paymentToken).safeTransferFrom(
                 msg.sender,
                 treasury_,
                 feeAmount
             );
         } else {
-            require(
-                tokenAddress[paymentToken] == true,
-                "NFT721Mint : PaymentToken ERC20 Not Supported"
-            );
             uint256 price = ConversionInt(conversionAddress).convertMintFee(
                 paymentToken,
                 getMintFee()

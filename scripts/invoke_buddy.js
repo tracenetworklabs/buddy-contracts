@@ -17,18 +17,19 @@ async function main() {
     // console.log("ERC721 Token Contract:", Token721.address);
     // await Token721.initialize("Test721", "Test721");
 
-    await Token721.safeTransferFrom(accounts[0], "0x8099ce938AceB379b48E377f17a12E332aa85941", 1);
+    // await Token721.safeTransferFrom(accounts[0], "0x8099ce938AceB379b48E377f17a12E332aa85941", 1);
 
-    // await new Promise(res => setTimeout(res, 5000));
-    // await Token721.mint(accounts[0], 1);
+    await new Promise(res => setTimeout(res, 5000));
+    await Token721.mint("0x6d4c72d6b441f004295aDca13B550fDF880aC994", 9);
+    console.log("here");
 
-    // await new Promise(res => setTimeout(res, 5000));
-    // await Token721.approve(buddyProxy.address, 1);
+    // await new Promise(res => setTimeout(res, 10000));
+    // await Token721.approve(buddyProxy.address, 4);
 
-    // await new Promise(res => setTimeout(res, 5000));
+    // await new Promise(res => setTimeout(res, 10000));
     // await buddyProxy.adminUpdateFeeToken(Token721.address, true); // USDC
 
-    // await buddyProxy.mint("QmQh36CsceXZoqS7v9YQLUyxXdRmWd8YWTBUz7WCXsiVty", Token721.address, 1, ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], {
+    // await buddyProxy.mint("QmSYVzbrU5VwNXb6aYJNzFCpTziCCxTK8LXzeJtGaEvKim", Token721.address, 4, ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], {
     //     // value: await ethers.utils.parseEther('2'),
     // });
 }

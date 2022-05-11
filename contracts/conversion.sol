@@ -1,6 +1,6 @@
 /**
  *Submitted for verification at polygonscan.com on 2022-05-09
-*/
+ */
 
 // SPDX-License-Identifier: UNLICENSED
 
@@ -710,7 +710,7 @@ interface QuickswapPair {
         );
 }
 
-contract ConversionV1 is Initializable, Ownable {
+contract Conversion is Initializable, Ownable {
     using SafeMathUpgradeable for uint256;
     address internal USX;
     address internal Trace;
@@ -745,7 +745,7 @@ contract ConversionV1 is Initializable, Ownable {
     /**
      * @dev Returns the latest price.
      */
-    function getLatestPrice(AggregatorV3Interface fetchPrice)
+    function getChainlinkPrice(AggregatorV3Interface fetchPrice)
         public
         view
         returns (uint256)
@@ -777,7 +777,7 @@ contract ConversionV1 is Initializable, Ownable {
         AggregatorV3Interface fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
         );
-        uint256 price = getLatestPrice(fetchPrice);
+        uint256 price = getChainlinkPrice(fetchPrice);
 
         price = mintFee.mul(1E18).mul(10**decimal).div(price).div(
             PRICE_PRECISION
@@ -786,23 +786,23 @@ contract ConversionV1 is Initializable, Ownable {
     }
 
     function getTraceAmount(uint256 mintFee) public view returns (uint256) {
-        return mintFee.mul(getSwapPrice(address(0), USD, Trace)).mul(100);
+        return mintFee.mul(getSwapPrice(USD, Trace)).mul(100);
     }
 
-    function getSwapPrice(
-        address _USX,
-        address tokenA,
-        address tokenB
-    ) public view returns (uint256) {
-        if (_USX == USX) {
-            return 100000000;
-        } else {
-            (uint256 reserves0, uint256 reserves1, ) = QuickswapPair(
-                factory.getPair(tokenA, tokenB)
-            ).getReserves();
-            uint256 price = reserves1.div(reserves0).div(10000);
-            return price;
-        }
+    function getSwapPrice(address tokenA, address tokenB)
+        public
+        view
+        returns (uint256)
+    {
+        (uint256 reserves0, uint256 reserves1, ) = QuickswapPair(
+            factory.getPair(tokenA, tokenB)
+        ).getReserves();
+        uint256 price = reserves1.div(reserves0).div(10000);
+        return price;
+    }
+
+    function getUSXPrice() public view returns (uint256) {
+        return 100000000;
     }
 
     /**
@@ -816,7 +816,7 @@ contract ConversionV1 is Initializable, Ownable {
         AggregatorV3Interface fetchPrice = AggregatorV3Interface(
             priceFeed[paymentToken][address(0)]
         );
-        uint256 price = getLatestPrice(fetchPrice);
+        uint256 price = getChainlinkPrice(fetchPrice);
         uint256 decimal = 18;
         if (paymentToken != address(0)) {
             decimal = IERC20(paymentToken).decimals();
@@ -827,10 +827,7 @@ contract ConversionV1 is Initializable, Ownable {
         return price;
     }
 
-    function addToken(address token0, address _priceFeed)
-        public
-        onlyOwner
-    {
+    function addToken(address token0, address _priceFeed) public onlyOwner {
         priceFeed[token0][address(0)] = _priceFeed;
     }
 }
