@@ -1,7 +1,3 @@
-/**
- *Submitted for verification at polygonscan.com on 2021-08-11
-*/
-
 // File: @openzeppelin/contracts/security/ReentrancyGuard.sol
 
 

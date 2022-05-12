@@ -2595,16 +2595,6 @@ abstract contract NFT721Metadata is NFT721Creator {
     uint256[999] private ______gap;
 }
 
-interface NftContract {
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) external;
-
-    function ownerOf(uint256 tokenId) external view returns (address owner);
-}
-
 // File contracts/mixins/NFT721Mint.sol
 
 pragma solidity ^0.7.0;
@@ -2649,7 +2639,7 @@ abstract contract NFT721Mint is
 
     event FeeUpdate(uint256 mintFee, uint256 uriUpdateFee);
 
-    event TokenUpdate(address indexed tokenAddress, bool status);
+    event TokenUpdate(address indexed tokenAddress, bool status, string tokenType);
 
     event DeviationPercentageUpdate(uint256 percentage);
 
@@ -2684,15 +2674,19 @@ abstract contract NFT721Mint is
         return updateFee;
     }
 
-    function checkMintFees(address paymentToken, uint256 feeAmount) internal {
+    function checkMintFees(address paymentToken, uint256 feeAmount, string memory _type) internal {
         address payable treasury_ = getBuddyTreasury();
         require(
             tokenAddress[paymentToken] == true,
             "NFT721Mint : PaymentToken Not Supported"
         );
-        if (IERC721Upgradeable(paymentToken).supportsInterface(0x80ac58cd)) {
+        if (
+            keccak256(abi.encodePacked((_type))) ==
+            keccak256(abi.encodePacked(("ERC721")))
+        ) {
             require(
-                msg.sender == IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
+                msg.sender ==
+                    IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
                 "NFT721Mint : Caller is not the owner"
             );
             IERC721Upgradeable(paymentToken).safeTransferFrom(
@@ -2759,9 +2753,10 @@ abstract contract NFT721Mint is
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
-        string[] memory values
+        string[] memory values,
+        string memory _type
     ) public payable returns (uint256 tokenId) {
-        checkMintFees(paymentToken, feeAmount);
+        checkMintFees(paymentToken, feeAmount, _type);
 
         tokenId = nextTokenId++;
         if (tokenIds[0] != 0) {
@@ -2923,12 +2918,12 @@ contract BuddyV1 is
     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateFeeToken(address _tokenAddress, bool status)
+    function adminUpdateFeeToken(address _tokenAddress, bool status, string memory _tokenType)
         public
         onlyOwner
     {
         tokenAddress[_tokenAddress] = status;
-        emit TokenUpdate(_tokenAddress, status);
+        emit TokenUpdate(_tokenAddress, status, _tokenType);
     }
 
     /**

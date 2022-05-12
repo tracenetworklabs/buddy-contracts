@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at polygonscan.com on 2022-03-28
+*/
+
 // File: contracts/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol
 
 // SPDX-License-Identifier: UNLICENSED
@@ -49,188 +53,6 @@ abstract contract Initializable {
             _initializing = false;
         }
     }
-}
-
-// File: contracts/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol
-
-pragma solidity ^0.7.0;
-
-/**
- * @dev Interface of the ERC165 standard, as defined in the
- * https://eips.ethereum.org/EIPS/eip-165[EIP].
- *
- * Implementers can declare support of contract interfaces, which can then be
- * queried by others ({ERC165Checker}).
- *
- * For an implementation, see {ERC165}.
- */
-interface IERC165Upgradeable {
-    /**
-     * @dev Returns true if this contract implements the interface defined by
-     * `interfaceId`. See the corresponding
-     * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section]
-     * to learn more about how these ids are created.
-     *
-     * This function call must use less than 30 000 gas.
-     */
-    function supportsInterface(bytes4 interfaceId) external view returns (bool);
-}
-
-pragma solidity ^0.7.0;
-
-/**
- * @dev Required interface of an ERC721 compliant contract.
- */
-interface IERC721Upgradeable is IERC165Upgradeable {
-    /**
-     * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
-     */
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 indexed tokenId
-    );
-
-    /**
-     * @dev Emitted when `owner` enables `approved` to manage the `tokenId` token.
-     */
-    event Approval(
-        address indexed owner,
-        address indexed approved,
-        uint256 indexed tokenId
-    );
-
-    /**
-     * @dev Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.
-     */
-    event ApprovalForAll(
-        address indexed owner,
-        address indexed operator,
-        bool approved
-    );
-
-    /**
-     * @dev Returns the number of tokens in ``owner``'s account.
-     */
-    function balanceOf(address owner) external view returns (uint256 balance);
-
-    /**
-     * @dev Returns the owner of the `tokenId` token.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     */
-    function ownerOf(uint256 tokenId) external view returns (address owner);
-
-    /**
-     * @dev Safely transfers `tokenId` token from `from` to `to`, checking first that contract recipients
-     * are aware of the ERC721 protocol to prevent tokens from being forever locked.
-     *
-     * Requirements:
-     *
-     * - `from` cannot be the zero address.
-     * - `to` cannot be the zero address.
-     * - `tokenId` token must exist and be owned by `from`.
-     * - If the caller is not `from`, it must be have been allowed to move this token by either {approve} or {setApprovalForAll}.
-     * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-     *
-     * Emits a {Transfer} event.
-     */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) external;
-
-    /**
-     * @dev Transfers `tokenId` token from `from` to `to`.
-     *
-     * WARNING: Usage of this method is discouraged, use {safeTransferFrom} whenever possible.
-     *
-     * Requirements:
-     *
-     * - `from` cannot be the zero address.
-     * - `to` cannot be the zero address.
-     * - `tokenId` token must be owned by `from`.
-     * - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
-     *
-     * Emits a {Transfer} event.
-     */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) external;
-
-    /**
-     * @dev Gives permission to `to` to transfer `tokenId` token to another account.
-     * The approval is cleared when the token is transferred.
-     *
-     * Only a single account can be approved at a time, so approving the zero address clears previous approvals.
-     *
-     * Requirements:
-     *
-     * - The caller must own the token or be an approved operator.
-     * - `tokenId` must exist.
-     *
-     * Emits an {Approval} event.
-     */
-    function approve(address to, uint256 tokenId) external;
-
-    /**
-     * @dev Returns the account approved for `tokenId` token.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     */
-    function getApproved(uint256 tokenId)
-        external
-        view
-        returns (address operator);
-
-    /**
-     * @dev Approve or remove `operator` as an operator for the caller.
-     * Operators can call {transferFrom} or {safeTransferFrom} for any token owned by the caller.
-     *
-     * Requirements:
-     *
-     * - The `operator` cannot be the caller.
-     *
-     * Emits an {ApprovalForAll} event.
-     */
-    function setApprovalForAll(address operator, bool _approved) external;
-
-    /**
-     * @dev Returns if the `operator` is allowed to manage all of the assets of `owner`.
-     *
-     * See {setApprovalForAll}
-     */
-    function isApprovedForAll(address owner, address operator)
-        external
-        view
-        returns (bool);
-
-    /**
-     * @dev Safely transfers `tokenId` token from `from` to `to`.
-     *
-     * Requirements:
-     *
-     * - `from` cannot be the zero address.
-     * - `to` cannot be the zero address.
-     * - `tokenId` token must exist and be owned by `from`.
-     * - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
-     * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-     *
-     * Emits a {Transfer} event.
-     */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes calldata data
-    ) external;
 }
 
 // File: contracts/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol
@@ -335,6 +157,31 @@ library StringsUpgradeable {
         require(value == 0, "Strings: hex length insufficient");
         return string(buffer);
     }
+}
+
+// File: contracts/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol
+
+pragma solidity ^0.7.0;
+
+/**
+ * @dev Interface of the ERC165 standard, as defined in the
+ * https://eips.ethereum.org/EIPS/eip-165[EIP].
+ *
+ * Implementers can declare support of contract interfaces, which can then be
+ * queried by others ({ERC165Checker}).
+ *
+ * For an implementation, see {ERC165}.
+ */
+interface IERC165Upgradeable {
+    /**
+     * @dev Returns true if this contract implements the interface defined by
+     * `interfaceId`. See the corresponding
+     * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section]
+     * to learn more about how these ids are created.
+     *
+     * This function call must use less than 30 000 gas.
+     */
+    function supportsInterface(bytes4 interfaceId) external view returns (bool);
 }
 
 /**
@@ -468,32 +315,6 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
     }
 
     uint256[50] private __gap;
-}
-
-/**
- * @dev ERC-721 interface for accepting safe transfers.
- * See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md.
- */
-interface ERC721TokenReceiver {
-    /**
-     * @dev Handle the receipt of a NFT. The ERC721 smart contract calls this function on the
-     * recipient after a `transfer`. This function MAY throw to revert and reject the transfer. Return
-     * of other than the magic value MUST result in the transaction being reverted.
-     * Returns `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))` unless throwing.
-     * @notice The contract address is always the message sender. A wallet/broker/auction application
-     * MUST implement the wallet interface if it will accept safe transfers.
-     * @param _operator The address which called `safeTransferFrom` function.
-     * @param _from The address which previously owned the token.
-     * @param _tokenId The NFT identifier which is being transferred.
-     * @param _data Additional data with no specified format.
-     * @return Returns `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`.
-     */
-    function onERC721Received(
-        address _operator,
-        address _from,
-        uint256 _tokenId,
-        bytes calldata _data
-    ) external returns (bytes4);
 }
 
 // File: contracts/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol
@@ -1101,10 +922,6 @@ pragma solidity ^0.7.0;
  * @notice Enables deposits and withdrawals.
  */
 abstract contract CollateralManagement is AdminRole {
-    // Equals to `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`
-    // which can be also obtained as `IERC721Receiver(0).onERC721Received.selector`
-    bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
-
     using AddressUpgradeable for address payable;
 
     event FundsWithdrawn(address indexed to, uint256 amount);
@@ -1142,51 +959,15 @@ abstract contract CollateralManagement is AdminRole {
      * @param amount       Amount to withdrawal or 0 to withdraw all available funds
      */
 
-    function withdrawERC20Tokens(
+    function withdrawTokens(
         address tokenAddress,
-        address to,
+        address payable to,
         uint256 amount
     ) public onlyAdmin {
         if (amount == 0) {
             amount = IERC20(tokenAddress).balanceOf(address(this));
         }
         IERC20(tokenAddress).transfer(to, amount);
-    }
-
-    /**
-     * @notice Allows an admin to withdraw ERC-721 token funds.
-     * @param tokenAddress ERC-20 token contract address
-     * @param to           Address to receive the withdrawn funds
-     * @param id       Amount to withdrawal or 0 to withdraw all available funds
-     */
-    function withdrawERC721Tokens(
-        address tokenAddress,
-        address to,
-        uint256 id
-    ) public onlyAdmin {
-        require(id > 0);
-        require(
-            address(this) == IERC721Upgradeable(tokenAddress).ownerOf(id),
-            "Contract is not the Owner"
-        );
-        IERC721Upgradeable(tokenAddress).safeTransferFrom(
-            address(this),
-            to,
-            id
-        );
-    }
-
-    function onERC721Received(
-        address _operator,
-        address _from,
-        uint256 _tokenId,
-        bytes calldata _data
-    ) external returns (bytes4) {
-        _operator;
-        _from;
-        _tokenId;
-        _data;
-        return 0x150b7a02;
     }
 
     uint256[1000] private __gap;
@@ -1231,7 +1012,7 @@ pragma solidity ^0.7.0;
  * @notice The Buddy treasury which collects fees generated by the market.
  * @dev The core responsibility of this contract is collecting fees.
  */
-contract Treasury is
+contract BuddyTreasury is
     AdminRole,
     OperatorRole,
     CollateralManagement,

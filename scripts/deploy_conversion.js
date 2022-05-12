@@ -19,6 +19,8 @@ async function main() {
     const factory = "0x5757371414417b8c6caad45baef941abc7d3ab32"
     const StableToken = USDC
 
+    const NFTToken = "0x2fAd792b99Ca771CF9eBAB6564eD70Da5EF017e4";
+
 
     // Mainnet
     // const USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
@@ -37,7 +39,7 @@ async function main() {
 
     //// ************ DEPLOY CONVERSION **************/////
 
-    const Conversion = await ethers.getContractFactory("ConversionV1");
+    const Conversion = await ethers.getContractFactory("Conversion");
     const conversion = await upgrades.deployProxy(Conversion, { initializer: 'initialize' })
     // await new Promise(res => setTimeout(res, 5000));
     console.log("conversion proxy", conversion.address);
@@ -60,17 +62,21 @@ async function main() {
     await conversion.addToken(Trace, router);
 
     await new Promise(res => setTimeout(res, 5000));
-    await conversion.adminUpdate(USX, Trace, router, factory);
-    console.log("here");
+    await conversion.addToken(NFTToken, router);
+
     await new Promise(res => setTimeout(res, 5000));
-    console.log("1",(await conversion.getSwapPrice(USX, StableToken, Trace)) / (100000000));
+    await conversion.adminUpdate(USX, Trace, router, factory);
+    
+    console.log("ERC20 Token" , await conversion.getName(MATIC));
 
-    console.log("2",(await conversion.getSwapPrice("0x0000000000000000000000000000000000000000", StableToken, Trace)) / (100000000));
+    console.log("ERC20 Token" , await conversion.getDecimal(MATIC));
 
-    // console.log((await conversion.getTraceAmount(2500000000)) / 1000000000000000000);
 
-    // await conversion.transferOwnership("0x8E9f0b9E549f0c9d1E996996b482eee10c8B980a");
-    await conversion.transferOwnership(accounts[0]);
+    console.log("ERC721 Token" , await conversion.getName(NFTToken));
+
+    console.log("ERC721 Token" , await conversion.getDecimal(NFTToken));
+
+
 }
 
 main()

@@ -1,6 +1,6 @@
 async function main() {
     const Buddy = await ethers.getContractFactory("BuddyV1")
-    let buddyProxy = await upgrades.upgradeProxy("0xD2bB6483fCc9415ee668066FB65BE827fB36E51A", Buddy, {
+    let buddyProxy = await upgrades.upgradeProxy("0xf7c8913DF28B004F5C16DcC9ba021D03d76DEEF0", Buddy, {
         // unsafeSkipStorageCheck: true
     })
     console.log("Your upgraded proxy is done!", buddyProxy.address);
