@@ -4,7 +4,7 @@ async function main() {
     const router = "0x8954AfA98594b838bda56FE4C12a09D7739D179b"
 
     const Conversion = await ethers.getContractFactory("Conversion")
-    let conversionProxy = await upgrades.upgradeProxy("0x9BF535eCAcEA4Ec97A4d095D6B7Dd4abF5863Ef9", Conversion)
+    let conversionProxy = await upgrades.upgradeProxy("0x703dD648C5A13a0C33b3A09054E540b743a6108F", Conversion)
     console.log("Your upgraded proxy is done!", conversionProxy.address);
     console.log(await conversionProxy.owner());
 }
