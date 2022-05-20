@@ -699,40 +699,11 @@ interface IERC721Metadata {
     function tokenURI(uint256 tokenId) external view returns (string memory);
 }
 
-abstract contract TokenDetails {
-    function getERC20Details(address _tokenAddress)
-        public
-        view
-        returns (
-            string memory,
-            string memory,
-            uint256
-        )
-    {
-        return (
-            IERC20(_tokenAddress).name(),
-            IERC20(_tokenAddress).symbol(),
-            IERC20(_tokenAddress).decimals()
-        );
-    }
-
-    function getERC721Details(address _tokenAddress)
-        public
-        view
-        returns (string memory, string memory)
-    {
-        return (
-            IERC721Metadata(_tokenAddress).name(),
-            IERC721Metadata(_tokenAddress).symbol()
-        );
-    }
-}
-
-contract Conversion is Initializable, Ownable, TokenDetails {
+contract Conversion is Initializable, Ownable {
     using SafeMathUpgradeable for uint256;
     address internal USX;
     address internal Trace;
-    address constant USD = 0xb0040280A0C97F20C92c09513b8C6e6Ff9Aa86DC;
+    address constant USD = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
 
     QuickswapRouter router;
     QuickswapFactory factory;

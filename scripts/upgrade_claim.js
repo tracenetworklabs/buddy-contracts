@@ -1,6 +1,6 @@
 async function main() {
     const Claim = await ethers.getContractFactory("ClaimV1")
-    let proxy = await upgrades.upgradeProxy("0x9cA714BcC6f1620B4C6FFd3931e1967193B1Ca47", Claim)
+    let proxy = await upgrades.upgradeProxy("0x57A72aF335cB36aB9d9b0fFc8cca26c518CA87d9", Claim)
     console.log("Your upgraded proxy is done!", proxy.address)
 }
 

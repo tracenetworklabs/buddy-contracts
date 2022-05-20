@@ -17,6 +17,8 @@ async function main() {
     // Mainnet
     // const treasuryOwner = "0x40a124c4849A25B9b19b2e7aFC4f07302fBb67B1";
     // const buddyOwner = "0x8e9f0b9e549f0c9d1e996996b482eee10c8b980a";
+    const Trace = "0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4"
+    const USX = "0x107065A122F92636a1358A70A0efe0F1A080a7e5"
 
     const USDT = "0xf2fe21e854c838c66579f62ba0a60ca84367cd8f"
     const USDC = "0xb0040280a0c97f20c92c09513b8c6e6ff9aa86dc"

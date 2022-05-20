@@ -1,0 +1,40 @@
+Buddy proxy : 0x2DCda82fae61f31378B58955C1C65993B319047A
+
+Buddy Implementation : 0xdc23ea9444f1778e9021f5107679cbac85111d96
+
+Buddy Implementaion owner : 0x8E9f0b9E549f0c9d1E996996b482eee10c8B980a
+
+Buddy proxy Admin : 0x39F9872A14931eE97b8F1D0Fec91B0A11E9844C4
+
+Buddy Proxy Owner : 0x8E9f0b9E549f0c9d1E996996b482eee10c8B980a
+
+
+Conversion proxy : 0x0069d9D3c4d62273611AB06D79825ECFd8D393BF
+
+Conversion Implementation : 0xe1412f926baf1131bbe15830ecbf22f8d0998821
+
+Conversion Implementaion owner : 0x8E9f0b9E549f0c9d1E996996b482eee10c8B980a
+
+Conversion proxy Admin : 0x39F9872A14931eE97b8F1D0Fec91B0A11E9844C4
+
+Conversion Proxy Owner : 0x8E9f0b9E549f0c9d1E996996b482eee10c8B980a
+
+
+Claim proxy : 0xA7f0E158086A9d648b0Df8E4Bce66142b95Aca8B
+
+Claim Implementation : 0x755a7a24CC53c4B3E3B748789b2Da8960860ABBc
+
+Claim Implementaion owner : 0x40a124c4849a25b9b19b2e7afc4f07302fbb67b1
+
+Claim proxy Admin : 0x39F9872A14931eE97b8F1D0Fec91B0A11E9844C4
+
+Claim Proxy Owner : 0x8E9f0b9E549f0c9d1E996996b482eee10c8B980a
+
+
+Treasury (For claim and buddy) : 0xd350854f1ca77ec5a2f151f5162121feacc679f0
+
+Mint Fee : 25 $
+
+Update Fee : 0
+
+Claim Fee: 25 $
