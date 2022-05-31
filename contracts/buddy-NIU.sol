@@ -1,14 +1,6 @@
 /**
- *Submitted for verification at polygonscan.com on 2022-04-27
+ *Submitted for verification at polygonscan.com on 2022-05-13
 */
-
-/**
- *Submitted for verification at polygonscan.com on 2022-04-14
- */
-
-/**
- *Submitted for verification at polygonscan.com on 2022-03-29
- */
 
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
@@ -347,7 +339,7 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
     uint256[49] private __gap;
 }
 
-// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol@v3.4.1-solc-0.7
+// File @openzeppelin/contracts-upgradeable/token/IERC20/IERC20.sol@v3.4.1-solc-0.7
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -2655,6 +2647,8 @@ abstract contract NFT721Mint is
 
     event DeviationPercentageUpdate(uint256 percentage);
 
+    event ConversionUpdated(address conversion);
+
     /**
      * @notice Gets the tokenId of the next NFT minted.
      */
@@ -2684,43 +2678,83 @@ abstract contract NFT721Mint is
         return updateFee;
     }
 
-    function checkMintFees(address paymentToken, uint256 feeAmount) internal {
+    function checkMintFees(address paymentToken, uint256 feeAmount, string memory _type) internal {
         address payable treasury_ = getBuddyTreasury();
-        uint256 price = ConversionInt(conversionAddress).convertMintFee(
-            paymentToken,
-            getMintFee()
+        require(
+            tokenAddress[paymentToken] == true,
+            "NFT721Mint : PaymentToken Not Supported"
         );
-        if (paymentToken != address(0)) {
-            checkDeviation(feeAmount, price);
-            IERC20(paymentToken).transferFrom(
+        if (
+            keccak256(abi.encodePacked((_type))) ==
+            keccak256(abi.encodePacked(("ERC721")))
+        ) {
+            require(
+                msg.sender ==
+                    IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
+                "NFT721Mint : Caller is not the owner"
+            );
+            IERC721Upgradeable(paymentToken).safeTransferFrom(
                 msg.sender,
-                getBuddyTreasury(),
+                treasury_,
                 feeAmount
             );
         } else {
-            checkDeviation(msg.value, price);
-            (bool success, ) = treasury_.call{value: msg.value}("");
-            require(success, "Transfer failed.");
+            uint256 price = ConversionInt(conversionAddress).convertMintFee(
+                paymentToken,
+                getMintFee()
+            );
+            if (paymentToken != address(0)) {
+                checkDeviation(feeAmount, price);
+                IERC20(paymentToken).transferFrom(
+                    msg.sender,
+                    getBuddyTreasury(),
+                    feeAmount
+                );
+            } else {
+                checkDeviation(msg.value, price);
+                (bool success, ) = treasury_.call{value: msg.value}("");
+                require(success, "Transfer failed.");
+            }
         }
     }
 
-    function checkUpdateFees(address paymentToken, uint256 feeAmount) internal {
+    function checkUpdateFees(address paymentToken, uint256 feeAmount, string memory _type) internal {
         address payable treasury_ = getBuddyTreasury();
-        uint256 price = ConversionInt(conversionAddress).convertMintFee(
-            paymentToken,
-            getUpdateFee()
+        require(
+            tokenAddress[paymentToken] == true,
+            "NFT721Mint : PaymentToken Not Supported"
         );
-        if (paymentToken != address(0)) {
-            checkDeviation(feeAmount, price);
-            IERC20(paymentToken).transferFrom(
+        if (
+            keccak256(abi.encodePacked((_type))) ==
+            keccak256(abi.encodePacked(("ERC721")))
+        ) {
+            require(
+                msg.sender ==
+                    IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
+                "NFT721Mint : Caller is not the owner"
+            );
+            IERC721Upgradeable(paymentToken).safeTransferFrom(
                 msg.sender,
-                getBuddyTreasury(),
+                treasury_,
                 feeAmount
             );
         } else {
-            checkDeviation(msg.value, price);
-            (bool success, ) = treasury_.call{value: msg.value}("");
-            require(success, "Transfer failed.");
+            uint256 price = ConversionInt(conversionAddress).convertMintFee(
+                paymentToken,
+                getUpdateFee()
+            );
+            if (paymentToken != address(0)) {
+                checkDeviation(feeAmount, price);
+                IERC20(paymentToken).transferFrom(
+                    msg.sender,
+                    getBuddyTreasury(),
+                    feeAmount
+                );
+            } else {
+                checkDeviation(msg.value, price);
+                (bool success, ) = treasury_.call{value: msg.value}("");
+                require(success, "Transfer failed.");
+            }
         }
     }
 
@@ -2743,13 +2777,10 @@ abstract contract NFT721Mint is
         uint256[] memory tokenIds,
         address[] memory collectionAddress,
         string[] memory properties,
-        string[] memory values
+        string[] memory values,
+        string memory _type
     ) public payable returns (uint256 tokenId) {
-        require(
-            tokenAddress[paymentToken] == true,
-            "Buddy: Invalid payment mode"
-        );
-        checkMintFees(paymentToken, feeAmount);
+        checkMintFees(paymentToken, feeAmount, _type);
 
         tokenId = nextTokenId++;
         if (tokenIds[0] != 0) {
@@ -2797,12 +2828,13 @@ abstract contract NFT721Mint is
         uint256[] memory releaseTokenIds,
         address[] memory releaseColAddresses,
         string[] memory properties,
-        string[] memory values
+        string[] memory values,
+        string memory _type
     ) public payable {
         address owner = ownerOf(tokenId);
         require(msg.sender == owner, "Buddy: Not Authorized");
 
-        checkUpdateFees(paymentToken, feeAmount);
+        checkUpdateFees(paymentToken, feeAmount, _type);
 
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         if (releaseTokenIds[0] != 0) {
@@ -2938,6 +2970,7 @@ contract BuddyV1 is
         onlyOwner
     {
         conversionAddress = _conversionAddress;
+        emit ConversionUpdated(conversionAddress);
     }
 
     /**

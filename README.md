@@ -49,4 +49,6 @@ Staging
 
 
 
-1. 
+Mint pass (Bitinning): 0x0E4721B6e54d11B640Da53a6b3C364759Ae76522
+
+Mint pass (nftfied): 0x4682D8fBd1c136d7bDF67abb3cBF5c35bf1E8F96

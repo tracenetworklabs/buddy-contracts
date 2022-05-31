@@ -975,7 +975,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         string memory name_,
         string memory symbol_,
         uint256 maxSupply_
-    ) public initializer {
+    ) internal initializer {
         _name = name_;
         _symbol = symbol_;
         _maxSupply = maxSupply_;
@@ -1084,7 +1084,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
             "ERC721Metadata: URI query for nonexistent token"
         );
 
-        string memory baseURI = _getbaseURI();
+        string memory baseURI = getbaseURI();
         return
             bytes(baseURI).length > 0
                 ? string(abi.encodePacked(baseURI, tokenId.toString()))
@@ -1096,7 +1096,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
      * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
      * by default, can be overridden in child contracts.
      */
-    function _getbaseURI() internal view virtual returns (string memory) {
+    function getbaseURI() public view virtual returns (string memory) {
         return _baseURI;
     }
 
@@ -1407,8 +1407,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         emit Approval(ERC721.ownerOf(tokenId), to, tokenId);
     }
 
-    function _updateBaseURI(string memory _baseURI) internal {
-        _baseURI = _baseURI;
+    function _updateBaseURI(string memory baseURI_) internal {
+        _baseURI = baseURI_;
 
         emit BaseURIUpdated(_baseURI);
     }

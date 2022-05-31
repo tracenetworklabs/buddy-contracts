@@ -37,7 +37,19 @@ async function main() {
     //     // value: await ethers.utils.parseEther('2'),
     // });
 
-    await buddyProxy.mint("QmP31LNr3J56HaWinxZaK29RN2YcRLQToDVFaHdta9pLYz", "0x0000000000000000000000000000000000000000", 0, ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], "ERC20", {
+    uint256 tokenId,
+        string memory tokenIPFSPath,
+        address paymentToken,
+        uint256 feeAmount,
+        uint256[] memory tokenIds,
+        address[] memory collectionAddresses,
+        uint256[] memory releaseTokenIds,
+        address[] memory releaseColAddresses,
+        string[] memory properties,
+        string[] memory values,
+        string memory _type
+
+    await buddyProxy.mint("QmP31LNr3J56HaWinxZaK29RN2YcRLQToDVFaHdta9pLYz", "0x0000000000000000000000000000000000000000", 0, ["0"], ["0x0000000000000000000000000000000000000000"], ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], "ERC20", {
         value: await ethers.utils.parseEther('0.018'),
     });
 

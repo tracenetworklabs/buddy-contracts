@@ -4,28 +4,24 @@ async function main() {
     const accounts = await ethers.provider.listAccounts();
     console.log("Accounts", accounts[0]);
 
-    // const treasury = await ethers.getContractFactory("Buddy721")
-    // let treasuryProxy = await upgrades.upgradeProxy("0x00958eD0DC8a8842081040d1CF3d8043b56d25dA", treasury, {
-    //     // unsafeSkipStorageCheck: true
-    // })
-    console.log("Your upgraded proxy is done!", treasuryProxy.address);
-    // console.log(await treasuryProxy.owner());
+    const buddy721 = await ethers.getContractFactory("Buddy721")
+    let Buddy721 = await buddy721.attach("0x4682D8fBd1c136d7bDF67abb3cBF5c35bf1E8F96");
 
-    // const buddy721 = await ethers.getContractFactory("Buddy721")
-    // let Buddy721 = await buddy721.attach("0x00958eD0DC8a8842081040d1CF3d8043b56d25dA");
+    function sleep(ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
 
-    // function sleep(ms) {
-    //     return new Promise((resolve) => {
-    //       setTimeout(resolve, ms);
-    //     });
-    //   }
+    console.log(await Buddy721.getNextTokenId());
 
-    // for (let i = 1; 1 <= await Buddy721.getNextTokenId(); i++) {
+    for (let i = 41; 1 <= 200; i++) {
 
-    //     console.log(await Buddy721.mint("0xC794015D6Fd0eDA03014c7400dc59E77f85E9E82"));
-    //     await sleep(20000);
+        console.log(await Buddy721.mint("0xE8408313fe1C8Ad8292B5550Da5c88b97437DddA"));
+        await sleep(10000);
+        console.log(await Buddy721.getNextTokenId());
 
-    // }
+    }
 
 }
 
