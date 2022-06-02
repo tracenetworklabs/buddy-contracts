@@ -2835,6 +2835,13 @@ abstract contract NFT721Mint is
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         if (releaseTokenIds[0] != 0) {
             for (uint256 i = 0; i < releaseTokenIds.length; i++) {
+                require(
+                    msg.sender ==
+                        CollectionContract(releaseColAddresses[i]).ownerOf(
+                            releaseTokenIds[i]
+                        ),
+                       "Buddy: Not Authorized" 
+                );
                 CollectionContract(releaseColAddresses[i]).release(releaseTokenIds[i]);
             }
         }
