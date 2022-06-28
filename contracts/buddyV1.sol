@@ -2614,7 +2614,7 @@ abstract contract NFT721Mint is
     mapping(address => bool) public tokenAddress;
     uint256 internal mintFee;
     uint256 internal updateFee;
-    mapping(uint256 => mapping(address => uint256[])) mapTokenIds;
+    mapping(uint256 => mapping(address => uint256[])) public mapTokenIds;
     address public conversionAddress;
     uint256 private nextTokenId;
     uint256 public deviationPercentage;
@@ -2835,14 +2835,24 @@ abstract contract NFT721Mint is
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         if (releaseTokenIds[0] != 0) {
             for (uint256 i = 0; i < releaseTokenIds.length; i++) {
+                uint256[] memory mappedTokenIds;
+                mappedTokenIds = mapTokenIds[tokenId][releaseColAddresses[i]];
+                for(uint256 j=0; j< mappedTokenIds.length; j++) {
+                    require(
+                        mappedTokenIds[j] == releaseTokenIds[i],
+                        "Buddy: TokenId not mapped"
+                    );
+
+                }
                 require(
                     msg.sender ==
                         CollectionContract(releaseColAddresses[i]).ownerOf(
                             releaseTokenIds[i]
                         ),
-                       "Buddy: Not Authorized" 
+                       "Buddy: Not Authorized"  
                 );
                 CollectionContract(releaseColAddresses[i]).release(releaseTokenIds[i]);
+                delete mapTokenIds[tokenId][releaseColAddresses[i]];
             }
         }
         if (tokenIds[0] != 0) {
