@@ -1,7 +1,3 @@
-/**
- *Submitted for verification at polygonscan.com on 2022-07-04
-*/
-
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
 
@@ -2678,7 +2674,7 @@ abstract contract NFT721Mint is
         return updateFee;
     }
 
-    function checkMintFees(
+    function _checkMintFees(
         address paymentToken,
         uint256 feeAmount,
         string memory _type
@@ -2722,7 +2718,7 @@ abstract contract NFT721Mint is
         }
     }
 
-    function checkUpdateFees(
+    function _checkUpdateFees(
         address paymentToken,
         uint256 feeAmount,
         string memory _type
@@ -2775,22 +2771,7 @@ abstract contract NFT721Mint is
         );
     }
 
-    /**
-     * @notice Allows a creator to mint an NFT.
-     */
-    function mint(
-        string memory tokenIPFSPath,
-        address paymentToken,
-        uint256 feeAmount,
-        uint256[] memory tokenIds,
-        address[] memory collectionAddress,
-        string[] memory properties,
-        string[] memory values,
-        string memory _type
-    ) public payable returns (uint256 tokenId) {
-        checkMintFees(paymentToken, feeAmount, _type);
-
-        tokenId = nextTokenId++;
+    function _lock(uint256[] memory tokenIds, address[] memory collectionAddress, uint256 tokenId) internal {
         if (tokenIds[0] != 0) {
             for (uint256 i = 0; i < tokenIds.length; i++) {
                 require(
@@ -2804,6 +2785,49 @@ abstract contract NFT721Mint is
                 mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
             }
         }
+    }
+
+    function _release(uint256[] memory releaseTokenIds, address[] memory releaseColAddresses,uint256 tokenId) internal {
+        if (releaseTokenIds[0] != 0) {
+            for (uint256 i = 0; i < releaseTokenIds.length; i++) {
+                uint256[] memory mappedTokenIds;
+                mappedTokenIds = mapTokenIds[tokenId][releaseColAddresses[i]];
+                for (uint256 j = 0; j < mappedTokenIds.length; j++) {
+                    if (mappedTokenIds[j] == releaseTokenIds[i]) { 
+                        require(
+                            msg.sender ==
+                                CollectionContract(releaseColAddresses[i])
+                                    .ownerOf(releaseTokenIds[j]),
+                            "Buddy: Not Authorized"
+                        );
+                    }
+                    CollectionContract(releaseColAddresses[i]).release( 
+                        releaseTokenIds[j]
+                    );
+                    delete mapTokenIds[tokenId][releaseColAddresses[i]][j];
+                }
+            }
+        }
+    }
+
+    /**
+     * @notice Allows a creator to mint an NFT.
+     */
+    function mint(
+        string memory tokenIPFSPath,
+        address paymentToken,
+        uint256 feeAmount,
+        uint256[] memory tokenIds,
+        address[] memory collectionAddress,
+        string[] memory properties,
+        string[] memory values,
+        string memory _type
+    ) public payable returns (uint256 tokenId) {
+        _checkMintFees(paymentToken, feeAmount, _type);
+
+        tokenId = nextTokenId++;
+
+        _lock(tokenIds, collectionAddress, tokenId);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
@@ -2817,7 +2841,6 @@ abstract contract NFT721Mint is
             values
         );
     }
-
 
     /**
      * @notice Allows a creator to update an NFT.
@@ -2837,38 +2860,10 @@ abstract contract NFT721Mint is
     ) public payable {
         require(msg.sender == ownerOf(tokenId), "Buddy: Not Authorized");
 
-        checkUpdateFees(paymentToken, feeAmount, _type);
-
+        _checkUpdateFees(paymentToken, feeAmount, _type);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        if (releaseTokenIds[0] != 0) {
-            for (uint256 i = 0; i < releaseTokenIds.length; i++) { //[7,8]
-                uint256[] memory mappedTokenIds;
-                mappedTokenIds = mapTokenIds[tokenId][releaseColAddresses[i]]; //[7,8]
-                for (uint256 j = 0; j < mappedTokenIds.length; j++) {
-                    if (mappedTokenIds[j] == releaseTokenIds[i]) { // 7==7
-                        require(msg.sender == CollectionContract(releaseColAddresses[i]).ownerOf(releaseTokenIds[j]),
-
-                            "Buddy: Not Authorized");
-                            CollectionContract(releaseColAddresses[i]).release(releaseTokenIds[j]);
-                            delete mapTokenIds[tokenId][releaseColAddresses[i]][j];
-
-                    }
-                }
-            }
-        }
-        if (tokenIds[0] != 0) {
-            for (uint256 i = 0; i < tokenIds.length; i++) {
-                require(
-                    msg.sender ==
-                        CollectionContract(collectionAddresses[i]).ownerOf(
-                            tokenIds[i]
-                        ),
-                    "Buddy: Not Authorized"
-                );
-                CollectionContract(collectionAddresses[i]).lock(tokenIds[i]);
-                mapTokenIds[tokenId][collectionAddresses[i]].push(tokenIds[i]);
-            }
-        }
+        _release(releaseTokenIds, releaseColAddresses, tokenId);
+        _lock(tokenIds, collectionAddresses, tokenId);
         
         emit Updated(
             msg.sender,
