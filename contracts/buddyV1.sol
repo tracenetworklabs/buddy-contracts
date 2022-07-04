@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at polygonscan.com on 2022-07-04
+*/
+
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
 
@@ -2814,6 +2818,7 @@ abstract contract NFT721Mint is
         );
     }
 
+
     /**
      * @notice Allows a creator to update an NFT.
      */
@@ -2836,22 +2841,18 @@ abstract contract NFT721Mint is
 
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         if (releaseTokenIds[0] != 0) {
-            for (uint256 i = 0; i < releaseTokenIds.length; i++) {
+            for (uint256 i = 0; i < releaseTokenIds.length; i++) { //[7,8]
                 uint256[] memory mappedTokenIds;
-                mappedTokenIds = mapTokenIds[tokenId][releaseColAddresses[i]];
+                mappedTokenIds = mapTokenIds[tokenId][releaseColAddresses[i]]; //[7,8]
                 for (uint256 j = 0; j < mappedTokenIds.length; j++) {
-                    if (mappedTokenIds[j] == releaseTokenIds[i]) { 
-                        require(
-                            msg.sender ==
-                                CollectionContract(releaseColAddresses[i])
-                                    .ownerOf(releaseTokenIds[i]),
-                            "Buddy: Not Authorized"
-                        );
+                    if (mappedTokenIds[j] == releaseTokenIds[i]) { // 7==7
+                        require(msg.sender == CollectionContract(releaseColAddresses[i]).ownerOf(releaseTokenIds[j]),
+
+                            "Buddy: Not Authorized");
+                            CollectionContract(releaseColAddresses[i]).release(releaseTokenIds[j]);
+                            delete mapTokenIds[tokenId][releaseColAddresses[i]][j];
+
                     }
-                    CollectionContract(releaseColAddresses[i]).release(
-                        releaseTokenIds[i]
-                    );
-                    delete mapTokenIds[tokenId][releaseColAddresses[i]][i];
                 }
             }
         }
