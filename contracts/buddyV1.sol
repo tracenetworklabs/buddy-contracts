@@ -2674,7 +2674,11 @@ abstract contract NFT721Mint is
         return updateFee;
     }
 
-    function checkMintFees(address paymentToken, uint256 feeAmount, string memory _type) internal {
+    function checkMintFees(
+        address paymentToken,
+        uint256 feeAmount,
+        string memory _type
+    ) internal {
         address payable treasury_ = getBuddyTreasury();
         require(
             tokenAddress[paymentToken] == true,
@@ -2714,7 +2718,11 @@ abstract contract NFT721Mint is
         }
     }
 
-    function checkUpdateFees(address paymentToken, uint256 feeAmount, string memory _type) internal {
+    function checkUpdateFees(
+        address paymentToken,
+        uint256 feeAmount,
+        string memory _type
+    ) internal {
         address payable treasury_ = getBuddyTreasury();
         require(
             tokenAddress[paymentToken] == true,
@@ -2795,12 +2803,7 @@ abstract contract NFT721Mint is
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        for (uint256 i = 0; i < properties.length; i++) {
-            tokenIdToProp[tokenId].push(properties[i]);
-        }
-        for (uint256 i = 0; i < properties.length; i++) {
-            propTovalue[tokenId][properties[i]].push(values[i]);
-        }
+
         emit Minted(
             msg.sender,
             tokenId,
@@ -2827,8 +2830,7 @@ abstract contract NFT721Mint is
         string[] memory values,
         string memory _type
     ) public payable {
-        address owner = ownerOf(tokenId);
-        require(msg.sender == owner, "Buddy: Not Authorized");
+        require(msg.sender == ownerOf(tokenId), "Buddy: Not Authorized");
 
         checkUpdateFees(paymentToken, feeAmount, _type);
 
@@ -2837,22 +2839,20 @@ abstract contract NFT721Mint is
             for (uint256 i = 0; i < releaseTokenIds.length; i++) {
                 uint256[] memory mappedTokenIds;
                 mappedTokenIds = mapTokenIds[tokenId][releaseColAddresses[i]];
-                for(uint256 j=0; j< mappedTokenIds.length; j++) {
-                    require(
-                        mappedTokenIds[j] == releaseTokenIds[i],
-                        "Buddy: TokenId not mapped"
+                for (uint256 j = 0; j < mappedTokenIds.length; j++) {
+                    if (mappedTokenIds[j] == releaseTokenIds[i]) { 
+                        require(
+                            msg.sender ==
+                                CollectionContract(releaseColAddresses[i])
+                                    .ownerOf(releaseTokenIds[i]),
+                            "Buddy: Not Authorized"
+                        );
+                    }
+                    CollectionContract(releaseColAddresses[i]).release(
+                        releaseTokenIds[i]
                     );
-
+                    delete mapTokenIds[tokenId][releaseColAddresses[i]][i];
                 }
-                require(
-                    msg.sender ==
-                        CollectionContract(releaseColAddresses[i]).ownerOf(
-                            releaseTokenIds[i]
-                        ),
-                       "Buddy: Not Authorized"  
-                );
-                CollectionContract(releaseColAddresses[i]).release(releaseTokenIds[i]);
-                delete mapTokenIds[tokenId][releaseColAddresses[i]];
             }
         }
         if (tokenIds[0] != 0) {
@@ -2868,12 +2868,7 @@ abstract contract NFT721Mint is
                 mapTokenIds[tokenId][collectionAddresses[i]].push(tokenIds[i]);
             }
         }
-        for (uint256 i = 0; i < properties.length; i++) {
-            tokenIdToProp[tokenId].push(properties[i]);
-        }
-        for (uint256 i = 0; i < properties.length; i++) {
-            propTovalue[tokenId][properties[i]].push(values[i]);
-        }
+        
         emit Updated(
             msg.sender,
             tokenId,
@@ -2904,7 +2899,7 @@ pragma solidity ^0.7.0;
  * @title Buddy NFTs implemented using the ERC-721 standard.
  * @dev This top level file holds no data directly to ease future upgrades.
  */
-contract Buddy is
+contract BuddyV3 is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Core,
