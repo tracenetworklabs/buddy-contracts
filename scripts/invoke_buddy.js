@@ -64,13 +64,6 @@ async function main() {
 
     await collectionInstanceTwo.initialize(treasuryProxy.address, "Stance Collection", "Stance-101", 40, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male", "Wardrobe Collection - NFT", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", "Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
 
-    // await collectionInstance.adminUpdateFees(mintFee);
-    // // await new Promise(res => setTimeout(res, 10000));
-
-    // var price = await conversion.convertMintFee("0x0000000000000000000000000000000000000000", mintFee);
-    // console.log("Price", price);
-
-    // await new Promise(res => setTimeout(res, 5000));
     await collectionInstanceTwo.adminUpdateERC20FeeToken("0x0000000000000000000000000000000000000000", true); // Matic
 
     await collectionInstanceTwo.mint("0x0000000000000000000000000000000000000000", 0, "ERC20", {
