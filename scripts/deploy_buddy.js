@@ -17,8 +17,11 @@ async function main() {
     // Mainnet
     // const treasuryOwner = "0x40a124c4849A25B9b19b2e7aFC4f07302fBb67B1";
     // const buddyOwner = "0x8e9f0b9e549f0c9d1e996996b482eee10c8b980a";
-    const Trace = "0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4"
-    const USX = "0x107065A122F92636a1358A70A0efe0F1A080a7e5"
+    // const Trace = "0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4"
+    // const USX = "0x107065A122F92636a1358A70A0efe0F1A080a7e5"
+
+    // const Treasury = ""
+    // const erc721 = ""
 
     const USDT = "0xf2fe21e854c838c66579f62ba0a60ca84367cd8f"
     const USDC = "0xb0040280a0c97f20c92c09513b8c6e6ff9aa86dc"
@@ -32,7 +35,9 @@ async function main() {
     const Trace = "0xb0A2D971803e74843f158B22c4DAEc154f038515"
     const router = "0x8954AfA98594b838bda56FE4C12a09D7739D179b"
     const factory = "0x5757371414417b8c6caad45baef941abc7d3ab32"
-    const StableToken = USDC
+    const erc721 = "0x2fAd792b99Ca771CF9eBAB6564eD70Da5EF017e4"
+    
+    const Treasury = "0x83Ef7A00E4520a3821317fc8dCF779616f2aBD06"
 
     const treasuryOwner = accounts[0];
     const buddyOwner = accounts[0];
@@ -44,7 +49,8 @@ async function main() {
     //// ************ DEPLOY TREASURY **************/////
 
     const buddyTreasury = await ethers.getContractFactory("BuddyTreasury");
-    const treasuryProxy = await upgrades.deployProxy(buddyTreasury, [treasuryOwner], { initializer: 'initialize' })
+    const treasuryProxy = await buddyTreasury.attach(Treasury);
+    // const treasuryProxy = await upgrades.deployProxy(buddyTreasury, [treasuryOwner], { initializer: 'initialize' })
     //await new Promise(res => setTimeout(res, 5000));
     console.log("Treasury proxy", treasuryProxy.address);
     console.log("Treasury admin", await treasuryProxy.isAdmin(treasuryOwner));
@@ -94,21 +100,24 @@ async function main() {
     //await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.adminUpdateFeeToken(USDC, true); // USDC
 
-    const token721 = await ethers.getContractFactory("Token721");
-    const Token721 = await token721.deploy();
-    await Token721.deployed();
-
-    console.log("ERC721 Token Contract:", Token721.address);
-    await Token721.initialize("Test", "Test721");
-
     //await new Promise(res => setTimeout(res, 5000));
-    await Token721.mint(accounts[0], 1);
+    await buddyProxy.adminUpdateFeeToken(erc721, true); // USDC
 
-    //await new Promise(res => setTimeout(res, 5000));
-    await Token721.approve(buddyProxy.address, 1);
+    // const token721 = await ethers.getContractFactory("Token721");
+    // const Token721 = await token721.deploy();
+    // await Token721.deployed();
 
-    //await new Promise(res => setTimeout(res, 5000));
-    await buddyProxy.adminUpdateFeeToken(Token721.address, true); // USDC
+    // console.log("ERC721 Token Contract:", Token721.address);
+    // await Token721.initialize("Test", "Test721");
+
+    // //await new Promise(res => setTimeout(res, 5000));
+    // await Token721.mint(accounts[0], 1);
+
+    // //await new Promise(res => setTimeout(res, 5000));
+    // await Token721.approve(buddyProxy.address, 1);
+
+    // //await new Promise(res => setTimeout(res, 5000));
+    // await buddyProxy.adminUpdateFeeToken(Token721.address, true); // USDC
 
     //await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.adminUpdateDeviation(5);
@@ -127,11 +136,11 @@ async function main() {
 
     //await new Promise(res => setTimeout(res, 5000));
     //Test Mint
-    console.log("Next token ID", await buddyProxy.getNextTokenId());
+    // console.log("Next token ID", await buddyProxy.getNextTokenId());
 
-    await buddyProxy.mint("QmQh36CsceXZoqS7v9YQLUyxXdRmWd8YWTBUz7WCXsiVty", Token721.address, 1, ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], {
-        // value: await ethers.utils.parseEther('2'),
-    });
+    // await buddyProxy.mint("QmQh36CsceXZoqS7v9YQLUyxXdRmWd8YWTBUz7WCXsiVty", Token721.address, 1, ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], {
+    //     // value: await ethers.utils.parseEther('2'),
+    // });
 
     console.log("Next token ID", await buddyProxy.getNextTokenId());
 

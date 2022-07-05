@@ -5,13 +5,13 @@
   },
   "proxies": [
     {
-      "address": "0xf7c8913DF28B004F5C16DcC9ba021D03d76DEEF0",
+      "address": "0xB249361c2Bef9f75b32E13ca6171897E11Bb737D",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "de2e7aec9bfbe05df0d54f90ce986f0b89a64a603dc1c0e15e66c84d3276d217": {
-      "address": "0x9AF111Bfb6666651133eD05090ef07c8B24DAb0d",
+    "2528b59201e238f7655d56fe72b8775a92e184d1fc9450f1e61bb8c9ec5a7a4a": {
+      "address": "0x4b600571b38A0AE814Cbdd9AF814f5F0199eC322",
       "layout": {
         "storage": [
           {
@@ -260,7 +260,7 @@
             "slot": "5161",
             "type": "t_array(t_uint256)1000_storage",
             "contract": "NFT721Mint",
-            "src": "contracts\\buddy-NIU.sol:2885"
+            "src": "contracts\\buddy-NIU.sol:2894"
           },
           {
             "label": "_owner",
@@ -485,9 +485,9 @@
         }
       }
     },
-    "2c48a4e7ba498a2298150bcb69a341216d0a65a001dd44d6dfd0d969048b3862": {
-      "address": "0xCbF04c10Db0C5c8e13DbACdfA8f3D973aaaAb82E",
-      "txHash": "0xd16aa081a6dff45df44e2c3e7b8757fb5ea301168dd9e42d7e94e5aee64a6f68",
+    "745161118dfec8ed18a870ec411dfa61dfa1dd39eb222de14953645142b6e276": {
+      "address": "0xf957064a52aF34C5dA0DDee4D9f32216Bdcb325C",
+      "txHash": "0xb11cfe67075c48bb6ab068d29618a8949e55a74faee0bd5f1c4e0acb6ecac841",
       "layout": {
         "storage": [
           {
@@ -736,7 +736,7 @@
             "slot": "5161",
             "type": "t_array(t_uint256)1000_storage",
             "contract": "NFT721Mint",
-            "src": "contracts\\buddyV1.sol:2881"
+            "src": "contracts\\buddyV1.sol:2889"
           },
           {
             "label": "_owner",

@@ -1,8 +1,14 @@
 /**
- *Submitted for verification at polygonscan.com on 2022-07-04
+ *Submitted for verification at polygonscan.com on 2022-05-12
 */
 
+/**
+ *Submitted for verification at polygonscan.com on 2022-04-20
+ */
+
 // SPDX-License-Identifier: UNLICENSED
+// File: contracts/Collection.sol
+
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
 
 // File @openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol@v3.4.1-solc-0.7
@@ -28,6 +34,115 @@ interface IERC165Upgradeable {
      * This function call must use less than 30 000 gas.
      */
     function supportsInterface(bytes4 interfaceId) external view returns (bool);
+}
+
+// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol@v3.4.1-solc-0.7
+
+/**
+ * @dev Interface of the ERC20 standard as defined in the EIP.
+ */
+interface IERC20 {
+    /**
+     * @dev Returns the name of token.
+     */
+    function name() external view returns (string memory);
+
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
+
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `recipient`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address recipient, uint256 amount)
+        external
+        returns (bool);
+
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
+
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Moves `amount` tokens from `sender` to `recipient` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
+}
+
+/**
+ * @dev Interface of the Price conversion contract
+ */
+interface ConversionInt {
+    function convertMintFee(address paymentToken, uint256 mintFee)
+        external
+        view
+        returns (uint256);
+
+    function convertUpdateFee(address paymentToken, uint256 updateFee)
+        external
+        view
+        returns (uint256);
 }
 
 // File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v3.4.1-solc-0.7
@@ -69,31 +184,6 @@ library AddressUpgradeable {
     }
 
     /**
-     * @dev Performs a Solidity function call using a low level `call`. A
-     * plain`call` is an unsafe replacement for a function call: use this
-     * function instead.
-     *
-     * If `target` reverts with a revert reason, it is bubbled up by this
-     * function (like regular Solidity function calls).
-     *
-     * Returns the raw returned data. To convert to the expected return value,
-     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
-     *
-     * Requirements:
-     *
-     * - `target` must be a contract.
-     * - calling `target` with `data` must not revert.
-     *
-     * _Available since v3.1._
-     */
-    function functionCall(address target, bytes memory data)
-        internal
-        returns (bytes memory)
-    {
-        return functionCall(target, data, "Address: low-level call failed");
-    }
-
-    /**
      * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
      * `errorMessage` as a fallback revert reason when `target` reverts.
      *
@@ -105,31 +195,6 @@ library AddressUpgradeable {
         string memory errorMessage
     ) internal returns (bytes memory) {
         return functionCallWithValue(target, data, 0, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but also transferring `value` wei to `target`.
-     *
-     * Requirements:
-     *
-     * - the calling contract must have an ETH balance of at least `value`.
-     * - the called Solidity function must be `payable`.
-     *
-     * _Available since v3.1._
-     */
-    function functionCallWithValue(
-        address target,
-        bytes memory data,
-        uint256 value
-    ) internal returns (bytes memory) {
-        return
-            functionCallWithValue(
-                target,
-                data,
-                value,
-                "Address: low-level call with value failed"
-            );
     }
 
     /**
@@ -154,43 +219,6 @@ library AddressUpgradeable {
         (bool success, bytes memory returndata) = target.call{value: value}(
             data
         );
-        return _verifyCallResult(success, returndata, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but performing a static call.
-     *
-     * _Available since v3.3._
-     */
-    function functionStaticCall(address target, bytes memory data)
-        internal
-        view
-        returns (bytes memory)
-    {
-        return
-            functionStaticCall(
-                target,
-                data,
-                "Address: low-level static call failed"
-            );
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
-     * but performing a static call.
-     *
-     * _Available since v3.3._
-     */
-    function functionStaticCall(
-        address target,
-        bytes memory data,
-        string memory errorMessage
-    ) internal view returns (bytes memory) {
-        require(isContract(target), "Address: static call to non-contract");
-
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.staticcall(data);
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
@@ -221,7 +249,7 @@ library AddressUpgradeable {
 // File @openzeppelin/contracts-upgradeable/proxy/Initializable.sol@v3.4.1-solc-0.7
 
 // solhint-disable-next-line compiler-version
-pragma solidity ^0.7.0;
+pragma solidity >=0.4.24 <0.8.0;
 
 /**
  * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed
@@ -339,99 +367,7 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
     uint256[49] private __gap;
 }
 
-// File @openzeppelin/contracts-upgradeable/token/IERC20/IERC20.sol@v3.4.1-solc-0.7
-
-/**
- * @dev Interface of the ERC20 standard as defined in the EIP.
- */
-interface IERC20 {
-    /**
-     * @dev Returns the name of token.
-     */
-    function name() external view returns (string memory);
-
-    /**
-     * @dev Returns the amount of tokens in existence.
-     */
-    function totalSupply() external view returns (uint256);
-
-    /**
-     * @dev Returns the amount of tokens owned by `account`.
-     */
-    function balanceOf(address account) external view returns (uint256);
-
-    /**
-     * @dev Moves `amount` tokens from the caller's account to `recipient`.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * Emits a {Transfer} event.
-     */
-    function transfer(address recipient, uint256 amount)
-        external
-        returns (bool);
-
-    /**
-     * @dev Returns the remaining number of tokens that `spender` will be
-     * allowed to spend on behalf of `owner` through {transferFrom}. This is
-     * zero by default.
-     *
-     * This value changes when {approve} or {transferFrom} are called.
-     */
-    function allowance(address owner, address spender)
-        external
-        view
-        returns (uint256);
-
-    /**
-     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * IMPORTANT: Beware that changing an allowance with this method brings the risk
-     * that someone may use both the old and the new allowance by unfortunate
-     * transaction ordering. One possible solution to mitigate this race
-     * condition is to first reduce the spender's allowance to 0 and set the
-     * desired value afterwards:
-     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-     *
-     * Emits an {Approval} event.
-     */
-    function approve(address spender, uint256 amount) external returns (bool);
-
-    /**
-     * @dev Moves `amount` tokens from `sender` to `recipient` using the
-     * allowance mechanism. `amount` is then deducted from the caller's
-     * allowance.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * Emits a {Transfer} event.
-     */
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) external returns (bool);
-
-    /**
-     * @dev Emitted when `value` tokens are moved from one account (`from`) to
-     * another (`to`).
-     *
-     * Note that `value` may be zero.
-     */
-    event Transfer(address indexed from, address indexed to, uint256 value);
-
-    /**
-     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
-     * a call to {approve}. `value` is the new allowance.
-     */
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
-}
+// File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
 
@@ -670,21 +606,6 @@ interface IERC721ReceiverUpgradeable {
         uint256 tokenId,
         bytes calldata data
     ) external returns (bytes4);
-}
-
-pragma solidity ^0.7.0;
-
-/**
- * @title ERC721 token receiver interface
- * @dev Interface for any contract that wants to support safeTransfers
- * from ERC721 asset contracts.
- */
-interface CollectionContract {
-    function lock(uint256 tokenId) external;
-
-    function release(uint256 tokenId) external;
-
-    function ownerOf(uint256 tokenId) external view returns (address);
 }
 
 // File @openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol@v3.4.1-solc-0.7
@@ -936,7 +857,7 @@ library SafeMathUpgradeable {
 
 // File @openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol@v3.4.1-solc-0.7
 
-pragma solidity ^0.7.0;
+pragma solidity >=0.6.0 <0.8.0;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -965,6 +886,86 @@ abstract contract ContextUpgradeable is Initializable {
     }
 
     uint256[50] private __gap;
+}
+
+// OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
+
+pragma solidity ^0.7.0;
+
+/**
+ * @dev Contract module which provides a basic access control mechanism, where
+ * there is an account (an owner) that can be granted exclusive access to
+ * specific functions.
+ *
+ * By default, the owner account will be the one that deploys the contract. This
+ * can later be changed with {transferOwnership}.
+ *
+ * This module is used through inheritance. It will make available the modifier
+ * `onlyOwner`, which can be applied to your functions to restrict their use to
+ * the owner.
+ */
+abstract contract Ownable is ContextUpgradeable {
+    address private _owner;
+
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    function ownable_init() internal initializer {
+        _transferOwnership(_msgSender());
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(
+            newOwner != address(0),
+            "Ownable: new owner is the zero address"
+        );
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Internal function without access restriction.
+     */
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
 }
 
 // File @openzeppelin/contracts-upgradeable/utils/EnumerableSetUpgradeable.sol@v3.4.1-solc-0.7
@@ -1639,18 +1640,6 @@ library EnumerableMapUpgradeable {
     }
 }
 
-interface ConversionInt {
-    function convertMintFee(address paymentToken, uint256 mintFee)
-        external
-        view
-        returns (uint256);
-
-    function convertUpdateFee(address paymentToken, uint256 updateFee)
-        external
-        view
-        returns (uint256);
-}
-
 // File @openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -1683,86 +1672,6 @@ library StringsUpgradeable {
             temp /= 10;
         }
         return string(buffer);
-    }
-}
-
-// OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
-
-pragma solidity ^0.7.0;
-
-/**
- * @dev Contract module which provides a basic access control mechanism, where
- * there is an account (an owner) that can be granted exclusive access to
- * specific functions.
- *
- * By default, the owner account will be the one that deploys the contract. This
- * can later be changed with {transferOwnership}.
- *
- * This module is used through inheritance. It will make available the modifier
- * `onlyOwner`, which can be applied to your functions to restrict their use to
- * the owner.
- */
-abstract contract Ownable is ContextUpgradeable {
-    address private _owner;
-
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
-
-    /**
-     * @dev Initializes the contract setting the deployer as the initial owner.
-     */
-    function ownable_init() internal initializer {
-        _transferOwnership(_msgSender());
-    }
-
-    /**
-     * @dev Returns the address of the current owner.
-     */
-    function owner() public view virtual returns (address) {
-        return _owner;
-    }
-
-    /**
-     * @dev Throws if called by any account other than the owner.
-     */
-    modifier onlyOwner() {
-        require(owner() == _msgSender(), "Ownable: caller is not the owner");
-        _;
-    }
-
-    /**
-     * @dev Leaves the contract without owner. It will not be possible to call
-     * `onlyOwner` functions anymore. Can only be called by the current owner.
-     *
-     * NOTE: Renouncing ownership will leave the contract without an owner,
-     * thereby removing any functionality that is only available to the owner.
-     */
-    function renounceOwnership() public virtual onlyOwner {
-        _transferOwnership(address(0));
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     * Can only be called by the current owner.
-     */
-    function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(
-            newOwner != address(0),
-            "Ownable: new owner is the zero address"
-        );
-        _transferOwnership(newOwner);
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     * Internal function without access restriction.
-     */
-    function _transferOwnership(address newOwner) internal virtual {
-        address oldOwner = _owner;
-        _owner = newOwner;
-        emit OwnershipTransferred(oldOwner, newOwner);
     }
 }
 
@@ -1810,11 +1719,9 @@ contract ERC721Upgradeable is
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    //Mapping from tokenId to Properties
-    mapping(uint256 => string[]) public tokenIdToProp;
+    mapping(address => bool) public whiteListedAddress;
 
-    ////Mapping from Properties to its value
-    mapping(uint256 => mapping(string => string[])) public propTovalue;
+    mapping(uint256 => bool) public status;
 
     // Token name
     string private _name;
@@ -1825,8 +1732,35 @@ contract ERC721Upgradeable is
     // Optional mapping for token URIs
     mapping(uint256 => string) internal _tokenURIs;
 
+    // Token totalSupply
+    uint256 internal _supply;
+
     // Base URI
     string private _baseURI;
+
+    //StartDate
+    uint256 internal _startDate;
+
+    //EndDate
+    uint256 internal _endDate;
+
+    //WhiteList
+    bool public whiteList;
+
+    // Price Conversion
+    address public priceConversion;
+
+    //Buddy Address
+    address public buddyAddress;
+
+    // Deviation Percentage
+    uint256 public deviationPercentage;
+
+    // Collection array
+    string[9] internal _collectionDetails;
+
+    // Collection attributes
+    string[] public collectionAttributes;
 
     /*
      *     bytes4(keccak256('balanceOf(address)')) == 0x70a08231
@@ -1862,16 +1796,42 @@ contract ERC721Upgradeable is
      */
     bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
+    event WhiteList(address whiteListedAddress, bool _status);
+
+    event BuddyAddressUpdated(address indexed buddyContractAddress);
+
+    modifier onlyBuddyContract() {
+        require(msg.sender == buddyAddress,"NFT721Mint: NOT_BUDDY_ADDRESS");
+        _;
+    }
+
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
-    function __ERC721_init(string memory name_, string memory symbol_)
-        internal
-        initializer
-    {
+    function __ERC721_init(
+        string memory name_,
+        string memory symbol_,
+        uint256 supply_,
+        uint256 startDate_,
+        uint256 endDate_,
+        bool whiteList_,
+        address priceConversion_,
+        string[] memory attributes_,
+        string[9] memory collectionDetails_
+    ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __ERC721_init_unchained(name_, symbol_);
+        _updateSupply(supply_);
+        _setTime(startDate_, endDate_);
+        whiteList = whiteList_;
+        priceConversion = priceConversion_;
+        _collectionDetails = collectionDetails_;
+        collectionAttributes = attributes_;
+    }
+
+    function _updateSupply(uint256 supply_) internal {
+        _supply = supply_;
     }
 
     function __ERC721_init_unchained(string memory name_, string memory symbol_)
@@ -1885,6 +1845,11 @@ contract ERC721Upgradeable is
         _registerInterface(_INTERFACE_ID_ERC721);
         _registerInterface(_INTERFACE_ID_ERC721_METADATA);
         _registerInterface(_INTERFACE_ID_ERC721_ENUMERABLE);
+    }
+
+    function _setTime(uint256 startDate_, uint256 endDate_) internal {
+        _startDate = startDate_;
+        _endDate = endDate_;
     }
 
     /**
@@ -1922,6 +1887,51 @@ contract ERC721Upgradeable is
      */
     function symbol() public view override returns (string memory) {
         return _symbol;
+    }
+
+    /**
+     * Returns startDate of minting process
+     */
+    function startDate() public view returns (uint256) {
+        return _startDate;
+    }
+
+    /**
+     * Returns endDate of minting process
+     */
+    function endDate() public view returns (uint256) {
+        return _endDate;
+    }
+
+    /**
+     * Returns all collection details
+     */
+    function getCollectionDetails()
+        public
+        view
+        returns (
+            string memory gender,
+            string memory description,
+            string memory image,
+            string memory category,
+            string memory theme,
+            string memory grade,
+            string memory colType,
+            string memory isWardrobeEnabled,
+            string memory wardrobeType
+        )
+    {
+        return (
+            _collectionDetails[0],
+            _collectionDetails[1],
+            _collectionDetails[2],
+            _collectionDetails[3],
+            _collectionDetails[4],
+            _collectionDetails[5],
+            _collectionDetails[6],
+            _collectionDetails[7],
+            _collectionDetails[8]
+        );
     }
 
     /**
@@ -1978,7 +1988,9 @@ contract ERC721Upgradeable is
      */
     function totalSupply() public view override returns (uint256) {
         // _tokenOwners are indexed by tokenIds, so .length() returns the number of tokenIds
+         if (_supply == 0) 
         return _tokenOwners.length();
+        return _supply;
     }
 
     /**
@@ -2065,9 +2077,25 @@ contract ERC721Upgradeable is
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
+        require(status[tokenId]==false,"ERC721: Token cannot be transferred");
 
         _transfer(from, to, tokenId);
     }
+
+    function lock(uint256 tokenId) external  returns (bool) { 
+        require(_exists(tokenId),"ERC721: operator query for nonexistent token");
+        require(status[tokenId] == false, "ERC721: Token locked already");
+        status[tokenId] = true;
+        return true;
+    }
+
+    function release(uint256 tokenId) external  returns (bool) {
+        require(_exists(tokenId),"ERC721: operator query for nonexistent token");
+        require(status[tokenId] == true, "ERC721: Token unlocked already");
+        status[tokenId] = false;
+        return true;
+    }
+
 
     /**
      * @dev See {IERC721-safeTransferFrom}.
@@ -2093,6 +2121,8 @@ contract ERC721Upgradeable is
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
+
+        require(status[tokenId]==false,"ERC721: Token cannot be transferred");
         _safeTransfer(from, to, tokenId, _data);
     }
 
@@ -2212,7 +2242,7 @@ contract ERC721Upgradeable is
         _holderTokens[to].add(tokenId);
 
         _tokenOwners.set(tokenId, to);
-
+        //Supply has to be incremented
         emit Transfer(address(0), to, tokenId);
     }
 
@@ -2242,6 +2272,7 @@ contract ERC721Upgradeable is
         _holderTokens[owner].remove(tokenId);
 
         _tokenOwners.remove(tokenId);
+        //decrement supply
 
         emit Transfer(owner, address(0), tokenId);
     }
@@ -2375,7 +2406,7 @@ contract ERC721Upgradeable is
 pragma solidity ^0.7.0;
 
 /**
- * @notice A mixin that stores a reference to the Buddy treasury contract.
+ * @notice A mixin that stores a reference to the Drops treasury contract.
  */
 abstract contract TreasuryNode is Initializable {
     using AddressUpgradeable for address payable;
@@ -2383,7 +2414,7 @@ abstract contract TreasuryNode is Initializable {
     address payable private treasury;
 
     /**
-     * @dev Called once after the initial deployment to set the Buddy treasury address.
+     * @dev Called once after the initial deployment to set the Drops treasury address.
      */
     function _initializeTreasuryNode(address payable _treasury)
         internal
@@ -2397,26 +2428,14 @@ abstract contract TreasuryNode is Initializable {
     }
 
     /**
-     * @notice Returns the address of the Buddy treasury.
+     * @notice Returns the address of the Drops treasury.
      */
-    function getBuddyTreasury() public view returns (address payable) {
+    function getDropsTreasury() public view returns (address payable) {
         return treasury;
     }
 
     // `______gap` is added to each mixin to allow adding new data slots or additional mixins in an upgrade-safe way.
     uint256[2000] private __gap;
-}
-
-// File contracts/mixins/NFT721Core.sol
-
-pragma solidity ^0.7.0;
-
-/**
- * @notice A place for common modifiers and functions used by various NFT721 mixins, if any.
- * @dev This also leaves a gap which can be used to add a new mixin to the top of the inheritance tree.
- */
-abstract contract NFT721Core {
-    uint256[1000] private ______gap;
 }
 
 // File contracts/mixins/NFT721Creator.sol
@@ -2432,23 +2451,17 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
     /**
      * @dev Stores an optional alternate address to receive creator revenue and royalty payments.
      */
+    mapping(uint256 => address payable) private tokenIdToCreatorPaymentAddress;
 
     event TokenCreatorUpdated(
         address indexed fromCreator,
         address indexed toCreator,
         uint256 indexed tokenId
     );
-
     /*
      * bytes4(keccak256('tokenCreator(uint256)')) == 0x40c1a064
      */
     bytes4 private constant _INTERFACE_TOKEN_CREATOR = 0x40c1a064;
-
-    /*
-     * bytes4(keccak256('getTokenCreatorPaymentAddress(uint256)')) == 0xec5f752e;
-     */
-    bytes4 private constant _INTERFACE_TOKEN_CREATOR_PAYMENT_ADDRESS =
-        0xec5f752e;
 
     modifier onlyCreatorAndOwner(uint256 tokenId) {
         require(
@@ -2467,14 +2480,6 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
      */
     function _initializeNFT721Creator() internal initializer {
         _registerInterface(_INTERFACE_TOKEN_CREATOR);
-    }
-
-    /**
-     * @notice Allows ERC165 interfaces which were not included originally to be registered.
-     * @dev Currently this is the only new interface, but later other mixins can overload this function to do the same.
-     */
-    function registerInterfaces() public {
-        _registerInterface(_INTERFACE_TOKEN_CREATOR_PAYMENT_ADDRESS);
     }
 
     /**
@@ -2500,16 +2505,8 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
      * @notice Allows the creator to burn if they currently own the NFT.
      */
     function burn(uint256 tokenId) public onlyCreatorAndOwner(tokenId) {
+        require(status[tokenId] == false,"NFT721Creator: Token is locked");
         _burn(tokenId);
-    }
-
-    /**
-     * @dev Remove the creator record when burned.
-     */
-    function _burn(uint256 tokenId) internal virtual override {
-        delete tokenIdToCreator[tokenId];
-
-        super._burn(tokenId);
     }
 
     uint256[999] private ______gap;
@@ -2523,77 +2520,12 @@ pragma solidity ^0.7.0;
  * @notice A mixin to extend the OpenZeppelin metadata implementation.
  */
 abstract contract NFT721Metadata is NFT721Creator {
-    using StringsUpgradeable for uint256;
-
-    /**
-     * @dev Stores hashes minted by a creator to prevent duplicates.
-     */
-    mapping(address => mapping(string => bool))
-        private creatorToIPFSHashToMinted;
-
     event BaseURIUpdated(string baseURI);
-    event TokenIPFSPathUpdated(
-        uint256 indexed tokenId,
-        string indexed indexedTokenIPFSPath,
-        string tokenIPFSPath
-    );
-    // This event was used in an order version of the contract
-    event NFTMetadataUpdated(string name, string symbol, string baseURI);
-
-    /**
-     * @notice Returns the IPFSPath to the metadata JSON file for a given NFT.
-     */
-    function getTokenIPFSPath(uint256 tokenId)
-        public
-        view
-        returns (string memory)
-    {
-        return _tokenURIs[tokenId];
-    }
-
-    /**
-     * @notice Checks if the creator has already minted a given NFT.
-     */
-    function getHasCreatorMintedIPFSHash(
-        address creator,
-        string memory tokenIPFSPath
-    ) public view returns (bool) {
-        return creatorToIPFSHashToMinted[creator][tokenIPFSPath];
-    }
 
     function _updateBaseURI(string memory _baseURI) internal {
         _setBaseURI(_baseURI);
 
         emit BaseURIUpdated(_baseURI);
-    }
-
-    /**
-     * @dev The IPFS path should be the CID + file.extension, e.g.
-     * `QmfPsfGwLhiJrU8t9HpG4wuyjgPo9bk8go4aQqSu9Qg4h7/metadata.json`
-     */
-    function _setTokenIPFSPath(uint256 tokenId, string memory _tokenIPFSPath)
-        internal
-    {
-        // 46 is the minimum length for an IPFS content hash, it may be longer if paths are used
-        require(
-            bytes(_tokenIPFSPath).length >= 46,
-            "NFT721Metadata: Invalid IPFS path"
-        );
-        require(
-            !creatorToIPFSHashToMinted[msg.sender][_tokenIPFSPath],
-            "NFT721Metadata: NFT was already minted"
-        );
-
-        creatorToIPFSHashToMinted[msg.sender][_tokenIPFSPath] = true;
-        _setTokenURI(tokenId, _tokenIPFSPath);
-    }
-
-    /**
-     * @dev When a token is burned, remove record of it allowing that creator to re-mint the same NFT again in the future.
-     */
-    function _burn(uint256 tokenId) internal virtual override {
-        delete creatorToIPFSHashToMinted[msg.sender][_tokenURIs[tokenId]];
-        super._burn(tokenId);
     }
 
     uint256[999] private ______gap;
@@ -2602,7 +2534,6 @@ abstract contract NFT721Metadata is NFT721Creator {
 // File contracts/mixins/NFT721Mint.sol
 
 pragma solidity ^0.7.0;
-pragma experimental ABIEncoderV2;
 
 /**
  * @notice Allows creators to mint NFTs.
@@ -2615,95 +2546,65 @@ abstract contract NFT721Mint is
     TreasuryNode
 {
     using SafeMathUpgradeable for uint256;
-    mapping(address => bool) public tokenAddress;
-    uint256 internal mintFee;
-    uint256 internal updateFee;
-    mapping(uint256 => mapping(address => uint256[])) public mapTokenIds;
-    address public conversionAddress;
     uint256 private nextTokenId;
-    uint256 public deviationPercentage;
+    mapping(address => bool) public erc20tokenAddress;
+    mapping(address => bool) public erc721tokenAddress;
+    uint256 internal mintFee;
 
-    event Minted(
-        address indexed creator,
-        uint256 indexed tokenId,
-        string indexed indexedTokenIPFSPath,
-        string tokenIPFSPath,
-        string[] category,
-        string[] values
+    event Minted(address indexed creator, uint256 indexed tokenId);
+
+    event CollectionDetails(
+        string symbol,
+        string[] attributes,
+        string[9] collectionDetails
     );
 
-    event Updated(
-        address indexed creator,
-        uint256 indexed tokenId,
-        string indexed indexedTokenIPFSPath,
-        string tokenIPFSPath,
-        string[] category,
-        string[] values
-    );
+    event ERC20TokenUpdated(address indexed erc20tokenAddress, bool _status);
 
-    event FeeUpdate(uint256 mintFee, uint256 uriUpdateFee);
+    event ERC721TokenUpdated(address indexed erc721tokenAddress, bool _status);
 
-    event TokenUpdate(address indexed tokenAddress, bool status);
+    event TokenFeesUpdated(uint256 mintFee);
 
-    event DeviationPercentageUpdate(uint256 percentage);
+    event DeviationPercentage(uint256 percentage);
 
     event ConversionUpdated(address conversion);
 
+    modifier onlyWhitelistedUsers() {
+        require(
+            whiteListedAddress[msg.sender] == true || whiteList == false,
+            "NFT721Mint : USER_ADDRESS_NOT_WHITELISTED"
+        );
+        _;
+    }
+
+
     /**
-     * @notice Gets the tokenId of the next NFT minted.
+     * @notice To check the totalSupply.
      */
-    function getNextTokenId() public view returns (uint256) {
-        return nextTokenId;
+    function checkSupply(uint256 tokenId) internal view {
+        if (_supply != 0) {
+            require(tokenId <= _supply, "NFT721Mint : SUPPLY_LIMIT_REACHED");
+        }
     }
 
     /**
-     * @dev Called once after the initial deployment to set the initial tokenId.
+     * @notice To pay fees.
      */
-    function _initializeNFT721Mint() internal initializer {
-        // Use ID 1 for the first NFT tokenId
-        nextTokenId = 1;
-    }
-
-    /**
-     * @dev Get USD fee for mint
-     */
-    function getMintFee() public view returns (uint256) {
-        return mintFee;
-    }
-
-    /**
-     * @dev Get USD fee for Update
-     */
-    function getUpdateFee() public view returns (uint256) {
-        return updateFee;
-    }
-
     function checkMintFees(
         address paymentToken,
         uint256 feeAmount,
         string memory _type
     ) internal {
-        address payable treasury_ = getBuddyTreasury();
-        require(
-            tokenAddress[paymentToken] == true,
-            "NFT721Mint : PaymentToken Not Supported"
-        );
+        address payable treasury_ = getDropsTreasury();
         if (
             keccak256(abi.encodePacked((_type))) ==
-            keccak256(abi.encodePacked(("ERC721")))
+            keccak256(abi.encodePacked(("ERC20")))
         ) {
             require(
-                msg.sender ==
-                    IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
-                "NFT721Mint : Caller is not the owner"
+                erc20tokenAddress[paymentToken] == true,
+                "NFT721Mint : PaymentToken Not Supported"
             );
-            IERC721Upgradeable(paymentToken).safeTransferFrom(
-                msg.sender,
-                treasury_,
-                feeAmount
-            );
-        } else {
-            uint256 price = ConversionInt(conversionAddress).convertMintFee(
+            uint256 price = ConversionInt(priceConversion).convertMintFee(
                 paymentToken,
                 getMintFee()
             );
@@ -2711,7 +2612,7 @@ abstract contract NFT721Mint is
                 checkDeviation(feeAmount, price);
                 IERC20(paymentToken).transferFrom(
                     msg.sender,
-                    getBuddyTreasury(),
+                    getDropsTreasury(),
                     feeAmount
                 );
             } else {
@@ -2719,23 +2620,11 @@ abstract contract NFT721Mint is
                 (bool success, ) = treasury_.call{value: msg.value}("");
                 require(success, "Transfer failed.");
             }
-        }
-    }
-
-    function checkUpdateFees(
-        address paymentToken,
-        uint256 feeAmount,
-        string memory _type
-    ) internal {
-        address payable treasury_ = getBuddyTreasury();
-        require(
-            tokenAddress[paymentToken] == true,
-            "NFT721Mint : PaymentToken Not Supported"
-        );
-        if (
-            keccak256(abi.encodePacked((_type))) ==
-            keccak256(abi.encodePacked(("ERC721")))
-        ) {
+        } else {
+            require(
+                erc721tokenAddress[paymentToken] == true,
+                "NFT721Mint : PaymentToken Not Supported"
+            );
             require(
                 msg.sender ==
                     IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
@@ -2743,26 +2632,9 @@ abstract contract NFT721Mint is
             );
             IERC721Upgradeable(paymentToken).safeTransferFrom(
                 msg.sender,
-                treasury_,
+                getDropsTreasury(),
                 feeAmount
             );
-        } else {
-            uint256 price = ConversionInt(conversionAddress).convertMintFee(
-                paymentToken,
-                getUpdateFee()
-            );
-            if (paymentToken != address(0)) {
-                checkDeviation(feeAmount, price);
-                IERC20(paymentToken).transferFrom(
-                    msg.sender,
-                    getBuddyTreasury(),
-                    feeAmount
-                );
-            } else {
-                checkDeviation(msg.value, price);
-                (bool success, ) = treasury_.call{value: msg.value}("");
-                require(success, "Transfer failed.");
-            }
         }
     }
 
@@ -2776,134 +2648,77 @@ abstract contract NFT721Mint is
     }
 
     /**
+     * @notice To check the date.
+     */
+    function checkDate() internal view {
+        if( _endDate!=0) {
+        require(
+            _startDate <= block.timestamp && block.timestamp <= _endDate,
+            "NFT721Mint : MINTING_ENDED"
+        );
+        }
+        else {
+            require(
+            _startDate <= block.timestamp ,
+            "NFT721Mint : MINTING_NOT_LIVE"
+            );
+        }
+    }
+
+    /**
+     * @notice Gets the tokenId of the next NFT minted.
+     */
+    function getNextTokenId() public view returns (uint256) {
+        return nextTokenId;
+    }
+
+    /**
+     * @notice Gets the mint Fee
+     */
+    function getMintFee() public view returns (uint256) {
+        return mintFee;
+    }
+
+    /**
+     * @dev Called once after the initial deployment to set the initial tokenId.
+     */
+    function _initializeNFT721Mint() internal initializer {
+        // Use ID 1 for the first NFT tokenId
+        nextTokenId = 1;
+    }
+
+    /**
      * @notice Allows a creator to mint an NFT.
      */
     function mint(
-        string memory tokenIPFSPath,
         address paymentToken,
         uint256 feeAmount,
-        uint256[] memory tokenIds,
-        address[] memory collectionAddress,
-        string[] memory properties,
-        string[] memory values,
         string memory _type
-    ) public payable returns (uint256 tokenId) {
-        checkMintFees(paymentToken, feeAmount, _type);
-
+    ) public payable onlyWhitelistedUsers returns (uint256 tokenId) {
         tokenId = nextTokenId++;
-        if (tokenIds[0] != 0) {
-            for (uint256 i = 0; i < tokenIds.length; i++) {
-                require(
-                    msg.sender ==
-                        CollectionContract(collectionAddress[i]).ownerOf(
-                            tokenIds[i]
-                        ),
-                    "Buddy: Not Authorized"
-                );
-                CollectionContract(collectionAddress[i]).lock(tokenIds[i]);
-                mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
-            }
-        }
+        checkSupply(tokenId);
+        checkDate();
+        checkMintFees(paymentToken, feeAmount, _type);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
-        _setTokenIPFSPath(tokenId, tokenIPFSPath);
-
-        emit Minted(
-            msg.sender,
-            tokenId,
-            tokenIPFSPath,
-            tokenIPFSPath,
-            properties,
-            values
-        );
-    }
-
-
-    /**
-     * @notice Allows a creator to update an NFT.
-     */
-    function updateTokenURI(
-        uint256 tokenId,
-        string memory tokenIPFSPath,
-        address paymentToken,
-        uint256 feeAmount,
-        uint256[] memory tokenIds,
-        address[] memory collectionAddresses,
-        uint256[] memory releaseTokenIds,
-        address[] memory releaseColAddresses,
-        string[] memory properties,
-        string[] memory values,
-        string memory _type
-    ) public payable {
-        require(msg.sender == ownerOf(tokenId), "Buddy: Not Authorized");
-
-        checkUpdateFees(paymentToken, feeAmount, _type);
-
-        _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        if (releaseTokenIds[0] != 0) {
-            for (uint256 i = 0; i < releaseTokenIds.length; i++) { //[7,8]
-                uint256[] memory mappedTokenIds;
-                mappedTokenIds = mapTokenIds[tokenId][releaseColAddresses[i]]; //[7,8]
-                for (uint256 j = 0; j < mappedTokenIds.length; j++) {
-                    if (mappedTokenIds[j] == releaseTokenIds[i]) { // 7==7
-                        require(msg.sender == CollectionContract(releaseColAddresses[i]).ownerOf(releaseTokenIds[j]),
-
-                            "Buddy: Not Authorized");
-                            CollectionContract(releaseColAddresses[i]).release(releaseTokenIds[j]);
-                            delete mapTokenIds[tokenId][releaseColAddresses[i]][j];
-
-                    }
-                }
-            }
-        }
-        if (tokenIds[0] != 0) {
-            for (uint256 i = 0; i < tokenIds.length; i++) {
-                require(
-                    msg.sender ==
-                        CollectionContract(collectionAddresses[i]).ownerOf(
-                            tokenIds[i]
-                        ),
-                    "Buddy: Not Authorized"
-                );
-                CollectionContract(collectionAddresses[i]).lock(tokenIds[i]);
-                mapTokenIds[tokenId][collectionAddresses[i]].push(tokenIds[i]);
-            }
-        }
-        
-        emit Updated(
-            msg.sender,
-            tokenId,
-            tokenIPFSPath,
-            tokenIPFSPath,
-            properties,
-            values
-        );
-    }
-
-    /**
-     * @dev Explicit override to address compile errors.
-     */
-    function _burn(uint256 tokenId)
-        internal
-        virtual
-        override(ERC721Upgradeable, NFT721Creator, NFT721Metadata)
-    {
-        super._burn(tokenId);
+        emit Minted(msg.sender, tokenId);
     }
 
     uint256[1000] private ______gap;
 }
 
+// File contracts/FNDNFT721.sol
+
+pragma experimental ABIEncoderV2;
+
 pragma solidity ^0.7.0;
 
 /**
- * @title Buddy NFTs implemented using the ERC-721 standard.
- * @dev This top level file holds no data directly to ease future upgrades.
+ * @title Drop NFTs implemented using the ERC-721 standard.
  */
-contract BuddyV0 is
+contract DropsCollection is
     ERC165Upgradeable,
     ERC721Upgradeable,
-    NFT721Core,
     NFT721Creator,
     NFT721Metadata,
     TreasuryNode,
@@ -2918,19 +2733,34 @@ contract BuddyV0 is
         address payable treasury,
         string memory name,
         string memory symbol,
-        address conversion
+        uint256 supply,
+        uint256 startDate,
+        uint256 endDate,
+        bool whitelisted,
+        address priceConversion,
+        string[] memory attributes,
+        string[9] memory collectionDetails
     ) public initializer {
-        TreasuryNode._initializeTreasuryNode(treasury);
         Ownable.ownable_init();
-        ERC721Upgradeable.__ERC721_init(name, symbol);
         NFT721Creator._initializeNFT721Creator();
         NFT721Mint._initializeNFT721Mint();
-        adminUpdateBaseURI("https://ipfs.io/ipfs/");
-        conversionAddress = conversion;
+        TreasuryNode._initializeTreasuryNode(treasury);
+        ERC721Upgradeable.__ERC721_init(
+            name,
+            symbol,
+            supply,
+            startDate,
+            endDate,
+            whitelisted,
+            priceConversion,
+            attributes,
+            collectionDetails
+        );
+        emit CollectionDetails(symbol, attributes, collectionDetails);
     }
 
     /**
-     * @notice Allows a Buddy admin to update NFT config variables.
+     * @notice Allows a Drop admin to update NFT config variables.
      * @dev This must be called right after the initial call to `initialize`.
      */
     function adminUpdateBaseURI(string memory baseURI) public onlyOwner {
@@ -2938,26 +2768,23 @@ contract BuddyV0 is
     }
 
     /**
-     * @notice Allows Admin to set fees.
+     * @notice Allows Admin to add token address.
      */
-    function adminUpdateFeeAmount(uint256 _mintFee, uint256 _updateFee)
+    function adminUpdateERC20FeeToken(address _tokenAddress, bool _status)
         public
         onlyOwner
     {
-        mintFee = _mintFee;
-        updateFee = _updateFee;
-        emit FeeUpdate(_mintFee, _updateFee);
+        erc20tokenAddress[_tokenAddress] = _status;
+        emit ERC20TokenUpdated(_tokenAddress, _status);
     }
 
     /**
-     * @notice Allows Admin to add token address.
+     * @notice Allows Admin to add fees for token address.
      */
-    function adminUpdateFeeToken(address _tokenAddress, bool status)
-        public
-        onlyOwner
-    {
-        tokenAddress[_tokenAddress] = status;
-        emit TokenUpdate(_tokenAddress, status);
+
+    function adminUpdateFees(uint256 _mintFee) public onlyOwner {
+        mintFee = _mintFee;
+        emit TokenFeesUpdated(mintFee);
     }
 
     /**
@@ -2968,7 +2795,26 @@ contract BuddyV0 is
         onlyOwner
     {
         deviationPercentage = _deviationPercentage;
-        emit DeviationPercentageUpdate(_deviationPercentage);
+        emit DeviationPercentage(_deviationPercentage);
+    }
+
+    function adminUpdateBuddy(address _buddyAddress)
+        public
+        onlyOwner
+    {
+        buddyAddress = _buddyAddress;
+        emit BuddyAddressUpdated(_buddyAddress);
+    }
+
+    /**
+     * @notice Allows Admin to add nft address.
+     */
+    function adminUpdateERC721FeeToken(address _nftAddress, bool _status)
+        public
+        onlyOwner
+    {
+        erc721tokenAddress[_nftAddress] = _status;
+        emit ERC721TokenUpdated(_nftAddress, _status);
     }
 
     /**
@@ -2978,18 +2824,89 @@ contract BuddyV0 is
         public
         onlyOwner
     {
-        conversionAddress = _conversionAddress;
-        emit ConversionUpdated(conversionAddress);
+        priceConversion = _conversionAddress;
+        emit ConversionUpdated(_conversionAddress);
     }
 
     /**
-     * @dev This is a no-op, just an explicit override to address compile errors due to inheritance.
+     * @notice Allows Admin to update address whitelist status.
      */
-    function _burn(uint256 tokenId)
-        internal
-        virtual
-        override(ERC721Upgradeable, NFT721Creator, NFT721Metadata, NFT721Mint)
+
+    function updateWhitelist(
+        address[] memory _whitelistAddresses,
+        bool[] memory _status
+    ) public onlyOwner {
+        require(whiteList == true, "DropsCollection : PUBLIC_COLLECTION");
+        for (uint256 i = 0; i < _whitelistAddresses.length; i++) {
+            whiteListedAddress[_whitelistAddresses[i]] = _status[i];
+            emit WhiteList(_whitelistAddresses[i], _status[i]);
+        }
+    }
+}
+
+pragma solidity ^0.7.0;
+
+contract LCMasterFlat is Initializable, Ownable {
+    address payable treasury;
+
+    struct collectionInfo {
+        // the collection symbol
+        string symbol;
+        // the contract address
+        address newCollection;
+    }
+
+    /**
+     * @notice Called once to configure the contract after the initial deployment.
+     * @dev This farms the initialize call out to inherited contracts as needed.
+     */
+    function initialize() public initializer {
+        Ownable.ownable_init();
+    }
+
+    // collection info mapping
+    mapping(address => mapping(string => collectionInfo)) public collections;
+    // get collection
+    mapping(address => mapping(string => address)) public getCollection;
+    // get collection code with address
+    mapping(address => string) public getCode;
+
+    event CollectionCreated(
+        address creator,
+        string colCode,
+        address newCollection
+    );
+
+    /**
+     * @notice Allows admin to create a collection.
+     */
+    function createCollection(string memory _colCode)
+        external
+        onlyOwner
+        returns (address collection)
     {
-        super._burn(tokenId);
+        require(
+            getCollection[msg.sender][_colCode] == address(0),
+            "DropMaster : COLLECTION_EXISTS"
+        );
+
+        bytes memory bytecode = type(DropsCollection).creationCode;
+        bytes32 salt = keccak256(abi.encodePacked(msg.sender, _colCode));
+
+        assembly {
+            collection := create2(0, add(bytecode, 32), mload(bytecode), salt)
+        }
+
+        require(collection != address(0), "Collection creation ?");
+
+        getCollection[msg.sender][_colCode] = collection;
+        getCode[collection] = _colCode;
+
+        collections[msg.sender][_colCode] = collectionInfo({
+            symbol: _colCode,
+            newCollection: collection
+        });
+
+        emit CollectionCreated(msg.sender, _colCode, collection);
     }
 }
