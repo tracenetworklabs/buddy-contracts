@@ -4,7 +4,7 @@ async function main() {
     const accounts = await ethers.provider.listAccounts();
     console.log("Accounts", accounts[0]);
     // We get the contract to deploy
-    const token = await ethers.getContractFactory("Buddy");
+    const token = await ethers.getContractFactory("BuddyV3");
     const instance721 = await token.deploy();
     await instance721.deployed();
 

@@ -1,7 +1,3 @@
-/**
- *Submitted for verification at polygonscan.com on 2022-05-16
-*/
-
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
 
@@ -680,9 +676,9 @@ pragma solidity ^0.7.0;
  * from ERC721 asset contracts.
  */
 interface CollectionContract {
-    function lock(uint256 tokenId) external;
+    function lock(uint256 tokenId) external returns (bool);
 
-    function release(uint256 tokenId) external;
+    function release(uint256 tokenId) external returns (bool);
 
     function ownerOf(uint256 tokenId) external view returns (address);
 }
@@ -2616,9 +2612,10 @@ abstract contract NFT721Mint is
 {
     using SafeMathUpgradeable for uint256;
     mapping(address => bool) public tokenAddress;
+    mapping(address => uint256) public tokenFreePassStatus;
     uint256 internal mintFee;
     uint256 internal updateFee;
-    mapping(uint256 => mapping(address => uint256[])) mapTokenIds;
+    mapping(uint256 => mapping(address => uint256[])) public mapTokenIds;
     address public conversionAddress;
     uint256 private nextTokenId;
     uint256 public deviationPercentage;
@@ -2678,7 +2675,27 @@ abstract contract NFT721Mint is
         return updateFee;
     }
 
-    function checkMintFees(address paymentToken, uint256 feeAmount, string memory _type) internal {
+    function getIsLocked(
+        uint256 buddyID,
+        address collectionContract,
+        uint256 findID
+    ) public view returns (bool) {
+        uint256[] memory mappedTokenIds = mapTokenIds[buddyID][
+            collectionContract
+        ];
+        for (uint256 i = 0; i < mappedTokenIds.length; i++) {
+            if (findID == mappedTokenIds[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function _checkMintFees(
+        address paymentToken,
+        uint256 feeAmount,
+        string memory _type
+    ) internal {
         address payable treasury_ = getBuddyTreasury();
         require(
             tokenAddress[paymentToken] == true,
@@ -2718,7 +2735,11 @@ abstract contract NFT721Mint is
         }
     }
 
-    function checkUpdateFees(address paymentToken, uint256 feeAmount, string memory _type) internal {
+    function _checkUpdateFees(
+        address paymentToken,
+        uint256 feeAmount,
+        string memory _type
+    ) internal {
         address payable treasury_ = getBuddyTreasury();
         require(
             tokenAddress[paymentToken] == true,
@@ -2767,6 +2788,67 @@ abstract contract NFT721Mint is
         );
     }
 
+    function _lock(
+        uint256[] memory tokenIds,
+        address[] memory collectionAddress,
+        uint256 tokenId
+    ) public {
+        if (tokenIds[0] != 0) {
+            for (uint256 i = 0; i < tokenIds.length; i++) {
+                require(
+                    msg.sender ==
+                        CollectionContract(collectionAddress[i]).ownerOf(
+                            tokenIds[i]
+                        ),
+                    "Buddy: Not Authorized"
+                );
+                require(
+                    CollectionContract(collectionAddress[i]).lock(tokenIds[i]),
+                    "Buddy: Lock failed"
+                );
+                mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
+            }
+        }
+    }
+
+    function _release(
+        uint256[] memory releaseTokenIds,
+        address[] memory releaseColAddresses,
+        uint256 tokenId
+    ) public {
+        uint8 internalCount = 0;
+        if (releaseTokenIds[0] != 0) {
+            for (uint256 i = 0; i < releaseTokenIds.length; i++) {
+                uint256[] memory mappedTokenIds;
+                mappedTokenIds = mapTokenIds[tokenId][releaseColAddresses[i]]; 
+                for (uint256 j = 0; j < mappedTokenIds.length; j++) {
+                    if (mappedTokenIds[j] == releaseTokenIds[i]) { 
+                        require(
+                            msg.sender ==
+                                CollectionContract(releaseColAddresses[i])
+                                    .ownerOf(releaseTokenIds[i]),
+                            "Buddy: Not Authorized"
+                        );
+
+                        require(
+                            CollectionContract(releaseColAddresses[i]).release(
+                                releaseTokenIds[i]
+                            ),
+                            "Buddy: Release failed"
+                        );
+                        internalCount = internalCount + 1;
+                        delete mapTokenIds[tokenId][releaseColAddresses[i]][j];
+                    }
+                }
+            }
+            // one of release token not released
+            require(
+                internalCount == releaseTokenIds.length,
+                "Buddy: Count doesnot match"
+            );
+        }
+    }
+
     /**
      * @notice Allows a creator to mint an NFT.
      */
@@ -2780,31 +2862,16 @@ abstract contract NFT721Mint is
         string[] memory values,
         string memory _type
     ) public payable returns (uint256 tokenId) {
-        checkMintFees(paymentToken, feeAmount, _type);
+        if(tokenFreePassStatus[paymentToken] == 0)  
+            _checkMintFees(paymentToken, feeAmount, _type);
 
         tokenId = nextTokenId++;
-        if (tokenIds[0] != 0) {
-            for (uint256 i = 0; i < tokenIds.length; i++) {
-                require(
-                    msg.sender ==
-                        CollectionContract(collectionAddress[i]).ownerOf(
-                            tokenIds[i]
-                        ),
-                    "Buddy: Not Authorized"
-                );
-                CollectionContract(collectionAddress[i]).lock(tokenIds[i]);
-                mapTokenIds[tokenId][collectionAddress[i]].push(tokenIds[i]);
-            }
-        }
+
+        _lock(tokenIds, collectionAddress, tokenId);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        for (uint256 i = 0; i < properties.length; i++) {
-            tokenIdToProp[tokenId].push(properties[i]);
-        }
-        for (uint256 i = 0; i < properties.length; i++) {
-            propTovalue[tokenId][properties[i]].push(values[i]);
-        }
+
         emit Minted(
             msg.sender,
             tokenId,
@@ -2831,36 +2898,15 @@ abstract contract NFT721Mint is
         string[] memory values,
         string memory _type
     ) public payable {
-        address owner = ownerOf(tokenId);
-        require(msg.sender == owner, "Buddy: Not Authorized");
-
-        checkUpdateFees(paymentToken, feeAmount, _type);
+        require(msg.sender == ownerOf(tokenId), "Buddy: Not Authorized");
+        
+        if(tokenFreePassStatus[paymentToken] == 0) 
+            _checkUpdateFees(paymentToken, feeAmount, _type);
 
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        if (releaseTokenIds[0] != 0) {
-            for (uint256 i = 0; i < releaseTokenIds.length; i++) {
-                CollectionContract(releaseColAddresses[i]).release(tokenIds[i]);
-            }
-        }
-        if (tokenIds[0] != 0) {
-            for (uint256 i = 0; i < tokenIds.length; i++) {
-                require(
-                    msg.sender ==
-                        CollectionContract(collectionAddresses[i]).ownerOf(
-                            tokenIds[i]
-                        ),
-                    "Buddy: Not Authorized"
-                );
-                CollectionContract(collectionAddresses[i]).lock(tokenIds[i]);
-                mapTokenIds[tokenId][collectionAddresses[i]].push(tokenIds[i]);
-            }
-        }
-        for (uint256 i = 0; i < properties.length; i++) {
-            tokenIdToProp[tokenId].push(properties[i]);
-        }
-        for (uint256 i = 0; i < properties.length; i++) {
-            propTovalue[tokenId][properties[i]].push(values[i]);
-        }
+        _release(releaseTokenIds, releaseColAddresses, tokenId);
+        _lock(tokenIds, collectionAddresses, tokenId);
+
         emit Updated(
             msg.sender,
             tokenId,
@@ -2891,7 +2937,7 @@ pragma solidity ^0.7.0;
  * @title Buddy NFTs implemented using the ERC-721 standard.
  * @dev This top level file holds no data directly to ease future upgrades.
  */
-contract Buddy is
+contract BuddyV3 is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Core,
@@ -2943,11 +2989,12 @@ contract Buddy is
     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateFeeToken(address _tokenAddress, bool status)
+    function adminUpdateFeeToken(address _tokenAddress, bool status, uint256 freepassStatus)
         public
         onlyOwner
     {
         tokenAddress[_tokenAddress] = status;
+        tokenFreePassStatus[_tokenAddress] = freepassStatus;
         emit TokenUpdate(_tokenAddress, status);
     }
 
