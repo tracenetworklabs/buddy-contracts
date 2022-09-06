@@ -51,7 +51,7 @@ async function main() {
     const buddyTreasury = await ethers.getContractFactory("BuddyTreasury");
     const treasuryProxy = await buddyTreasury.attach(Treasury);
     // const treasuryProxy = await upgrades.deployProxy(buddyTreasury, [treasuryOwner], { initializer: 'initialize' })
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     console.log("Treasury proxy", treasuryProxy.address);
     console.log("Treasury admin", await treasuryProxy.isAdmin(treasuryOwner));
 
@@ -59,49 +59,55 @@ async function main() {
 
     const Conversion = await ethers.getContractFactory("ConversionV1");
     const conversion = await upgrades.deployProxy(Conversion, { initializer: 'initialize' })
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     console.log("conversion proxy", conversion.address);
 
     //// ************ ADD PRICE FEED ADDRESS **************/////
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await conversion.addToken(MATIC, PRICE_MATIC_USD);
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await conversion.addToken(USDC, PRICE_USDC_USD);
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await conversion.addToken(USDT, PRICE_USDT_USD);
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await conversion.addToken(USX, router);
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await conversion.addToken(Trace, router);
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await conversion.adminUpdate(USX, Trace, router, factory);
 
     //// ************ DEPLOY BUDDY **************/////
-    const Buddy = await ethers.getContractFactory("BuddyV1")
+    const Buddy = await ethers.getContractFactory("BuddyV3")
     const buddyProxy = await upgrades.deployProxy(Buddy, [treasuryProxy.address, "TRACE BUDDY", "BUDDY", conversion.address], { initializer: 'initialize' })
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     console.log("Buddy Proxy:", buddyProxy.address);
 
     await buddyProxy.adminUpdateFeeAmount(mintFee, updateFee); // Update mint and update fee
 
     //// ************ ADD TOKEN TO BUDDY **************/////
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.adminUpdateFeeToken(MATIC, true); // Matic
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.adminUpdateFeeToken(USDT, true); // USDT
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.adminUpdateFeeToken(USDC, true); // USDC
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.adminUpdateFeeToken(erc721, true); // USDC
+
+    await new Promise(res => setTimeout(res, 5000));
+    await buddyProxy.adminUpdateFeeToken(Trace, true); // USDC
+
+    await new Promise(res => setTimeout(res, 5000));
+    await buddyProxy.adminUpdateFeeToken(USX, true); // USDC
 
     // const token721 = await ethers.getContractFactory("Token721");
     // const Token721 = await token721.deploy();
@@ -110,31 +116,31 @@ async function main() {
     // console.log("ERC721 Token Contract:", Token721.address);
     // await Token721.initialize("Test", "Test721");
 
-    // //await new Promise(res => setTimeout(res, 5000));
+    // await new Promise(res => setTimeout(res, 5000));
     // await Token721.mint(accounts[0], 1);
 
-    // //await new Promise(res => setTimeout(res, 5000));
+    // await new Promise(res => setTimeout(res, 5000));
     // await Token721.approve(buddyProxy.address, 1);
 
-    // //await new Promise(res => setTimeout(res, 5000));
-    // await buddyProxy.adminUpdateFeeToken(Token721.address, true); // USDC
+    // await new Promise(res => setTimeout(res, 5000));
+    // await buddyProxy.adminUpdateFeeToken(Token721.address, true); // erc721
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.adminUpdateDeviation(5);
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     await buddyProxy.transferOwnership(buddyOwner);
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     console.log("New admin Buddy", await buddyProxy.owner());
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     console.log("Mint fee", await buddyProxy.getMintFee());
 
-    // //await new Promise(res => setTimeout(res, 5000));
-    // console.log("Matic price", await conversion.convertMintFee(MATIC, mintFee));
+    await new Promise(res => setTimeout(res, 5000));
+    console.log("Matic price", await conversion.convertMintFee(MATIC, mintFee));
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     //Test Mint
     // console.log("Next token ID", await buddyProxy.getNextTokenId());
 
@@ -144,11 +150,11 @@ async function main() {
 
     console.log("Next token ID", await buddyProxy.getNextTokenId());
 
-    await buddyProxy.mint("QmQ9w553N7jSjcFD827BqC22H8Zd8sfi2GX2SZYhe72y1q", "0x0000000000000000000000000000000000000000", "1000000000000000000", ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], {
-        value: await ethers.utils.parseEther('2'),
+    await buddyProxy.mint("QmQ9w553N7jSjcFD827BqC22H8Zd8sfi2GX2SZYhe72y1q", "0x0000000000000000000000000000000000000000", "12779080747049725", ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], "ERC20", {
+        value: "12779080747049725",
     });
 
-    //await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
     console.log("Next token ID", await buddyProxy.getNextTokenId());
 }
 

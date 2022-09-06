@@ -7,104 +7,42 @@ async function main() {
 
     //// ************ DEPLOY TREASURY **************/////
 
-    // const buddyTreasury = await ethers.getContractFactory("BuddyTreasury");
-    // //  const treasuryProxy = await buddyTreasury.attach(Treasury);
-    // const treasuryProxy = await upgrades.deployProxy(buddyTreasury, [accounts[0]], { initializer: 'initialize' })
-    // //await new Promise(res => setTimeout(res, 5000));
-    // console.log("Treasury proxy", treasuryProxy.address);
-    // console.log("Treasury admin", await treasuryProxy.isAdmin(accounts[0]));
+    const conversion = "0x0069d9D3c4d62273611AB06D79825ECFd8D393BF"
+    const Treasury = "0xd350854f1ca77ec5a2f151f5162121feacc679f0"
+    const MATIC = "0x0000000000000000000000000000000000000000"
 
-    // //// ************ DEPLOY CONVERSION **************/////
+    const USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
+    const USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+    const erc721 = "0x4682d8fbd1c136d7bdf67abb3cbf5c35bf1e8f96" //NFT FIED BUDDY Mint Pass
 
-    // const Conversion = await ethers.getContractFactory("Conversion");
-    // const conversion = await upgrades.deployProxy(Conversion, { initializer: 'initialize' })
-    // //await new Promise(res => setTimeout(res, 5000));
-    // console.log("conversion proxy", conversion.address);
+    const Buddy = await ethers.getContractFactory("BuddyV4")
+    // const buddyProxy = await Buddy.deploy();
+    // await buddyProxy.deployed();
+    // const buddyProxy = await upgrades.deployProxy(Buddy, [Treasury, "TRACE BUDDY", "BUDDY", conversion], { initializer: 'initialize' })
+    const buddyProxy = await Buddy.attach("0x016263918C053490aeb2399E85860E8f9665040B");
+    // await new Promise(res => setTimeout(res, 5000));
+    console.log("Buddy Proxy:", buddyProxy.address);
 
-    const Buddy = await ethers.getContractFactory("Buddy")
-    const buddyProxy = await upgrades.deployProxy(Buddy, ["0x9b5c6E084F5432A46749754BC36B83f038FCbC3A", "TRACE BUDDY", "BUDDY", "0x94EE01F14927eeF4C4d6eA95f64Fd769Ec6e75aD"], { initializer: 'initialize' })
+    // await new Promise(res => setTimeout(res, 5000));
+    // await buddyProxy.adminUpdateDeviation(5);
 
-    console.log("Buddy", buddyProxy.address);
-
-    // const blockNumBefore = await ethers.provider.getBlockNumber();
-    // const blockBefore = await ethers.provider.getBlock(blockNumBefore);
-    // const startTime = blockBefore.timestamp;
-    // const thirtyDays = 30 * 24 * 60 * 60;
-    // const endTime = startTime + thirtyDays;
-
-    // const LimitedCollection = await ethers.getContractFactory("LCMasterFlat")
-    // const LimitedCollectionProxy = await upgrades.deployProxy(LimitedCollection, { initializer: 'initialize' });
-    // // await new Promise(res => setTimeout(res, 10000));
-
-    // console.log("Owner", await LimitedCollectionProxy.owner());
-    // console.log("LimitedCollectionProxy:", LimitedCollectionProxy.address);
-
-    // //First Collection
-    // await LimitedCollectionProxy.createCollection("Wardrobe-101");
-    // // await new Promise(res => setTimeout(res, 10000));
-
-    // const Collection = await LimitedCollectionProxy.getCollection(accounts[0], "Wardrobe-101");
-    // console.log("First Collection Address", Collection);
-
-    // //Second Collection
-    // await LimitedCollectionProxy.createCollection("Stance-101");
-    // // await new Promise(res => setTimeout(res, 10000));
-
-    // const CollectionTwo = await LimitedCollectionProxy.getCollection(accounts[0], "Stance-101");
-    // console.log("Second Collection Address", CollectionTwo);
-
-    // //First Collection
-    // const collection = await ethers.getContractFactory('DropsCollection');
-    // const collectionInstance = await collection.attach(Collection);
-
-    // await collectionInstance.initialize(treasuryProxy.address, "Wardrobe Collection", "Wardrobe-101", 20, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male", "Wardrobe Collection - NFT", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", "Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
-
-    // //Second Collection
-    // const collectionInstanceTwo = await collection.attach(CollectionTwo);
-
-    // await collectionInstanceTwo.initialize(treasuryProxy.address, "Stance Collection", "Stance-101", 40, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male", "Wardrobe Collection - NFT", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", "Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
-
-    // await collectionInstanceTwo.adminUpdateERC20FeeToken("0x0000000000000000000000000000000000000000", true); // Matic
-
-    // await collectionInstanceTwo.mint("0x0000000000000000000000000000000000000000", 0, "ERC20", {
-    //     value: 0
+    // await buddyProxy.mint("QmZbwom1K41GQoAwKPQfwaMK49wCrXwMBCkBvHx4vJAZSh", "0x0000000000000000000000000000000000000000", "12779080747049725", ["0"], ["0x0000000000000000000000000000000000000000"], ["test"], ["test"], "ERC20", {
+    //     value: "12779080747049725",
     // });
 
-    // await collectionInstanceTwo.mint("0x0000000000000000000000000000000000000000", 0, "ERC20", {
-    //     value: 0
-    // });
+    // await buddyProxy.adminUpdateFeeAmount(1000000, 1000000); // Update mint and update fee
+    // await new Promise(res => setTimeout(res, 5000));
+    // await new Promise(res => setTimeout(res, 5000));
+    await buddyProxy.adminUpdateFeeToken(MATIC, true, 0); // Matic
 
-    // await collectionInstance.adminUpdateERC20FeeToken("0x0000000000000000000000000000000000000000", true); // Matic
+    await new Promise(res => setTimeout(res, 5000));
+    await buddyProxy.adminUpdateFeeToken(USDT, true, 0); // USDT
 
-    // await collectionInstance.mint("0x0000000000000000000000000000000000000000", 0, "ERC20", {
-    //     value: 0
-    // });
+    await new Promise(res => setTimeout(res, 5000));
+    await buddyProxy.adminUpdateFeeToken(USDC, true, 0); // USDC
 
-    // await collectionInstance.mint("0x0000000000000000000000000000000000000000", 0, "ERC20", {
-    //     value: 0
-    // });
-
-    // await collectionInstance.mint("0x0000000000000000000000000000000000000000", 0, "ERC20", {
-    //     value: 0
-    // });
-
-    // await buddyProxy._lock([1,0], [Collection, Collection], 1);
-
-    // console.log(await buddyProxy.getIsLocked(0, Collection,1));
-
-    // await buddyProxy._release([0], [Collection], 1);
-
-    // await buddyProxy._lock([2, 3], [Collection, Collection], 1);
-
-    // await buddyProxy._release([2, 3], [Collection, Collection], 1);
-
-    // await buddyProxy._lock([2,2], [Collection, CollectionTwo], 2);
-
-    // await buddyProxy._release([2], [Collection], 2);
-
-    // await buddyProxy._lock([1,1], [Collection, CollectionTwo], 2);
-
-    // await buddyProxy._release([2,1,0], [CollectionTwo, CollectionTwo,Collection], 2);
+    await new Promise(res => setTimeout(res, 5000));
+    await buddyProxy.adminUpdateFeeToken(erc721, true, 0); // USDC
 
 }
 

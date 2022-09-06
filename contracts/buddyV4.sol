@@ -2591,10 +2591,13 @@ abstract contract NFT721Metadata is NFT721Creator {
         delete creatorToIPFSHashToMinted[msg.sender][_tokenURIs[tokenId]];
         super._burn(tokenId);
     }
+    mapping(address => uint256) public tokenFreePassStatus;
+    mapping(address => mapping(uint256 => bool)) public nftIdPassStatus;
 
-    uint256[999] private ______gap;
+    uint256[997] private ______gap;
 }
 
+abstract contract upgradeCheck {}
 // File contracts/mixins/NFT721Mint.sol
 
 pragma solidity ^0.7.0;
@@ -2612,7 +2615,6 @@ abstract contract NFT721Mint is
 {
     using SafeMathUpgradeable for uint256;
     mapping(address => bool) public tokenAddress;
-    mapping(address => uint256) public tokenFreePassStatus;
     uint256 internal mintFee;
     uint256 internal updateFee;
     mapping(uint256 => mapping(address => uint256[])) public mapTokenIds;
@@ -2640,7 +2642,7 @@ abstract contract NFT721Mint is
 
     event FeeUpdate(uint256 mintFee, uint256 uriUpdateFee);
 
-    event TokenUpdate(address indexed tokenAddress, bool status);
+    event TokenUpdate(address indexed tokenAddress, bool status, uint256 freePassStatus);
 
     event DeviationPercentageUpdate(uint256 percentage);
 
@@ -2820,9 +2822,9 @@ abstract contract NFT721Mint is
         if (releaseTokenIds[0] != 0) {
             for (uint256 i = 0; i < releaseTokenIds.length; i++) {
                 uint256[] memory mappedTokenIds;
-                mappedTokenIds = mapTokenIds[tokenId][releaseColAddresses[i]]; 
+                mappedTokenIds = mapTokenIds[tokenId][releaseColAddresses[i]];
                 for (uint256 j = 0; j < mappedTokenIds.length; j++) {
-                    if (mappedTokenIds[j] == releaseTokenIds[i]) { 
+                    if (mappedTokenIds[j] == releaseTokenIds[i]) {
                         require(
                             msg.sender ==
                                 CollectionContract(releaseColAddresses[i])
@@ -2862,8 +2864,15 @@ abstract contract NFT721Mint is
         string[] memory values,
         string memory _type
     ) public payable returns (uint256 tokenId) {
-        if(tokenFreePassStatus[paymentToken] == 0)  
+        if (tokenFreePassStatus[paymentToken] == 0)
             _checkMintFees(paymentToken, feeAmount, _type);
+        else {
+            require(
+                nftIdPassStatus[paymentToken][feeAmount] == false,
+                "Buddy: Ticket is Used"
+            );
+            nftIdPassStatus[paymentToken][feeAmount] = true;
+        }
 
         tokenId = nextTokenId++;
 
@@ -2899,9 +2908,16 @@ abstract contract NFT721Mint is
         string memory _type
     ) public payable {
         require(msg.sender == ownerOf(tokenId), "Buddy: Not Authorized");
-        
-        if(tokenFreePassStatus[paymentToken] == 0) 
+
+        if (tokenFreePassStatus[paymentToken] == 0)
             _checkUpdateFees(paymentToken, feeAmount, _type);
+        else {
+            require(
+                nftIdPassStatus[paymentToken][feeAmount] == false,
+                "Buddy: Ticket is Used"
+            );
+            nftIdPassStatus[paymentToken][feeAmount] = true;
+        }
 
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         _release(releaseTokenIds, releaseColAddresses, tokenId);
@@ -2937,7 +2953,7 @@ pragma solidity ^0.7.0;
  * @title Buddy NFTs implemented using the ERC-721 standard.
  * @dev This top level file holds no data directly to ease future upgrades.
  */
-contract BuddyV3 is
+contract BuddyV4 is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Core,
@@ -2970,8 +2986,8 @@ contract BuddyV3 is
      * @notice Allows a Buddy admin to update NFT config variables.
      * @dev This must be called right after the initial call to `initialize`.
      */
-    function adminUpdateBaseURI(string memory baseURI) public onlyOwner {
-        _updateBaseURI(baseURI);
+    function adminUpdateBaseURI(string memory _baseURI) public onlyOwner {
+        _updateBaseURI(_baseURI);
     }
 
     /**
@@ -2989,13 +3005,14 @@ contract BuddyV3 is
     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateFeeToken(address _tokenAddress, bool status, uint256 freepassStatus)
-        public
-        onlyOwner
-    {
+    function adminUpdateFeeToken(
+        address _tokenAddress,
+        bool status,
+        uint256 freepassStatus
+    ) public onlyOwner {
         tokenAddress[_tokenAddress] = status;
         tokenFreePassStatus[_tokenAddress] = freepassStatus;
-        emit TokenUpdate(_tokenAddress, status);
+        emit TokenUpdate(_tokenAddress, status, freepassStatus);
     }
 
     /**
