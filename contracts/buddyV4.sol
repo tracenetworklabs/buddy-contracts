@@ -2616,11 +2616,6 @@ abstract contract NFT721Mint is
 {
     using SafeMathUpgradeable for uint256;
     mapping(address => bool) public tokenAddress;
-<<<<<<< HEAD:contracts/buddyV4.sol
-=======
-    mapping(address => uint256) public tokenFreePassStatus;
-    mapping(address => mapping(uint256 => bool)) public nftIdPassStatus;
->>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007:contracts/buddychanges.sol
     uint256 internal mintFee;
     uint256 internal updateFee;
     mapping(uint256 => mapping(address => uint256[])) public mapTokenIds;
@@ -2873,7 +2868,6 @@ abstract contract NFT721Mint is
     ) public payable returns (uint256 tokenId) {
         if (tokenFreePassStatus[paymentToken] == 0)
             _checkMintFees(paymentToken, feeAmount, _type);
-<<<<<<< HEAD:contracts/buddyV4.sol
         else {
             require(
                 nftIdPassStatus[paymentToken][feeAmount] == false,
@@ -2881,10 +2875,6 @@ abstract contract NFT721Mint is
             );
             nftIdPassStatus[paymentToken][feeAmount] = true;
         }
-=======
-        
-        require(nftIdPassStatus[paymentToken][feeAmount] == false, "Buddy: Nft id already used");
->>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007:contracts/buddychanges.sol
 
         tokenId = nextTokenId++;
 
@@ -2967,11 +2957,7 @@ pragma solidity ^0.7.0;
  * @title Buddy NFTs implemented using the ERC-721 standard.
  * @dev This top level file holds no data directly to ease future upgrades.
  */
-<<<<<<< HEAD:contracts/buddyV4.sol
 contract BuddyV4 is
-=======
-contract BuddyChanges is
->>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007:contracts/buddychanges.sol
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Core,
@@ -3027,7 +3013,6 @@ contract BuddyChanges is
     /**
      * @notice Allows Admin to add token address.
      */
-<<<<<<< HEAD:contracts/buddyV4.sol
     function adminUpdateFeeToken(
         address _tokenAddress,
         bool status,
@@ -3036,15 +3021,6 @@ contract BuddyChanges is
         tokenAddress[_tokenAddress] = status;
         tokenFreePassStatus[_tokenAddress] = freepassStatus;
         emit TokenUpdate(_tokenAddress, status, freepassStatus);
-=======
-    function adminUpdateFeeToken(address _tokenAddress, bool status, uint256 freepassStatus)
-       public
-       onlyOwner
-    {
-         tokenAddress[_tokenAddress] = status;
-         tokenFreePassStatus[_tokenAddress] = freepassStatus;
-         emit TokenUpdate(_tokenAddress, status);
->>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007:contracts/buddychanges.sol
     }
 
     /**
