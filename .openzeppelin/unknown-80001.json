@@ -1,6 +1,7 @@
 {
   "manifestVersion": "3.2",
   "admin": {
+<<<<<<< HEAD
     "address": "0xb8dcF17c8755aeEa720Df2436C64fefB8824C4E0"
   },
   "proxies": [
@@ -26,12 +27,42 @@
     {
       "address": "0x9882224b64aF861bA8932d38e3317B2cB4662c21",
       "txHash": "0x8e3917438f708a0bfa8dc79f5fe9681ac6b299012695f4282ed7e9e474874a90",
+=======
+    "address": "0xDd0Bfc29ccA254510e7d07A2F2299A3B1B8a4F54",
+    "txHash": "0xf69f2658cbbd49f716ad1937f596237c4c20ee1121857bfb6917d4fcea39ad9b"
+  },
+  "proxies": [
+    {
+      "address": "0x438dB07d8E70f2b57cAca1a6E203d6b6f91d983E",
+      "txHash": "0x1c3a1da8d532e55c216e136d5b193943b712acd47b20bfe944572666b0f3d3af",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1FADeed6837038FF32e55975637679E2E659a3d0",
+      "txHash": "0x9975857b8a1ea34388cf596cfa125afc953d1a101d7f2313644ec22fe743e196",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5c4C5791d171BC5cCF3a3926ffEe555AD0A429a5",
+      "txHash": "0x8713efde70ba209dfdffbb7f91dd524b6baa933a988c63aa9d87e065ba04ce97",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xFD2624C7131309334c0Ba913f61906c9CC2C856f",
+      "txHash": "0x675f52d31b720b350089e88bd341ce831488b532c8625db069e88ff143297c6d",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
       "kind": "transparent"
     }
   ],
   "impls": {
+<<<<<<< HEAD
     "ac6d7e969022fbf0c1ce22cfc6940e104f3528c75e4101f0a4b4055ffa82acb9": {
       "address": "0xc8235f7bA9CbeFeDdbEcd68B6c9F55Ad7f3791a6",
+=======
+    "a2fd5f9c205a6c9d2e6e0578b7a16b3e308687c3d307027b36473131b1fb9fdd": {
+      "address": "0x5e447cb6874362a4284C6fc759584b4552f0Eb10",
+      "txHash": "0x13381064d4b095effe56dd7f8b7009340cb84dabb2910fec7c8c11755d80ae84",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
       "layout": {
         "storage": [
           {
@@ -40,7 +71,11 @@
             "slot": "0",
             "type": "t_bool",
             "contract": "Initializable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV4.sol:238"
+=======
+            "src": "contracts\\treasury.sol:24"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_initializing",
@@ -48,7 +83,11 @@
             "slot": "0",
             "type": "t_bool",
             "contract": "Initializable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV4.sol:243"
+=======
+            "src": "contracts\\treasury.sol:29"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "__gap",
@@ -56,6 +95,7 @@
             "slot": "1",
             "type": "t_array(t_uint256)50_storage",
             "contract": "ContextUpgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV4.sol:963"
           },
           {
@@ -65,10 +105,14 @@
             "type": "t_mapping(t_bytes4,t_bool)",
             "contract": "ERC165Upgradeable",
             "src": "contracts\\buddyV4.sol:292"
+=======
+            "src": "contracts\\treasury.sol:266"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "__gap",
             "offset": 0,
+<<<<<<< HEAD
             "slot": "52",
             "type": "t_array(t_uint256)49_storage",
             "contract": "ERC165Upgradeable",
@@ -153,10 +197,33 @@
             "type": "t_string_storage",
             "contract": "ERC721Upgradeable",
             "src": "contracts\\buddyV4.sol:1825"
+=======
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC165Upgradeable",
+            "src": "contracts\\treasury.sol:470"
+          },
+          {
+            "label": "_roles",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)633_storage)",
+            "contract": "AccessControlUpgradeable",
+            "src": "contracts\\treasury.sol:578"
           },
           {
             "label": "__gap",
             "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "AccessControlUpgradeable",
+            "src": "contracts\\treasury.sol:803"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+<<<<<<< HEAD
             "slot": "112",
             "type": "t_array(t_uint256)41_storage",
             "contract": "ERC721Upgradeable",
@@ -209,10 +276,17 @@
             "type": "t_address_payable",
             "contract": "TreasuryNode",
             "src": "contracts\\buddyV4.sol:2379"
+=======
+            "slot": "151",
+            "type": "t_array(t_uint256)1000_storage",
+            "contract": "AdminRole",
+            "src": "contracts\\treasury.sol:846"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "__gap",
             "offset": 0,
+<<<<<<< HEAD
             "slot": "3154",
             "type": "t_array(t_uint256)2000_storage",
             "contract": "TreasuryNode",
@@ -305,6 +379,12 @@
             "type": "t_address",
             "contract": "Ownable",
             "src": "contracts\\buddyV4.sol:1702"
+=======
+            "slot": "1151",
+            "type": "t_array(t_uint256)1000_storage",
+            "contract": "CollateralManagement",
+            "src": "contracts\\treasury.sol:1192"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           }
         ],
         "types": {
@@ -312,6 +392,7 @@
             "label": "address",
             "numberOfBytes": "20"
           },
+<<<<<<< HEAD
           "t_address_payable": {
             "label": "address payable",
             "numberOfBytes": "20"
@@ -328,10 +409,13 @@
             "label": "struct EnumerableMapUpgradeable.MapEntry[]",
             "numberOfBytes": "32"
           },
+=======
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           "t_array(t_uint256)1000_storage": {
             "label": "uint256[1000]",
             "numberOfBytes": "32000"
           },
+<<<<<<< HEAD
           "t_array(t_uint256)2000_storage": {
             "label": "uint256[2000]",
             "numberOfBytes": "64000"
@@ -340,6 +424,8 @@
             "label": "uint256[41]",
             "numberOfBytes": "1312"
           },
+=======
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]",
             "numberOfBytes": "1568"
@@ -348,6 +434,7 @@
             "label": "uint256[50]",
             "numberOfBytes": "1600"
           },
+<<<<<<< HEAD
           "t_array(t_uint256)999_storage": {
             "label": "uint256[999]",
             "numberOfBytes": "31968"
@@ -356,6 +443,8 @@
             "label": "uint256[]",
             "numberOfBytes": "32"
           },
+=======
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           "t_bool": {
             "label": "bool",
             "numberOfBytes": "1"
@@ -364,6 +453,7 @@
             "label": "bytes32",
             "numberOfBytes": "32"
           },
+<<<<<<< HEAD
           "t_bytes4": {
             "label": "bytes4",
             "numberOfBytes": "4"
@@ -372,10 +462,13 @@
             "label": "mapping(address => uint256[])",
             "numberOfBytes": "32"
           },
+=======
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           "t_mapping(t_address,t_bool)": {
             "label": "mapping(address => bool)",
             "numberOfBytes": "32"
           },
+<<<<<<< HEAD
           "t_mapping(t_address,t_mapping(t_address,t_bool))": {
             "label": "mapping(address => mapping(address => bool))",
             "numberOfBytes": "32"
@@ -976,11 +1069,27 @@
               {
                 "label": "_key",
                 "type": "t_bytes32",
+=======
+          "t_mapping(t_bytes32,t_struct(RoleData)633_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(RoleData)633_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
                 "offset": 0,
                 "slot": "0"
               },
               {
+<<<<<<< HEAD
                 "label": "_value",
+=======
+                "label": "adminRole",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
                 "type": "t_bytes32",
                 "offset": 0,
                 "slot": "1"
@@ -988,6 +1097,7 @@
             ],
             "numberOfBytes": "64"
           },
+<<<<<<< HEAD
           "t_struct(Set)1054_storage": {
             "label": "struct EnumerableSetUpgradeable.Set",
             "members": [
@@ -1030,6 +1140,8 @@
             ],
             "numberOfBytes": "64"
           },
+=======
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           "t_uint256": {
             "label": "uint256",
             "numberOfBytes": "32"
@@ -1037,9 +1149,15 @@
         }
       }
     },
+<<<<<<< HEAD
     "65b04b645e7d5e37568e1413ef1c0242e0e16e30878eff8645bf0e6c1e13d304": {
       "address": "0xCB34a6868d0055C35C7E20B5563Bb24000984c85",
       "txHash": "0x6e7d383bc03d6603e79eedc4041dfd48940313866a62798cd9f2517de5753089",
+=======
+    "1bcd7ef2259944642b26ce9b91adee0e6dab0f1f18e59db4c79f46eb0fcfb60c": {
+      "address": "0xfCB73ae55a41190185D1d2EE10Bacd4De5C0155f",
+      "txHash": "0xccfd1ee64718344f6c3c5392390258b922b84e4e04cfb83e8a4c463ff53dfebc",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
       "layout": {
         "storage": [
           {
@@ -1079,7 +1197,11 @@
             "offset": 0,
             "slot": "52",
             "type": "t_address",
+<<<<<<< HEAD
             "contract": "ConversionV1",
+=======
+            "contract": "Conversion",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
             "src": "contracts\\conversion.sol:704"
           },
           {
@@ -1087,7 +1209,11 @@
             "offset": 0,
             "slot": "53",
             "type": "t_address",
+<<<<<<< HEAD
             "contract": "ConversionV1",
+=======
+            "contract": "Conversion",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
             "src": "contracts\\conversion.sol:705"
           },
           {
@@ -1095,7 +1221,11 @@
             "offset": 0,
             "slot": "54",
             "type": "t_contract(QuickswapRouter)863",
+<<<<<<< HEAD
             "contract": "ConversionV1",
+=======
+            "contract": "Conversion",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
             "src": "contracts\\conversion.sol:708"
           },
           {
@@ -1103,7 +1233,11 @@
             "offset": 0,
             "slot": "55",
             "type": "t_contract(QuickswapFactory)873",
+<<<<<<< HEAD
             "contract": "ConversionV1",
+=======
+            "contract": "Conversion",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
             "src": "contracts\\conversion.sol:709"
           },
           {
@@ -1111,7 +1245,11 @@
             "offset": 0,
             "slot": "56",
             "type": "t_uint256",
+<<<<<<< HEAD
             "contract": "ConversionV1",
+=======
+            "contract": "Conversion",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
             "src": "contracts\\conversion.sol:711"
           },
           {
@@ -1119,7 +1257,11 @@
             "offset": 0,
             "slot": "57",
             "type": "t_uint256",
+<<<<<<< HEAD
             "contract": "ConversionV1",
+=======
+            "contract": "Conversion",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
             "src": "contracts\\conversion.sol:712"
           },
           {
@@ -1127,7 +1269,11 @@
             "offset": 0,
             "slot": "58",
             "type": "t_mapping(t_address,t_mapping(t_address,t_address))",
+<<<<<<< HEAD
             "contract": "ConversionV1",
+=======
+            "contract": "Conversion",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
             "src": "contracts\\conversion.sol:713"
           }
         ],
@@ -1168,8 +1314,13 @@
       }
     },
     "a1e11ac187d5ce6995b78c39f1fc6d952ec1f282ec24e541ba5cc39e876006e3": {
+<<<<<<< HEAD
       "address": "0xc90110A3538257a58A813240F6407d87E72be09c",
       "txHash": "0xe5ed15d3f696ec2202d7036ea29649f5d595ec29b24ff0923c834c2e217d4ea3",
+=======
+      "address": "0xcf2CAddbCcb0F56b644dAcdEf4946427Aa3610a3",
+      "txHash": "0x33d32a7543cb8aa93a397e1f0b5454327ef063fc8abc3ac36dbbc2db4e7600f1",
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
       "layout": {
         "storage": [
           {
@@ -1178,7 +1329,11 @@
             "slot": "0",
             "type": "t_bool",
             "contract": "Initializable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:238"
+=======
+            "src": "contracts\\buddyV1.sol:238"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_initializing",
@@ -1186,7 +1341,11 @@
             "slot": "0",
             "type": "t_bool",
             "contract": "Initializable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:243"
+=======
+            "src": "contracts\\buddyV1.sol:243"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "__gap",
@@ -1194,7 +1353,11 @@
             "slot": "1",
             "type": "t_array(t_uint256)50_storage",
             "contract": "ContextUpgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:963"
+=======
+            "src": "contracts\\buddyV1.sol:963"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_supportedInterfaces",
@@ -1202,7 +1365,11 @@
             "slot": "51",
             "type": "t_mapping(t_bytes4,t_bool)",
             "contract": "ERC165Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:292"
+=======
+            "src": "contracts\\buddyV1.sol:292"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "__gap",
@@ -1210,7 +1377,11 @@
             "slot": "52",
             "type": "t_array(t_uint256)49_storage",
             "contract": "ERC165Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:335"
+=======
+            "src": "contracts\\buddyV1.sol:335"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_holderTokens",
@@ -1218,7 +1389,11 @@
             "slot": "101",
             "type": "t_mapping(t_address,t_struct(UintSet)1440_storage)",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1798"
+=======
+            "src": "contracts\\buddyV1.sol:1798"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_tokenOwners",
@@ -1226,7 +1401,11 @@
             "slot": "102",
             "type": "t_struct(UintToAddressMap)1868_storage",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1801"
+=======
+            "src": "contracts\\buddyV1.sol:1801"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_tokenApprovals",
@@ -1234,7 +1413,11 @@
             "slot": "104",
             "type": "t_mapping(t_uint256,t_address)",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1804"
+=======
+            "src": "contracts\\buddyV1.sol:1804"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_operatorApprovals",
@@ -1242,7 +1425,11 @@
             "slot": "105",
             "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1807"
+=======
+            "src": "contracts\\buddyV1.sol:1807"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "tokenIdToProp",
@@ -1250,7 +1437,11 @@
             "slot": "106",
             "type": "t_mapping(t_uint256,t_array(t_string_storage)dyn_storage)",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1810"
+=======
+            "src": "contracts\\buddyV1.sol:1810"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "propTovalue",
@@ -1258,7 +1449,11 @@
             "slot": "107",
             "type": "t_mapping(t_uint256,t_mapping(t_string_memory_ptr,t_array(t_string_storage)dyn_storage))",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1813"
+=======
+            "src": "contracts\\buddyV1.sol:1813"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_name",
@@ -1266,7 +1461,11 @@
             "slot": "108",
             "type": "t_string_storage",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1816"
+=======
+            "src": "contracts\\buddyV1.sol:1816"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_symbol",
@@ -1274,7 +1473,11 @@
             "slot": "109",
             "type": "t_string_storage",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1819"
+=======
+            "src": "contracts\\buddyV1.sol:1819"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_tokenURIs",
@@ -1282,7 +1485,11 @@
             "slot": "110",
             "type": "t_mapping(t_uint256,t_string_storage)",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1822"
+=======
+            "src": "contracts\\buddyV1.sol:1822"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_baseURI",
@@ -1290,7 +1497,11 @@
             "slot": "111",
             "type": "t_string_storage",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1825"
+=======
+            "src": "contracts\\buddyV1.sol:1825"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "__gap",
@@ -1298,7 +1509,11 @@
             "slot": "112",
             "type": "t_array(t_uint256)41_storage",
             "contract": "ERC721Upgradeable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2366"
+=======
+            "src": "contracts\\buddyV1.sol:2366"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "______gap",
@@ -1306,7 +1521,11 @@
             "slot": "153",
             "type": "t_array(t_uint256)1000_storage",
             "contract": "NFT721Core",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2415"
+=======
+            "src": "contracts\\buddyV1.sol:2415"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "tokenIdToCreator",
@@ -1314,7 +1533,11 @@
             "slot": "1153",
             "type": "t_mapping(t_uint256,t_address_payable)",
             "contract": "NFT721Creator",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2426"
+=======
+            "src": "contracts\\buddyV1.sol:2426"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "______gap",
@@ -1322,7 +1545,11 @@
             "slot": "1154",
             "type": "t_array(t_uint256)999_storage",
             "contract": "NFT721Creator",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2511"
+=======
+            "src": "contracts\\buddyV1.sol:2511"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "creatorToIPFSHashToMinted",
@@ -1330,7 +1557,11 @@
             "slot": "2153",
             "type": "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_bool))",
             "contract": "NFT721Metadata",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2527"
+=======
+            "src": "contracts\\buddyV1.sol:2527"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "______gap",
@@ -1338,7 +1569,11 @@
             "slot": "2154",
             "type": "t_array(t_uint256)999_storage",
             "contract": "NFT721Metadata",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2595"
+=======
+            "src": "contracts\\buddyV1.sol:2595"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "treasury",
@@ -1346,7 +1581,11 @@
             "slot": "3153",
             "type": "t_address_payable",
             "contract": "TreasuryNode",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2379"
+=======
+            "src": "contracts\\buddyV1.sol:2379"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "__gap",
@@ -1354,7 +1593,11 @@
             "slot": "3154",
             "type": "t_array(t_uint256)2000_storage",
             "contract": "TreasuryNode",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2403"
+=======
+            "src": "contracts\\buddyV1.sol:2403"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "tokenAddress",
@@ -1362,7 +1605,11 @@
             "slot": "5154",
             "type": "t_mapping(t_address,t_bool)",
             "contract": "NFT721Mint",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2614"
+=======
+            "src": "contracts\\buddyV1.sol:2614"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "mintFee",
@@ -1370,7 +1617,11 @@
             "slot": "5155",
             "type": "t_uint256",
             "contract": "NFT721Mint",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2615"
+=======
+            "src": "contracts\\buddyV1.sol:2615"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "updateFee",
@@ -1378,7 +1629,11 @@
             "slot": "5156",
             "type": "t_uint256",
             "contract": "NFT721Mint",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2616"
+=======
+            "src": "contracts\\buddyV1.sol:2616"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "mapTokenIds",
@@ -1386,7 +1641,11 @@
             "slot": "5157",
             "type": "t_mapping(t_uint256,t_mapping(t_address,t_array(t_uint256)dyn_storage))",
             "contract": "NFT721Mint",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2617"
+=======
+            "src": "contracts\\buddyV1.sol:2617"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "conversionAddress",
@@ -1394,7 +1653,11 @@
             "slot": "5158",
             "type": "t_address",
             "contract": "NFT721Mint",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2618"
+=======
+            "src": "contracts\\buddyV1.sol:2618"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "nextTokenId",
@@ -1402,7 +1665,11 @@
             "slot": "5159",
             "type": "t_uint256",
             "contract": "NFT721Mint",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2619"
+=======
+            "src": "contracts\\buddyV1.sol:2619"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "deviationPercentage",
@@ -1410,7 +1677,11 @@
             "slot": "5160",
             "type": "t_uint256",
             "contract": "NFT721Mint",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2620"
+=======
+            "src": "contracts\\buddyV1.sol:2620"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "______gap",
@@ -1418,7 +1689,11 @@
             "slot": "5161",
             "type": "t_array(t_uint256)1000_storage",
             "contract": "NFT721Mint",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:2927"
+=======
+            "src": "contracts\\buddyV1.sol:2927"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           },
           {
             "label": "_owner",
@@ -1426,7 +1701,11 @@
             "slot": "6161",
             "type": "t_address",
             "contract": "Ownable",
+<<<<<<< HEAD
             "src": "contracts\\buddyV3.sol:1702"
+=======
+            "src": "contracts\\buddyV1.sol:1702"
+>>>>>>> a097f013d2dd91ca164a329a1be041746e2c5007
           }
         ],
         "types": {
