@@ -40,8 +40,10 @@ async function main() {
     //// ************ DEPLOY CONVERSION **************/////
 
     const Conversion = await ethers.getContractFactory("Conversion");
-    const conversion = await upgrades.deployProxy(Conversion, { initializer: 'initialize' })
+    //const conversion = await upgrades.deployProxy(Conversion, { initializer: 'initialize' })
+    const conversion = await Conversion.deploy(Conversion);
     // await new Promise(res => setTimeout(res, 5000));
+    // const conversion = await Conversion.attach("0x460F02340B2001a2498C439d3187fc551e39bcAa");
     console.log("conversion proxy", conversion.address);
 
     //// ************ ADD PRICE FEED ADDRESS **************/////
@@ -67,7 +69,37 @@ async function main() {
     await new Promise(res => setTimeout(res, 5000));
     await conversion.adminUpdate(USX, Trace, router, factory);
     
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.getERC20Details(MATIC);
 
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.getERC20Details(USDC);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.getERC20Details(USDT);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.getERC20Details(USX);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.getERC20Details(Trace);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.getERC721Details("0xCe84fdE7c35CdFab56daf8f12208720917845d49");
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.getERC721Details("0x0E4721B6e54d11B640Da53a6b3C364759Ae76522");
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.getERC721Details("0x4682D8fBd1c136d7bDF67abb3cBF5c35bf1E8F96");
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.getERC721Details("0x798Df33C5a46C069D90cd82997e2B14B8f273Cca");
+    
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.getERC721Details("0x79D9dca73917d268c7C80ba27d4c555C903305dF");
+
+    await conversion.getERC721Details("0x17b66009Af459Dc8EbF37acF8a8b355379BE2FE5");
 
 }
 

@@ -1,6 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
 require('@openzeppelin/hardhat-upgrades')
-
+require("@nomiclabs/hardhat-etherscan");
 require("dotenv").config()
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -52,6 +52,9 @@ module.exports = {
       // },
       saveDeployments: true,
     },
+  },
+  etherscan: {
+    apiKey: "F3HN9IGWSZ5NYWEJBEM4Q214H2Q1BESN67"
   },
   solidity: {
     // version:  "0.7.6",

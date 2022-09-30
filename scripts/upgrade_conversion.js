@@ -1,7 +1,7 @@
 async function main() {
 
     const Conversion = await ethers.getContractFactory("Conversion")
-    let conversionProxy = await upgrades.upgradeProxy("0x0069d9D3c4d62273611AB06D79825ECFd8D393BF", Conversion)
+    let conversionProxy = await upgrades.upgradeProxy("0x7C6C2EAa88389E6aB48be96006F2a46c4027d8AB", Conversion)
     console.log("Your upgraded proxy is done!", conversionProxy.address);
     console.log(await conversionProxy.owner());
 }
