@@ -699,11 +699,11 @@ interface IERC721Metadata {
     function tokenURI(uint256 tokenId) external view returns (string memory);
 }
 
-contract ConversionV1 is Initializable, Ownable {
+contract Conversion is Initializable, Ownable {
     using SafeMathUpgradeable for uint256;
     address internal USX;
     address internal Trace;
-    address constant USD = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+    address constant USD = 0xb0040280A0C97F20C92c09513b8C6e6Ff9Aa86DC;
 
     QuickswapRouter router;
     QuickswapFactory factory;

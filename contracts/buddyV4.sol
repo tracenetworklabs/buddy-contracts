@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: UNLICENSED
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
 
@@ -345,6 +346,16 @@ interface IERC20 {
      * @dev Returns the name of token.
      */
     function name() external view returns (string memory);
+
+    /**
+     * @dev Returns the symbol of the token.
+     */
+    function symbol() external view returns (string memory);
+
+    /**
+     * @dev Returns the decimals places of the token.
+     */
+    function decimals() external view returns (uint256);
 
     /**
      * @dev Returns the amount of tokens in existence.
@@ -952,7 +963,7 @@ abstract contract ContextUpgradeable is Initializable {
     function __Context_init_unchained() internal initializer {}
 
     function _msgSender() internal view virtual returns (address payable) {
-        return payable(msg.sender);
+        return msg.sender;
     }
 
     function _msgData() internal view virtual returns (bytes memory) {
@@ -2596,7 +2607,6 @@ abstract contract NFT721Metadata is NFT721Creator {
 
     uint256[997] private ______gap;
 }
-pragma solidity ^0.7.0;
 
 abstract contract upgradeCheck {}
 // File contracts/mixins/NFT721Mint.sol
@@ -2644,7 +2654,8 @@ abstract contract NFT721Mint is
 
     event FeeUpdate(uint256 mintFee, uint256 uriUpdateFee);
 
-    event TokenUpdate(address indexed tokenAddress, bool status, uint256 freePassStatus);
+    event TokenUpdate(address indexed tokenAddress, bool status, uint256 freePassStatus, string tokenType,
+    string name, string symbol, uint256 decimal);
 
     event DeviationPercentageUpdate(uint256 percentage);
 
@@ -2880,9 +2891,9 @@ abstract contract NFT721Mint is
 
         _lock(tokenIds, collectionAddress, tokenId);
         _mint(msg.sender, tokenId);
-        _updateTokenCreator(tokenId, payable(msg.sender));
+        _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        nftIdPassStatus[paymentToken][feeAmount] = true;
+
         emit Minted(
             msg.sender,
             tokenId,
@@ -2921,11 +2932,9 @@ abstract contract NFT721Mint is
             nftIdPassStatus[paymentToken][feeAmount] = true;
         }
 
-        require(nftIdPassStatus[paymentToken][feeAmount] == false, "Buddy: Nft id already used");
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         _release(releaseTokenIds, releaseColAddresses, tokenId);
         _lock(tokenIds, collectionAddresses, tokenId);
-        nftIdPassStatus[paymentToken][feeAmount] = true;
 
         emit Updated(
             msg.sender,
@@ -2957,7 +2966,7 @@ pragma solidity ^0.7.0;
  * @title Buddy NFTs implemented using the ERC-721 standard.
  * @dev This top level file holds no data directly to ease future upgrades.
  */
-contract BuddyV4 is
+contract BuddyV5 is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Core,
@@ -3016,11 +3025,16 @@ contract BuddyV4 is
     function adminUpdateFeeToken(
         address _tokenAddress,
         bool status,
-        uint256 freepassStatus
+        uint256 freepassStatus,
+        string memory tokenType
     ) public onlyOwner {
         tokenAddress[_tokenAddress] = status;
         tokenFreePassStatus[_tokenAddress] = freepassStatus;
-        emit TokenUpdate(_tokenAddress, status, freepassStatus);
+        (string memory name, 
+         string memory symbol, 
+         uint256 decimal) = getTokenDetails(_tokenAddress, tokenType);
+        
+        emit TokenUpdate(_tokenAddress, status, freepassStatus, tokenType, name, symbol, decimal);
     }
 
     /**
@@ -3054,5 +3068,24 @@ contract BuddyV4 is
         override(ERC721Upgradeable, NFT721Creator, NFT721Metadata, NFT721Mint)
     {
         super._burn(tokenId);
+    }
+
+    function getTokenDetails(address _tokenAddress, string memory tokenType) public view returns(string memory , string memory, uint256) {
+       if(keccak256(abi.encodePacked((tokenType))) == keccak256(abi.encodePacked(("ERC721")))) {
+            string memory _name =  IERC721MetadataUpgradeable(_tokenAddress).name();
+            string memory _symbol = IERC721MetadataUpgradeable(_tokenAddress).symbol();
+            return (_name, _symbol, 0);
+        }
+        else { 
+            if(_tokenAddress!= address(0)) {
+                string memory _name = IERC20(_tokenAddress).name();
+                string memory _symbol = IERC20(_tokenAddress).symbol();
+                uint256 _decimal = IERC20(_tokenAddress).decimals();
+                return ( _name, _symbol, _decimal);
+            }
+            else {
+                return ("Matic", "Matic", 18);
+            }
+        }
     }
 }
